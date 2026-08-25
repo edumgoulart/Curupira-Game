@@ -1,17 +1,26 @@
-# Godot 4+ specific ignores
-.godot/
-.nomedia
+# ─── Godot 4 ───────────────────────────────────────────────
+# Cache de importação/compilação da engine. Regerado ao abrir o projeto.
+game/.godot/
+game/.nomedia
 
-# Godot-specific ignores
-.import/
-export.cfg
-export_credentials.cfg
+# Traduções importadas (geradas automaticamente a partir dos CSV)
+game/*.translation
+
+# ─── Builds / exports ──────────────────────────────────────
+game/build/
+*.pck
+*.exe
+
+# ─── .NET / Mono ───────────────────────────────────────────
+game/.mono/
+game/data_*/
+game/mono_crash.*.json
+
+# ─── Diversos ──────────────────────────────────────────────
 *.tmp
 
-# Imported translations (automatically generated from CSV files)
-*.translation
-
-# Mono-specific ignores
-.mono/
-data_*/
-mono_crash.*.json
+# ─── NÃO ignorar ───────────────────────────────────────────
+# Na Godot 4 os arquivos .import ficam ao lado do asset
+# (ex.: game/assets/curupira.png.import) e PRECISAM ser versionados:
+# sem eles a engine reimporta tudo e os UIDs mudam, quebrando as cenas.
+!*.import

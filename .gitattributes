@@ -1,0 +1,16 @@
+# ─── Git LFS ───────────────────────────────────────────────
+# Arte pesada não entra como blob normal no histórico.
+*.kra filter=lfs diff=lfs merge=lfs -text
+*.png filter=lfs diff=lfs merge=lfs -text
+
+# ─── Cenas e recursos da Godot ─────────────────────────────
+# Merge automático de .tscn/.tres não é confiável: o resultado
+# costuma abrir corrompido na engine. 'binary' desliga o merge
+# de linha, então o Git para e pede que alguém escolha uma
+# versão inteira. Como resolver: ver README (seção Merge).
+*.tscn binary
+*.tres binary
+
+# ─── Metadados de importação ───────────────────────────────
+# 'binary' = -diff -merge -text: sem diff textual e sem merge automático.
+*.import binary
