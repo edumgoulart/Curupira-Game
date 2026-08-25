@@ -39,9 +39,22 @@ e linhas de verdade em vez de descrever de memória.
 
 ## Estado atual
 
-O repositório é um **scaffold**: `game/` ainda não contém `project.godot`. Não
-existe código, cena ou asset ainda. Trabalho de faculdade em dupla, entregue ao
-longo de um semestre.
+Projeto Godot criado, ainda **sem conteúdo**: existe `game/project.godot`, mas
+não há cena, script nem asset. `game/scenes/`, `game/scripts/` e `game/assets/`
+estão vazias (só com `.gitkeep`). Nenhuma cena principal está definida, então
+rodar o jogo falha com `Can't run project: no main scene defined` — isso é
+esperado até a primeira cena existir.
+
+Trabalho de faculdade em dupla, entregue ao longo de um semestre.
+
+Configuração da engine em `game/project.godot`:
+
+- `config/name="Jogo Curupira"`, features `4.7` + `GL Compatibility`
+- **Renderer: `gl_compatibility`**, não Forward+. Decisão para rodar em máquina
+  fraca. Trocar isso altera como sprites e luzes 2D aparecem — não mude sem
+  combinar com a dupla.
+- `3d/physics_engine` e `rendering_device/driver.windows` são defaults da engine
+  e não têm efeito aqui (jogo 2D, Linux).
 
 ## A Godot abre `game/`, não a raiz
 
@@ -55,9 +68,57 @@ acima (não está no PATH):
 ```bash
 GODOT=../Godot_v4.7.1-stable_linux.x86_64
 
-$GODOT --path game/ --editor          # abrir o editor
-$GODOT --path game/                   # rodar o jogo
-$GODOT --path game/ --headless --quit # reimportar assets sem abrir a GUI
+$GODOT --path game/ --editor                   # abrir o editor
+$GODOT --path game/                            # rodar o jogo
+```
+
+Para verificar se o projeto está íntegro sem abrir a GUI, use
+`--editor --headless --quit`: ela escaneia o filesystem e sai com código 0.
+Sem o `--editor`, a engine tenta *rodar* o jogo e sai com código 1 enquanto não
+houver cena principal — o que não indica projeto quebrado.
+
+### Agentes: como rodar a Godot sem atrapalhar quem está usando o editor
+
+**Antes de rodar a engine, cheque se o editor já está aberto:**
+
+```bash
+pgrep -af Godot
+```
+
+Se estiver, **não rode nada contra `game/`**. Duas instâncias escrevendo em
+`game/.godot/` ao mesmo tempo disputam o cache do filesystem.
+
+Rodar a engine direto tem dois efeitos colaterais que atingem a máquina do
+usuário, fora do repositório:
+
+1. **Abre pop-up na tela dele.** Mesmo com `--headless`, a Godot chama o
+   `zenity` para mostrar erro em janela nativa — por exemplo o alerta de cena
+   principal ausente. `--headless` não impede isso.
+2. **Reescreve `~/.config/godot/editor_settings-4.7.tres`**, que são as
+   preferências globais do editor (tema, fonte, atalhos), compartilhadas com
+   todos os outros projetos Godot da máquina.
+
+Receita segura: copiar o projeto para fora do repositório, usar um
+`XDG_CONFIG_HOME` descartável e tirar o `DISPLAY`.
+
+```bash
+TMP=$(mktemp -d)
+cp -r game "$TMP/game" && rm -rf "$TMP/game/.godot"
+
+env -u DISPLAY -u WAYLAND_DISPLAY XDG_CONFIG_HOME="$TMP/cfg" \
+  "$GODOT" --path "$TMP/game" --editor --headless --quit
+```
+
+Sem `DISPLAY` o zenity falha com `Failed to open display` e nenhuma janela
+aparece, mas o erro real continua saindo no stderr. O `XDG_CONFIG_HOME` faz a
+engine gravar as preferências na pasta temporária em vez das do usuário. E como
+o `.godot/` é o da cópia, o cache do projeto de verdade não é tocado.
+
+Confirme com `md5sum` antes e depois que estes dois não mudaram:
+
+```bash
+~/.config/godot/editor_settings-4.7.tres
+game/.godot/editor/editor_layout.cfg
 ```
 
 Não há framework de teste configurado. Se for adicionar um, ele entra em
