@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://8lhfspgqww72"]
 
+[ext_resource type="PackedScene" uid="uid://belpnixegstgd" path="res://scenes/hello_a.tscn" id="1_l6cm7"]
+
 [node name="Control" type="Control" unique_id=754559773]
 layout_mode = 3
 anchors_preset = 15
@@ -27,3 +29,5 @@ layout_mode = 2
 
 [node name="Button4" type="Button" parent="VBoxContainer" unique_id=983986114]
 layout_mode = 2
+
+[node name="HelloA" parent="VBoxContainer" unique_id=1816631116 instance=ExtResource("1_l6cm7")]
