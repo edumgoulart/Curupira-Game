@@ -39,22 +39,43 @@ e linhas de verdade em vez de descrever de memória.
 
 ## Estado atual
 
-Projeto Godot criado, ainda **sem conteúdo**: existe `game/project.godot`, mas
-não há cena, script nem asset. `game/scenes/`, `game/scripts/` e `game/assets/`
-estão vazias (só com `.gitkeep`). Nenhuma cena principal está definida, então
-rodar o jogo falha com `Can't run project: no main scene defined` — isso é
-esperado até a primeira cena existir.
-
 Trabalho de faculdade em dupla, entregue ao longo de um semestre.
 
-Configuração da engine em `game/project.godot`:
+Três cenas em `game/scenes/`, ainda esqueléticas:
 
-- `config/name="Jogo Curupira"`, features `4.7` + `GL Compatibility`
-- **Renderer: `gl_compatibility`**, não Forward+. Decisão para rodar em máquina
-  fraca. Trocar isso altera como sprites e luzes 2D aparecem — não mude sem
-  combinar com a dupla.
-- `3d/physics_engine` e `rendering_device/driver.windows` são defaults da engine
-  e não têm efeito aqui (jogo 2D, Linux).
+| cena | raiz | conteúdo |
+|---|---|---|
+| `main_menu.tscn` | `Control` | `VBoxContainer` com 4 botões (`Novo Jogo`, `Continuar`, `Button3`, `Button4`) |
+| `level_select.tscn` | `Control` | vazia |
+| `level1.tscn` | `Node2D` | vazia |
+
+`run/main_scene` aponta para `main_menu.tscn` (via `uid://8lhfspgqww72`).
+Nenhum botão tem sinal conectado e **não existe script ainda** —
+`game/scripts/` e `game/assets/` seguem vazias, só com `.gitkeep`.
+
+### Renderer: Forward+
+
+O projeto nasceu em GL Compatibility e **foi trocado para Forward+**.
+
+Cuidado ao verificar isso: `forward_plus` é o padrão da engine, então a troca
+**apagou** a linha `renderer/rendering_method` de `project.godot` em vez de
+mudá-la. A ausência da linha *é* o Forward+ — quem procurar por `grep` não vai
+achar nada e pode concluir errado.
+
+Duas inconsistências ficaram para trás na troca, ambas inofensivas hoje:
+
+- `config/features` ainda lista `"GL Compatibility"`.
+- `renderer/rendering_method.mobile` continua `"gl_compatibility"` (o padrão
+  seria `"mobile"`). Só afetaria um export para celular.
+
+Forward+ exige **Vulkan**. A máquina onde o projeto foi trocado tem RTX 3050 +
+Intel UHD com ICDs instalados, então roda. Antes de assumir que vale para os
+dois, confirme que a máquina do outro integrante também tem Vulkan — em
+hardware antigo ou VM sem passthrough, Forward+ não sobe e GL Compatibility
+seria o caminho.
+
+`3d/physics_engine` e `rendering_device/driver.windows` são defaults da engine
+e não têm efeito aqui (jogo 2D, Linux).
 
 ## A Godot abre `game/`, não a raiz
 
@@ -74,8 +95,10 @@ $GODOT --path game/                            # rodar o jogo
 
 Para verificar se o projeto está íntegro sem abrir a GUI, use
 `--editor --headless --quit`: ela escaneia o filesystem e sai com código 0.
-Sem o `--editor`, a engine tenta *rodar* o jogo e sai com código 1 enquanto não
-houver cena principal — o que não indica projeto quebrado.
+
+Atenção: agora que `run/main_scene` existe, rodar sem `--editor` **abre a
+janela do jogo** na tela de quem estiver na máquina. Antes, sem cena principal,
+isso só gerava um erro. Agentes: não rode essa forma.
 
 ### Agentes: como rodar a Godot sem atrapalhar quem está usando o editor
 
