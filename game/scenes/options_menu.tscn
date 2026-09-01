@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://bix2h1cy55eu"]
+
+[ext_resource type="Script" uid="uid://dm88twr2ufgmi" path="res://scripts/options_menu.gd" id="1_liyum"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ijpji"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="Options" type="Control" unique_id=1631428257]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_liyum")
+
+[node name="Label" type="Label" parent="." unique_id=1946345476]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.4626736
+anchor_top = 0.18441358
+anchor_right = 0.5381944
+anchor_bottom = 0.18441358
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 26
+text = "Menu de opções"
+metadata/_edit_use_anchors_ = true
+
+[node name="Voltar" type="Button" parent="." unique_id=1543631112]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -62.0
+offset_top = -30.0
+offset_right = 62.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_ijpji")
+text = "Voltar"
+
+[connection signal="pressed" from="Voltar" to="." method="_on_voltar_pressed"]

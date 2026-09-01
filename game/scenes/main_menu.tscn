@@ -1,33 +1,68 @@
 [gd_scene format=3 uid="uid://8lhfspgqww72"]
 
-[ext_resource type="PackedScene" uid="uid://belpnixegstgd" path="res://scenes/hello_a.tscn" id="1_l6cm7"]
+[ext_resource type="Script" uid="uid://b17bdgg2g31q1" path="res://scripts/main_menu.gd" id="1_l6cm7"]
 
-[node name="Control" type="Control" unique_id=754559773]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l6cm7"]
+bg_color = Color(1, 1, 1, 1)
+
+[node name="Main Menu" type="Control" unique_id=754559773]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_l6cm7")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1673181407]
-layout_mode = 0
-offset_left = 547.0
-offset_top = 283.0
-offset_right = 638.0
-offset_bottom = 358.0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -93.0
+offset_top = -107.125
+offset_right = 93.0
+offset_bottom = 107.125
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
 alignment = 1
 
 [node name="Novo Jogo" type="Button" parent="VBoxContainer" unique_id=662351807]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
+text = "Novo jogo"
 
 [node name="Continuar" type="Button" parent="VBoxContainer" unique_id=1833861900]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
+text = "Continuar jogo"
 
-[node name="Button3" type="Button" parent="VBoxContainer" unique_id=440763041]
+[node name="Opcoes" type="Button" parent="VBoxContainer" unique_id=440763041]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
+text = "Opções"
 
-[node name="Button4" type="Button" parent="VBoxContainer" unique_id=983986114]
+[node name="Sair" type="Button" parent="VBoxContainer" unique_id=983986114]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
+text = "Sair"
 
-[node name="HelloA" parent="VBoxContainer" unique_id=1816631116 instance=ExtResource("1_l6cm7")]
+[connection signal="pressed" from="VBoxContainer/Novo Jogo" to="." method="_on_novo_jogo_pressed"]
+[connection signal="pressed" from="VBoxContainer/Continuar" to="." method="_on_continuar_pressed"]
+[connection signal="pressed" from="VBoxContainer/Opcoes" to="." method="_on_opcoes_pressed"]
+[connection signal="pressed" from="VBoxContainer/Sair" to="." method="_on_sair_pressed"]

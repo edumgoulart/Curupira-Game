@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://belpnixegstgd"]
-
-[ext_resource type="Script" uid="uid://d0ad08kv63j1q" path="res://scenes/hello_a.gd" id="1_wrsmq"]
-
-[node name="HelloA" type="Node2D" unique_id=1816631116]
-script = ExtResource("1_wrsmq")
