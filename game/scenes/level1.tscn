@@ -1,3 +1,39 @@
 [gd_scene format=3 uid="uid://x5gtkowxmddu"]
 
+[ext_resource type="PackedScene" uid="uid://cgscaaxbomnlu" path="res://scenes/curupira.tscn" id="1_g2h75"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rsrsk"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_rsrsk"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_5gxoi"]
+
 [node name="Node2D" type="Node2D" unique_id=548584006]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=673135974]
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=1824960003]
+position = Vector2(0, 265)
+physics_material_override = SubResource("PhysicsMaterial_rsrsk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=396065718]
+shape = SubResource("WorldBoundaryShape2D_rsrsk")
+
+[node name="Sprite2D" type="Sprite2D" parent="Floor" unique_id=1492973825]
+
+[node name="LeftWall" type="StaticBody2D" parent="." unique_id=1503441096]
+position = Vector2(-573, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall" unique_id=533410303]
+rotation = 1.5707964
+shape = SubResource("WorldBoundaryShape2D_5gxoi")
+
+[node name="RightWall" type="StaticBody2D" parent="." unique_id=255086197]
+position = Vector2(573, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall" unique_id=1743014974]
+rotation = 4.712389
+shape = SubResource("WorldBoundaryShape2D_5gxoi")
+
+[node name="Curupira" parent="." unique_id=722028489 instance=ExtResource("1_g2h75")]
+position = Vector2(-704, -368)

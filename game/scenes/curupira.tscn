@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://cgscaaxbomnlu"]
+
+[ext_resource type="Script" uid="uid://b254wjgbq6vsd" path="res://scripts/curupira.gd" id="1_38npl"]
+[ext_resource type="Texture2D" uid="uid://deqd8mnvn15uy" path="res://assets/char/idle_0.png" id="1_se248"]
+[ext_resource type="Texture2D" uid="uid://ca12ko0cdsiwo" path="res://assets/char/idle_3.png" id="2_38npl"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_se248")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_38npl")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"jump",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ixury"]
+radius = 16.0
+height = 60.0
+
+[node name="Curupira" type="CharacterBody2D" unique_id=722028489]
+position = Vector2(-55, -351)
+script = ExtResource("1_38npl")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=188185585]
+position = Vector2(201.75, 479.25)
+scale = Vector2(0.13793945, 0.12426758)
+sprite_frames = SubResource("SpriteFrames_wrsmq")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1661674320]
+position = Vector2(202, 543)
+shape = SubResource("CapsuleShape2D_ixury")
