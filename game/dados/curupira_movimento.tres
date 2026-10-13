@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="MovimentoData" format=3 uid="uid://b8r8xbjv8wljx"]
+
+[ext_resource type="Script" uid="uid://c5e7tusaokb4a" path="res://scripts/movimento_data.gd" id="1_kr4hm"]
+
+[resource]
+script = ExtResource("1_kr4hm")
+velocidade = 600.0
+velocidade_pulo = 1100.0
+gravidade = 2800.0
+distancia_dash = 300.0
+duracao_dash = 0.2
+recarga_dash = 0.8
+coyote_time = 0.1
+jump_buffer = 0.1
+corte_pulo = 0.5
