@@ -5,12 +5,26 @@
 [sub_resource type="CanvasTexture" id="CanvasTexture_1vb1h"]
 specular_color = Color(0.93046373, 0.59675264, 0.56647086, 1)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_folha"]
+radius = 12.0
+
 [node name="ProjectileBase" type="Area2D" unique_id=1876905377]
+collision_layer = 4
+collision_mask = 9
 script = ExtResource("1_5bkip")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1449060370]
+shape = SubResource("CircleShape2D_folha")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1906856156]
 texture = SubResource("CanvasTexture_1vb1h")
 
+[node name="VisualProvisorio" type="Polygon2D" parent="."]
+color = Color(0.3, 0.75, 0.25, 1)
+polygon = PackedVector2Array(-16, 0, -4, -8, 16, 0, -4, 8)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]

@@ -1,18 +1,16 @@
 [gd_scene format=3 uid="uid://cgscaaxbomnlu"]
 
 [ext_resource type="Script" uid="uid://b254wjgbq6vsd" path="res://scripts/curupira.gd" id="1_38npl"]
-[ext_resource type="Texture2D" uid="uid://deqd8mnvn15uy" path="res://assets/placeholder/char/idle_0.png" id="2_38npl"]
-[ext_resource type="Texture2D" uid="uid://ca12ko0cdsiwo" path="res://assets/placeholder/char/idle_3.png" id="3_qh6tu"]
 [ext_resource type="Resource" uid="uid://b8r8xbjv8wljx" path="res://dados/curupira_movimento.tres" id="4_mov"]
+[ext_resource type="Script" uid="uid://clbs5p7o6xlh4" path="res://scripts/atirador.gd" id="5_atir"]
+[ext_resource type="Texture2D" uid="uid://3cvibx4pvx86" path="res://assets/curupira.png" id="5_b0kjx"]
+[ext_resource type="Resource" uid="uid://ccami2t22011l" path="res://dados/ataques/tiro_de_folha.tres" id="6_folha"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_38npl")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_qh6tu")
+"texture": ExtResource("5_b0kjx")
 }],
 "loop": 1,
 "name": &"idle",
@@ -20,10 +18,7 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("2_38npl")
-}, {
-"duration": 1.0,
-"texture": ExtResource("3_qh6tu")
+"texture": ExtResource("5_b0kjx")
 }],
 "loop": 1,
 "name": &"jump",
@@ -31,22 +26,25 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ixury"]
-radius = 25.0
-height = 118.0
+radius = 20.0
+height = 128.0
 
 [node name="Curupira" type="CharacterBody2D" unique_id=722028489]
 position = Vector2(-55, -351)
 collision_layer = 2
-collision_mask = 1
 script = ExtResource("1_38npl")
 dados = ExtResource("4_mov")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=188185585]
-position = Vector2(201.75, 479.25)
-scale = Vector2(0.25, 0.25)
+position = Vector2(-4, -14)
+scale = Vector2(0.13476874, 0.13476874)
 sprite_frames = SubResource("SpriteFrames_wrsmq")
-animation = &"jump"
+animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1661674320]
-position = Vector2(202, 608)
 shape = SubResource("CapsuleShape2D_ixury")
+
+[node name="Atirador" type="Marker2D" parent="." unique_id=700014690]
+position = Vector2(45, -2)
+script = ExtResource("5_atir")
+ataque = ExtResource("6_folha")

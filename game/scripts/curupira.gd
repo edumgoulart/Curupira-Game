@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Curupira — movimento lateral com gravidade, game feel e dash.
+## Curupira — movimento lateral com gravidade, game feel, dash e ataque básico.
 ##
 ## Animações usadas (criar no SpriteFrames do AnimatedSprite2D com estes nomes exatos):
 ##   idle   — parado no chão
@@ -10,8 +10,6 @@ extends CharacterBody2D
 ## Se uma animação ainda não existir, o código só não troca para ela (não dá erro).
 
 enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH }
-
-const CENA_PROJETIL: PackedScene = preload("res://scenes/projectile_base.tscn")
 
 ## Valores de movimento (velocidade, pulo, gravidade, dash, game feel). Editar o .tres no inspetor.
 @export var dados: MovimentoData
@@ -29,6 +27,7 @@ var _tempo_recarga_dash: float = 0.0
 var _dash_aereo_disponivel: bool = true
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+@onready var atirador: Atirador = $Atirador
 
 
 func _ready() -> void:
@@ -50,10 +49,9 @@ func _physics_process(delta: float) -> void:
 	_atualizar_estado()
 	_atualizar_animacao()
 
-	# Provisório: o sistema de ataque (cadência, AtaqueData) vem num passo próprio.
-	# Não atira durante o dash.
-	if estado != Estado.DASH and Input.is_action_just_pressed("attack_basic"):
-		atirar()
+	# Segurar o botão atira sem parar; a cadência fica com o Atirador. Não atira durante o dash.
+	if estado != Estado.DASH and Input.is_action_pressed("attack_basic"):
+		atirador.tentar_atirar(olhando_para)
 
 
 ## Usado pelo sistema de dano: enquanto true, o Curupira não leva golpe.
@@ -185,10 +183,3 @@ func _tocar(nome: StringName) -> void:
 		return
 	if sprite.animation != nome or not sprite.is_playing():
 		sprite.play(nome)
-
-
-func atirar() -> void:
-	var projetil: Node2D = CENA_PROJETIL.instantiate()
-	get_parent().add_child(projetil)
-	projetil.global_position = global_position
-	projetil.direction = float(olhando_para)

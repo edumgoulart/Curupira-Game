@@ -168,7 +168,7 @@ rotation = 4.712389
 shape = SubResource("WorldBoundaryShape2D_5gxoi")
 
 [node name="Curupira" parent="." unique_id=722028489 instance=ExtResource("1_g2h75")]
-position = Vector2(-702, -368)
+position = Vector2(-554, 217)
 
 [node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1282430316]
 position = Vector2(-3, 138)

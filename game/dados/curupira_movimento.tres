@@ -4,12 +4,3 @@
 
 [resource]
 script = ExtResource("1_kr4hm")
-velocidade = 600.0
-velocidade_pulo = 1100.0
-gravidade = 2800.0
-distancia_dash = 300.0
-duracao_dash = 0.2
-recarga_dash = 0.8
-coyote_time = 0.1
-jump_buffer = 0.1
-corte_pulo = 0.5

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AtaqueData" format=3 uid="uid://ccami2t22011l"]
+
+[ext_resource type="Script" uid="uid://ctxn0hif3pl2o" path="res://scripts/ataque_data.gd" id="1_atq"]
+[ext_resource type="PackedScene" uid="uid://d0jqbwe0xx7yu" path="res://scenes/projectile_base.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1_atq")
+nome = "Tiro de Folha"
+dano = 4
+tiros_por_segundo = 5.0
+carga_por_acerto = 1
+velocidade_projetil = 1800.0
+cena_projetil = ExtResource("2_proj")
