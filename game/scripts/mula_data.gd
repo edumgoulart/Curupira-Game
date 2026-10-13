@@ -1,23 +1,9 @@
 class_name MulaData
-extends Resource
+extends ChefeData
 ## Números da Mula sem Cabeça. Os marcados "GDD" vêm da tabela de chefes do GDD;
 ## os "provisório" foram combinados com o Arthur e devem ser ajustados testando.
-
-@export_group("Identidade (GDD)")
-## Nome mostrado na tela de vitória.
-@export var nome: String = "Mula sem Cabeça"
-## Id do progresso no GameState (fase1 = Mula, fase2 = Cuca, fase3 = Boto, boss = Máquina).
-@export var id_progresso: String = "fase1"
-## Ataques que o Curupira ganha ao vencer (texto da tela de vitória). GDD: Bola de Fogo e Canhão Flamejante.
-@export var recompensa: String = "Bola de Fogo e Canhão Flamejante"
-
-@export_group("Geral (GDD)")
-## Vida da Mula. GDD: 1200.
-@export var vida: int = 1200
-## Pausa entre um ataque e o próximo (s). GDD: 1,2.
-@export_range(0.0, 5.0, 0.05, "suffix:s") var pausa_entre_ataques: float = 1.2
-## Golpes tirados do Curupira ao encostar no corpo da Mula. Provisório (combinado): 1.
-@export var golpes_contato: int = 1
+## Nome, vida (GDD: 1200), pausa entre ataques (GDD: 1,2 s) e contato ficam em ChefeData
+## e estão preenchidos no mula.tres.
 
 @export_group("Três bolas de fogo")
 ## Aviso antes da primeira bola (s). GDD: 0,5.

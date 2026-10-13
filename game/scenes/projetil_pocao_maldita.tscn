@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bxa47bvr5vvu0"]
+
+[ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
+[ext_resource type="PackedScene" uid="uid://cou73y4f40q1p" path="res://scenes/respingo_veneno.tscn" id="2_resp"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pocao"]
+radius = 30.0
+
+[node name="PocaoMaldita" type="Area2D"]
+collision_layer = 4
+collision_mask = 9
+script = ExtResource("1_proj")
+cena_impacto = ExtResource("2_resp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_pocao")
+
+[node name="VisualProvisorio" type="Polygon2D" parent="."]
+color = Color(0.4, 0.9, 0.25, 0.3)
+polygon = PackedVector2Array(44, 0, 41.6, 12.4, 34.5, 23.5, 23.4, 32.4, 9.5, 38, -6, 40, -21.5, 38, -35.4, 32.4, -46.5, 23.5, -53.6, 12.4, -56, 0, -53.6, -12.4, -46.5, -23.5, -35.4, -32.4, -21.5, -38, -6, -40, 9.5, -38, 23.4, -32.4, 34.5, -23.5, 41.6, -12.4)
+
+[node name="Frasco" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.45, 0.2, 0.65, 1)
+polygon = PackedVector2Array(26, 6, 24.4, 14.9, 19.9, 22.7, 13, 28.5, 4.5, 31.6, -4.5, 31.6, -13, 28.5, -19.9, 22.7, -24.4, 14.9, -26, 6, -24.4, -2.9, -19.9, -10.7, -13, -16.5, -4.5, -19.6, 4.5, -19.6, 13, -16.5, 19.9, -10.7, 24.4, -2.9)
+
+[node name="Liquido" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.4, 0.95, 0.3, 1)
+polygon = PackedVector2Array(-22, 10, 22, 10, 18, 22, 8, 30, -8, 30, -18, 22)
+
+[node name="Gargalo" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.75, 0.85, 0.8, 1)
+polygon = PackedVector2Array(-8, -32, 8, -32, 8, -16, -8, -16)
+
+[node name="Rolha" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.45, 0.28, 0.12, 1)
+polygon = PackedVector2Array(-9, -40, 9, -40, 9, -32, -9, -32)
+
+[node name="Caveira" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.95, 0.92, 0.82, 1)
+polygon = PackedVector2Array(9, -2, 7.8, 2, 4.5, 4.9, 0, 6, -4.5, 4.9, -7.8, 2, -9, -2, -7.8, -6, -4.5, -8.9, -0, -10, 4.5, -8.9, 7.8, -6)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-56, -46, 106, 92)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]

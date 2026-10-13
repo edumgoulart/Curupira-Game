@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://732vscxrtr21"]
+
+[ext_resource type="Script" uid="uid://cdhwfgmfly81c" path="res://scripts/poca_cuca.gd" id="1_poca"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_poca"]
+size = Vector2(260, 30)
+
+[node name="PocaCuca" type="Area2D"]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1_poca")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -15)
+shape = SubResource("RectangleShape2D_poca")
+
+[node name="Veneno" type="Polygon2D" parent="."]
+color = Color(0.3, 0.8, 0.15, 0.82)
+polygon = PackedVector2Array(130, -6, 126.7, -2.4, 117.1, 0.9, 101.6, 4, 81.1, 6.5, 56.4, 8.4, 28.9, 9.6, 0, 10, -28.9, 9.6, -56.4, 8.4, -81.1, 6.5, -101.6, 4, -117.1, 0.9, -126.7, -2.4, -130, -6, -126.7, -9.6, -117.1, -12.9, -101.6, -16, -81.1, -18.5, -56.4, -20.4, -28.9, -21.6, -0, -22, 28.9, -21.6, 56.4, -20.4, 81.1, -18.5, 101.6, -16, 117.1, -12.9, 126.7, -9.6)
+
+[node name="Bolha1" type="Polygon2D" parent="Veneno"]
+color = Color(0.7, 1, 0.45, 0.9)
+polygon = PackedVector2Array(-61, -14, -62.7, -8.7, -67.2, -5.4, -72.8, -5.4, -77.3, -8.7, -79, -14, -77.3, -19.3, -72.8, -22.6, -67.2, -22.6, -62.7, -19.3)
+
+[node name="Bolha2" type="Polygon2D" parent="Veneno"]
+color = Color(0.7, 1, 0.45, 0.9)
+polygon = PackedVector2Array(-4, -10, -5.1, -6.5, -8.1, -4.3, -11.9, -4.3, -14.9, -6.5, -16, -10, -14.9, -13.5, -11.9, -15.7, -8.1, -15.7, -5.1, -13.5)
+
+[node name="Bolha3" type="Polygon2D" parent="Veneno"]
+color = Color(0.7, 1, 0.45, 0.9)
+polygon = PackedVector2Array(55, -16, 53.1, -10.1, 48.1, -6.5, 41.9, -6.5, 36.9, -10.1, 35, -16, 36.9, -21.9, 41.9, -25.5, 48.1, -25.5, 53.1, -21.9)
+
+[node name="Bolha4" type="Polygon2D" parent="Veneno"]
+color = Color(0.7, 1, 0.45, 0.9)
+polygon = PackedVector2Array(100, -9, 99, -6.1, 96.5, -4.2, 93.5, -4.2, 91, -6.1, 90, -9, 91, -11.9, 93.5, -13.8, 96.5, -13.8, 99, -11.9)
+
+[node name="Lentidao" type="Polygon2D" parent="."]
+color = Color(0.45, 0.3, 0.9, 0.8)
+polygon = PackedVector2Array(130, -6, 126.7, -2.4, 117.1, 0.9, 101.6, 4, 81.1, 6.5, 56.4, 8.4, 28.9, 9.6, 0, 10, -28.9, 9.6, -56.4, 8.4, -81.1, 6.5, -101.6, 4, -117.1, 0.9, -126.7, -2.4, -130, -6, -126.7, -9.6, -117.1, -12.9, -101.6, -16, -81.1, -18.5, -56.4, -20.4, -28.9, -21.6, -0, -22, 28.9, -21.6, 56.4, -20.4, 81.1, -18.5, 101.6, -16, 117.1, -12.9, 126.7, -9.6)
+
+[node name="Bolha1" type="Polygon2D" parent="Lentidao"]
+color = Color(0.8, 0.7, 1, 0.9)
+polygon = PackedVector2Array(-61, -14, -62.7, -8.7, -67.2, -5.4, -72.8, -5.4, -77.3, -8.7, -79, -14, -77.3, -19.3, -72.8, -22.6, -67.2, -22.6, -62.7, -19.3)
+
+[node name="Bolha2" type="Polygon2D" parent="Lentidao"]
+color = Color(0.8, 0.7, 1, 0.9)
+polygon = PackedVector2Array(-4, -10, -5.1, -6.5, -8.1, -4.3, -11.9, -4.3, -14.9, -6.5, -16, -10, -14.9, -13.5, -11.9, -15.7, -8.1, -15.7, -5.1, -13.5)
+
+[node name="Bolha3" type="Polygon2D" parent="Lentidao"]
+color = Color(0.8, 0.7, 1, 0.9)
+polygon = PackedVector2Array(55, -16, 53.1, -10.1, 48.1, -6.5, 41.9, -6.5, 36.9, -10.1, 35, -16, 36.9, -21.9, 41.9, -25.5, 48.1, -25.5, 53.1, -21.9)
+
+[node name="Bolha4" type="Polygon2D" parent="Lentidao"]
+color = Color(0.8, 0.7, 1, 0.9)
+polygon = PackedVector2Array(100, -9, 99, -6.1, 96.5, -4.2, 93.5, -4.2, 91, -6.1, 90, -9, 91, -11.9, 93.5, -13.8, 96.5, -13.8, 99, -11.9)
+

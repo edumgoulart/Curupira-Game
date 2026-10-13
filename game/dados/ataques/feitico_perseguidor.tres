@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AtaqueData" format=3 uid="uid://g1pputhpptgw"]
+
+[ext_resource type="Script" uid="uid://ctxn0hif3pl2o" path="res://scripts/ataque_data.gd" id="1_atq"]
+[ext_resource type="PackedScene" uid="uid://c8hi7hdk43ref" path="res://scenes/projetil_feitico_perseguidor.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1_atq")
+nome = "Feitiço Perseguidor"
+dano = 3
+tiros_por_segundo = 4.0
+carga_por_acerto = 1
+velocidade_projetil = 900.0
+cena_projetil = ExtResource("2_proj")
+curva = 540.0
+duracao_maxima = 3.0
+fase_que_libera = "fase2"

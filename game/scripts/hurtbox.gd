@@ -6,6 +6,8 @@ extends Area2D
 ## Layer/mask são configurados na cena: hurtbox de inimigo no layer "enemy", do Curupira no "player".
 
 signal golpe_recebido(amount: int, from: Node)
+## Efeito de estado (GDD: envenenamento, lentidão). O dono decide o que fazer com ele.
+signal efeito_recebido(efeito: StringName, intensidade: float, duracao: float)
 
 ## false = nenhuma hitbox enxerga esta hurtbox (ex.: Curupira invencível).
 ## Desliga as formas de colisão, e não o monitorable: testado no Godot 4.7, religar o
@@ -22,3 +24,9 @@ var ligada: bool = true:
 
 func take_damage(amount: int, from: Node) -> void:
 	golpe_recebido.emit(amount, from)
+
+
+## Quem causa o efeito só chama isto, sem saber quem é o dono (igual ao take_damage).
+## Ex.: &"veneno" com intensidade = dano por segundo.
+func aplicar_efeito(efeito: StringName, intensidade: float, duracao: float) -> void:
+	efeito_recebido.emit(efeito, intensidade, duracao)

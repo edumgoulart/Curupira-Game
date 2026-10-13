@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://c8hi7hdk43ref"]
+
+[ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_perseguidor"]
+radius = 14.0
+
+[node name="FeiticoPerseguidor" type="Area2D"]
+collision_layer = 4
+collision_mask = 9
+script = ExtResource("1_proj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_perseguidor")
+
+[node name="VisualProvisorio" type="Polygon2D" parent="."]
+color = Color(0.45, 0.95, 0.35, 0.5)
+polygon = PackedVector2Array(-36, 0, -10, -12, 8, -14, 18, 0, 8, 14, -10, 12)
+
+[node name="Orbe" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.4, 0.95, 0.3, 1)
+polygon = PackedVector2Array(17, 0, 15.7, 5.6, 12.1, 10.2, 6.9, 12.7, 1.1, 12.7, -4.1, 10.2, -7.7, 5.6, -9, 0, -7.7, -5.6, -4.1, -10.2, 1.1, -12.7, 6.9, -12.7, 12.1, -10.2, 15.7, -5.6)
+
+[node name="Miolo" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.75, 0.5, 1, 1)
+polygon = PackedVector2Array(12, 0, 10.9, 3.5, 7.9, 5.7, 4.1, 5.7, 1.1, 3.5, 0, 0, 1.1, -3.5, 4.1, -5.7, 7.9, -5.7, 10.9, -3.5)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-38, -16, 58, 32)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]

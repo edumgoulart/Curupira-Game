@@ -8,6 +8,7 @@ extends Control
 ## fase3 = Boto cor-de-rosa, boss = Máquina (liberada depois dos três).
 
 const CENA_MULA: String = "res://scenes/level1.tscn"
+const CENA_CUCA: String = "res://scenes/level2.tscn"
 const CATALOGO: CatalogoAtaques = preload("res://dados/ataques/catalogo.tres")
 
 var _basicos: Array[AtaqueData] = []
@@ -16,6 +17,7 @@ var _i_basico: int = 0
 var _i_especial: int = 0
 
 @onready var mula: Button = %Mula
+@onready var cuca: Button = %Cuca
 @onready var maquina: Button = %Maquina
 @onready var basico: Button = %Basico
 @onready var especial: Button = %Especial
@@ -27,6 +29,8 @@ var _i_especial: int = 0
 func _ready() -> void:
 	if GameState.concluiu("fase1"):
 		mula.text += "  (derrotada)"
+	if GameState.concluiu("fase2"):
+		cuca.text += "  (derrotada)"
 	# A Máquina só libera depois dos três; mesmo liberada, a fase ainda não existe.
 	if GameState.boss_liberado():
 		maquina.text = "Máquina de IA — em breve"
@@ -97,8 +101,12 @@ func _atualizar_textos() -> void:
 	basico.text = "Básico: " + _com_setas(b.nome, _basicos.size())
 	especial.text = "Especial: " + _com_setas(e.nome, _especiais.size())
 	detalhe_basico.text = "%d de dano · %s tiros/s · +%d de carga por acerto" % [b.dano, _numero(b.tiros_por_segundo), b.carga_por_acerto]
+	if b.curva > 0.0:
+		detalhe_basico.text += " · persegue o chefe"
 	if e.duracao_disparo > 0.0:
 		detalhe_especial.text = "até %d de dano em %s s · fica parado disparando" % [e.dano, _numero(e.duracao_disparo)]
+	elif e.veneno_por_segundo > 0:
+		detalhe_especial.text = "%d de dano + veneno de %d/s por %s s" % [e.dano, e.veneno_por_segundo, _numero(e.duracao_veneno)]
 	else:
 		detalhe_especial.text = "%d de dano" % e.dano
 
@@ -118,6 +126,10 @@ func _numero(valor: float) -> String:
 
 func _on_mula_pressed() -> void:
 	get_tree().change_scene_to_file(CENA_MULA)
+
+
+func _on_cuca_pressed() -> void:
+	get_tree().change_scene_to_file(CENA_CUCA)
 
 
 func _on_voltar_pressed() -> void:

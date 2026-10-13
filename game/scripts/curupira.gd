@@ -34,6 +34,8 @@ var _tempo_invencivel: float = 0.0
 var _tempo_especial: float = 0.0
 # No ar só pode um dash por pulo; volta a valer ao tocar o chão.
 var _dash_aereo_disponivel: bool = true
+# Lentidão ativa: quem está deixando lento (ex.: poça da Cuca) -> fator de velocidade.
+var _lentidoes: Dictionary = {}
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var atirador: Atirador = $Atirador
@@ -83,7 +85,7 @@ func _physics_process(delta: float) -> void:
 	# Não atira durante o dash, disparando um especial nem derrotado.
 	var pode_atirar: bool = estado != Estado.DASH and estado != Estado.ESPECIAL and estado != Estado.DERROTADO
 	if pode_atirar and Input.is_action_pressed("attack_basic"):
-		atirador.tentar_atirar(olhando_para)
+		atirador.tentar_atirar(olhando_para, fator_lentidao())
 	# Especial: só com a barra cheia; disparar zera a barra.
 	if pode_atirar and Input.is_action_just_pressed("attack_special") and carga.esta_cheia():
 		atirador.atirar_especial(olhando_para)
@@ -92,6 +94,27 @@ func _physics_process(delta: float) -> void:
 		if atirador.especial.duracao_disparo > 0.0:
 			estado = Estado.ESPECIAL
 			_tempo_especial = atirador.especial.duracao_disparo
+
+
+## Lentidão (GDD: deixa movimentos e ataques mais lentos). Quem deixa lento chama
+## aplicar_lentidao ao encostar e remover_lentidao ao sair. Pulo e dash não mudam.
+func aplicar_lentidao(fonte: Node, fator: float) -> void:
+	_lentidoes[fonte] = fator
+	sprite.self_modulate = Color(0.7, 0.75, 1.3)  # azulado enquanto lento (só visual)
+
+
+func remover_lentidao(fonte: Node) -> void:
+	_lentidoes.erase(fonte)
+	if _lentidoes.is_empty():
+		sprite.self_modulate = Color.WHITE
+
+
+## 1 = normal; 0,6 = 40% mais lento. Com duas fontes ao mesmo tempo, vale a mais forte.
+func fator_lentidao() -> float:
+	var fator: float = 1.0
+	for f in _lentidoes.values():
+		fator = minf(fator, f)
+	return fator
 
 
 ## Chamado pela Hurtbox quando uma hitbox de inimigo encosta.
@@ -186,7 +209,7 @@ func _mover_horizontal() -> void:
 	# get_axis já anula esquerda + direita juntas. signf deixa o analógico com
 	# velocidade fixa (sem "andar devagar" com o analógico meio inclinado).
 	var direcao: float = signf(Input.get_axis("move_left", "move_right"))
-	velocity.x = direcao * dados.velocidade
+	velocity.x = direcao * dados.velocidade * fator_lentidao()
 	if direcao != 0.0:
 		olhando_para = int(direcao)
 		sprite.flip_h = olhando_para < 0

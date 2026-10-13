@@ -17,6 +17,11 @@ extends Resource
 @export var pulsos: int = 0
 ## Pontos de carga para poder disparar. GDD: a barra tem 100 pontos.
 @export var carga_necessaria: int = 100
+## Veneno aplicado no chefe ao acertar (dano por segundo). 0 = sem veneno.
+## Poção Maldita (GDD): 20 por segundo.
+@export var veneno_por_segundo: int = 0
+## Duração do veneno (s); reaplicar só renova o tempo. Poção Maldita (GDD): 8.
+@export var duracao_veneno: float = 0.0
 ## Cena do especial: um Projetil (sai voando) ou um FeixeCanhao (preso ao Curupira).
 @export var cena_projetil: PackedScene
 ## Fase cujo chefe libera este especial ("" = especial inicial). Ex.: "fase1" = Mula sem Cabeça.

@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://0m08yvlvv41c"]
+
+[ext_resource type="Script" uid="uid://b4yma15hm2k3p" path="res://scripts/cuca.gd" id="1_cuca"]
+[ext_resource type="Resource" uid="uid://bnkyhs3er0hpi" path="res://dados/chefes/cuca.tres" id="2_dados"]
+[ext_resource type="Texture2D" uid="uid://drqctfj4ooyxr" path="res://assets/cuca.png" id="3_qxdtv"]
+[ext_resource type="Script" uid="uid://ksseueomg1ru" path="res://scripts/vida.gd" id="3_vida"]
+[ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="4_hurt"]
+[ext_resource type="Script" uid="uid://d3vtyqb5tvlwv" path="res://scripts/hitbox.gd" id="5_hit"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_76oae"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_qxdtv")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
+size = Vector2(200, 420)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_contato"]
+size = Vector2(170, 380)
+
+[node name="Cuca" type="Node2D" unique_id=1865095803]
+script = ExtResource("1_cuca")
+dados = ExtResource("2_dados")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1305944791]
+position = Vector2(0, -25)
+scale = Vector2(0.33, 0.33)
+sprite_frames = SubResource("SpriteFrames_76oae")
+animation = &"idle"
+
+[node name="Vida" type="Node" parent="." unique_id=2122042039]
+script = ExtResource("3_vida")
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=1951728824]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("4_hurt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=1725066729]
+shape = SubResource("RectangleShape2D_hurtbox")
+
+[node name="Contato" type="Area2D" parent="." unique_id=1287175069]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_hit")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contato" unique_id=1727515297]
+position = Vector2(0, 10)
+shape = SubResource("RectangleShape2D_contato")
+
+[node name="Mao" type="Marker2D" parent="." unique_id=247007808]
+position = Vector2(-115, 0)
+
+[node name="Pe" type="Marker2D" parent="." unique_id=2058917083]
+position = Vector2(0, 211)

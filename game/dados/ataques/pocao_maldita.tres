@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecialData" format=3 uid="uid://kk1faua6wkvr"]
+
+[ext_resource type="Script" uid="uid://cj38o0p86nmco" path="res://scripts/especial_data.gd" id="1_esp"]
+[ext_resource type="PackedScene" uid="uid://bxa47bvr5vvu0" path="res://scenes/projetil_pocao_maldita.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1_esp")
+nome = "Poção Maldita"
+dano = 40
+velocidade_projetil = 1000.0
+carga_necessaria = 100
+veneno_por_segundo = 20
+duracao_veneno = 8.0
+cena_projetil = ExtResource("2_proj")
+fase_que_libera = "fase2"

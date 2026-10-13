@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="CucaData" format=3 uid="uid://bnkyhs3er0hpi"]
+
+[ext_resource type="Script" uid="uid://vflqed8f5r14" path="res://scripts/cuca_data.gd" id="1_dados"]
+[ext_resource type="PackedScene" uid="uid://cnnh7jq8ty8lm" path="res://scenes/feitico_cuca.tscn" id="2_feitico"]
+[ext_resource type="PackedScene" uid="uid://ckmo8xb0ct3ue" path="res://scenes/pocao_cuca.tscn" id="3_pocao"]
+[ext_resource type="PackedScene" uid="uid://732vscxrtr21" path="res://scenes/poca_cuca.tscn" id="4_poca"]
+
+[resource]
+script = ExtResource("1_dados")
+nome = "Cuca"
+id_progresso = "fase2"
+recompensa = "Feitiço Perseguidor e Poção Maldita"
+vida = 1600
+pausa_entre_ataques = 1.6
+golpes_contato = 1
+aviso_feitico = 0.5
+golpes_feitico = 1
+quantidade_feiticos = 3
+abertura_feitico = 15.0
+velocidade_feitico = 700.0
+cena_feitico = ExtResource("2_feitico")
+aviso_pocao = 0.6
+parada_apos_pocao = 1.5
+velocidade_horizontal_pocao = 600.0
+gravidade_pocao = 1800.0
+cena_pocao = ExtResource("3_pocao")
+duracao_poca = 5.0
+max_pocas = 2
+tempo_veneno = 1.0
+golpes_veneno = 1
+lentidao = 0.4
+cena_poca = ExtResource("4_poca")

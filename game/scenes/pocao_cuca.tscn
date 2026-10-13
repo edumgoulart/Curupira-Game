@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://ckmo8xb0ct3ue"]
+
+[ext_resource type="Script" uid="uid://ceew40l853ixf" path="res://scripts/pocao_cuca.gd" id="1_pocao"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pocao"]
+radius = 14.0
+
+[node name="PocaoCuca" type="Area2D"]
+collision_layer = 16
+collision_mask = 1
+script = ExtResource("1_pocao")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_pocao")
+
+[node name="Veneno" type="Polygon2D" parent="."]
+color = Color(0.35, 0.85, 0.2, 1)
+polygon = PackedVector2Array(16, 4, 14.8, 10.1, 11.3, 15.3, 6.1, 18.8, 0, 20, -6.1, 18.8, -11.3, 15.3, -14.8, 10.1, -16, 4, -14.8, -2.1, -11.3, -7.3, -6.1, -10.8, -0, -12, 6.1, -10.8, 11.3, -7.3, 14.8, -2.1)
+
+[node name="Gargalo" type="Polygon2D" parent="Veneno"]
+color = Color(0.75, 0.85, 0.8, 1)
+polygon = PackedVector2Array(-6, -20, 6, -20, 6, -8, -6, -8)
+
+[node name="Rolha" type="Polygon2D" parent="Veneno"]
+color = Color(0.45, 0.28, 0.12, 1)
+polygon = PackedVector2Array(-7, -27, 7, -27, 7, -20, -7, -20)
+
+[node name="Lentidao" type="Polygon2D" parent="."]
+color = Color(0.55, 0.35, 0.95, 1)
+polygon = PackedVector2Array(16, 4, 14.8, 10.1, 11.3, 15.3, 6.1, 18.8, 0, 20, -6.1, 18.8, -11.3, 15.3, -14.8, 10.1, -16, 4, -14.8, -2.1, -11.3, -7.3, -6.1, -10.8, -0, -12, 6.1, -10.8, 11.3, -7.3, 14.8, -2.1)
+
+[node name="Gargalo" type="Polygon2D" parent="Lentidao"]
+color = Color(0.75, 0.85, 0.8, 1)
+polygon = PackedVector2Array(-6, -20, 6, -20, 6, -8, -6, -8)
+
+[node name="Rolha" type="Polygon2D" parent="Lentidao"]
+color = Color(0.45, 0.28, 0.12, 1)
+polygon = PackedVector2Array(-7, -27, 7, -27, 7, -20, -7, -20)
+

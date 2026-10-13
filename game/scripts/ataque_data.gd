@@ -15,5 +15,10 @@ extends Resource
 @export var velocidade_projetil: float = 1000.0
 ## Cena do projétil disparado.
 @export var cena_projetil: PackedScene
+## Quanto o projétil consegue virar atrás do chefe (graus/s). 0 = reto.
+## Feitiço Perseguidor (combinado): 540.
+@export var curva: float = 0.0
+## Tempo máximo do projétil no ar (s). 0 = até sair da tela. Perseguidor (combinado): 3.
+@export var duracao_maxima: float = 0.0
 ## Fase cujo chefe libera este ataque ("" = ataque inicial). Ex.: "fase1" = Mula sem Cabeça.
 @export var fase_que_libera: String = ""

@@ -33,15 +33,19 @@ func _physics_process(delta: float) -> void:
 
 ## Chamado a cada frame enquanto o botão de ataque está segurado.
 ## Só dispara se a recarga (1 / tiros_por_segundo) já passou.
-func tentar_atirar(direcao: int) -> void:
+## multiplicador < 1 deixa a cadência mais lenta (lentidão da poça da Cuca).
+func tentar_atirar(direcao: int, multiplicador: float = 1.0) -> void:
 	if ataque == null:
 		return
 	# is_zero_approx: mesmo motivo do dash — 0,2 - 12 × (1/60) não dá 0 exato em float.
 	if _tempo_recarga > 0.0 and not is_zero_approx(_tempo_recarga):
 		return
-	_tempo_recarga = 1.0 / ataque.tiros_por_segundo
+	_tempo_recarga = 1.0 / (ataque.tiros_por_segundo * multiplicador)
 
 	var projetil: Projetil = _criar(ataque.cena_projetil, ataque.dano, ataque.velocidade_projetil, direcao)
+	projetil.curva = ataque.curva
+	projetil.duracao_maxima = ataque.duracao_maxima
+	_lancar(projetil)
 	# Só o básico carrega o especial: cada acerto soma a carga do ataque equipado.
 	var carga: int = ataque.carga_por_acerto
 	projetil.acertou.connect(func(_alvo: Area2D) -> void: acerto_basico.emit(carga))
@@ -60,14 +64,22 @@ func atirar_especial(direcao: int) -> void:
 		add_child(no)
 	else:
 		no.free()
-		_criar(especial.cena_projetil, especial.dano, especial.velocidade_projetil, direcao)
+		var projetil: Projetil = _criar(especial.cena_projetil, especial.dano, especial.velocidade_projetil, direcao)
+		projetil.veneno_por_segundo = especial.veneno_por_segundo
+		projetil.duracao_veneno = especial.duracao_veneno
+		_lancar(projetil)
 
 
+## Cria o projétil SEM pôr na cena: quem chama ainda preenche curva/veneno antes,
+## porque o _ready do projétil já usa esses valores.
 func _criar(cena: PackedScene, dano: int, velocidade: float, direcao: int) -> Projetil:
 	position.x = _x_base * direcao
 	var projetil: Projetil = cena.instantiate()
 	projetil.configurar(dano, velocidade, float(direcao))
 	projetil.global_position = global_position
+	return projetil
+
+
+func _lancar(projetil: Projetil) -> void:
 	# Projétil vai para a cena atual, não para o Curupira: assim não anda junto com ele.
 	get_tree().current_scene.add_child(projetil)
-	return projetil
