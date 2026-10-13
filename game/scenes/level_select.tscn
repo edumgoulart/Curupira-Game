@@ -18,7 +18,7 @@ script = ExtResource("1_3shnc")
 layout_mode = 1
 
 [node name="Painel" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(820, 0)
+custom_minimum_size = Vector2(900, 0)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -30,42 +30,7 @@ grow_vertical = 2
 
 [node name="Caixa" type="VBoxContainer" parent="Painel"]
 layout_mode = 2
-theme_override_constants/separation = 14
-
-[node name="Label" type="Label" parent="Painel/Caixa" unique_id=814406697]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
-theme_override_font_sizes/font_size = 60
-text = "Escolha o chefe"
-horizontal_alignment = 1
-
-[node name="Mula" type="Button" parent="Painel/Caixa"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-text = "Mula sem Cabeça"
-
-[node name="Cuca" type="Button" parent="Painel/Caixa"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-disabled = true
-text = "Cuca — em breve"
-
-[node name="Boto" type="Button" parent="Painel/Caixa"]
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-disabled = true
-text = "Boto cor-de-rosa — em breve"
-
-[node name="Maquina" type="Button" parent="Painel/Caixa"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 72)
-layout_mode = 2
-disabled = true
-text = "Máquina de IA — derrote os três"
-
-[node name="Separador" type="HSeparator" parent="Painel/Caixa"]
-layout_mode = 2
+theme_override_constants/separation = 10
 
 [node name="AtaquesTitulo" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
@@ -74,31 +39,83 @@ theme_override_font_sizes/font_size = 34
 text = "Ataques levados para a luta"
 horizontal_alignment = 1
 
-[node name="Basico" type="Label" parent="Painel/Caixa"]
+[node name="Basico" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
 text = "Básico: Tiro de Folha"
+
+[node name="DetalheBasico" type="Label" parent="Painel/Caixa"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
+theme_override_font_sizes/font_size = 22
+text = ""
 horizontal_alignment = 1
 
-[node name="Especial" type="Label" parent="Painel/Caixa"]
+[node name="Especial" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
 text = "Especial: Instinto Selvagem"
+
+[node name="DetalheEspecial" type="Label" parent="Painel/Caixa"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
+theme_override_font_sizes/font_size = 22
+text = ""
 horizontal_alignment = 1
 
 [node name="AtaquesAviso" type="Label" parent="Painel/Caixa"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
 theme_override_font_sizes/font_size = 22
 text = "derrote chefes para liberar outros ataques"
 horizontal_alignment = 1
 
+[node name="Separador" type="HSeparator" parent="Painel/Caixa"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Painel/Caixa" unique_id=814406697]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
+theme_override_font_sizes/font_size = 52
+text = "Escolha o chefe"
+horizontal_alignment = 1
+
+[node name="Mula" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+text = "Mula sem Cabeça"
+
+[node name="Cuca" type="Button" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+disabled = true
+text = "Cuca — em breve"
+
+[node name="Boto" type="Button" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+disabled = true
+text = "Boto cor-de-rosa — em breve"
+
+[node name="Maquina" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 68)
+layout_mode = 2
+disabled = true
+text = "Máquina de IA — derrote os três"
+
 [node name="Espaco" type="Control" parent="Painel/Caixa"]
-custom_minimum_size = Vector2(0, 8)
+custom_minimum_size = Vector2(0, 4)
 layout_mode = 2
 
 [node name="voltar" type="Button" parent="Painel/Caixa" unique_id=1785121933]
-custom_minimum_size = Vector2(0, 72)
+custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
 text = "Voltar"
 

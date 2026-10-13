@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://qlej0ru4rb3i"]
+
+[ext_resource type="Script" uid="uid://b8ictfeo5kxmf" path="res://scripts/explosao.gd" id="1_expl"]
+
+[node name="Explosao" type="Node2D"]
+script = ExtResource("1_expl")
+
+[node name="Fogo" type="Polygon2D" parent="."]
+color = Color(1, 0.45, 0.08, 0.9)
+polygon = PackedVector2Array(42, 0, 39.5, 14.4, 32.2, 27, 21, 36.4, 7.3, 41.4, -7.3, 41.4, -21, 36.4, -32.2, 27, -39.5, 14.4, -42, 0, -39.5, -14.4, -32.2, -27, -21, -36.4, -7.3, -41.4, 7.3, -41.4, 21, -36.4, 32.2, -27, 39.5, -14.4)
+
+[node name="Miolo" type="Polygon2D" parent="Fogo"]
+color = Color(1, 0.85, 0.3, 1)
+polygon = PackedVector2Array(22, 0, 19.8, 9.5, 13.7, 17.2, 4.9, 21.4, -4.9, 21.4, -13.7, 17.2, -19.8, 9.5, -22, 0, -19.8, -9.5, -13.7, -17.2, -4.9, -21.4, 4.9, -21.4, 13.7, -17.2, 19.8, -9.5)
+

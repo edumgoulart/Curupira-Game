@@ -9,6 +9,10 @@ const FASES := ["fase1", "fase2", "fase3"]
 const BOSS := "boss"
 
 var concluidas: Array[String] = []
+# Ataques escolhidos na seleção (caminho do .tres). "" = usa o padrão do Curupira
+# (Tiro de Folha / Instinto Selvagem). Salvos junto com o progresso.
+var basico_equipado: String = ""
+var especial_equipado: String = ""
 
 
 # Lê o save ao abrir o jogo: assim, vencer uma fase aberta direto (F6) não
@@ -41,10 +45,24 @@ func boss_liberado() -> bool:
 func zerou() -> bool:
 	return concluiu(BOSS)
 
+
+## Um ataque está liberado se é inicial ("") ou se a fase que o libera foi concluída.
+func liberado(fase_que_libera: String) -> bool:
+	return fase_que_libera == "" or concluiu(fase_que_libera)
+
+
+## Guarda a escolha da tela de seleção (só pode trocar antes da fase, GDD).
+func equipar(caminho_basico: String, caminho_especial: String) -> void:
+	basico_equipado = caminho_basico
+	especial_equipado = caminho_especial
+	salvar()
+
 # Mem para Save, chamada pela funçao marcar concluida ao derrotar o boss
 func salvar() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("progresso", "concluidas", concluidas)
+	cfg.set_value("equipamento", "basico", basico_equipado)
+	cfg.set_value("equipamento", "especial", especial_equipado)
 	var erro := cfg.save(SAVE_PATH)
 	if erro != OK:
 		push_error("Falha ao salvar: %s" % error_string(erro))
@@ -55,10 +73,14 @@ func carregar() -> bool:
 	if cfg.load(SAVE_PATH) != OK:
 		return false
 	concluidas.assign(cfg.get_value("progresso", "concluidas", []))
+	basico_equipado = cfg.get_value("equipamento", "basico", "")
+	especial_equipado = cfg.get_value("equipamento", "especial", "")
 	return true
 
 
 func apagar_save() -> void:
 	concluidas.clear()
+	basico_equipado = ""
+	especial_equipado = ""
 	if tem_save():
 		DirAccess.remove_absolute(SAVE_PATH)

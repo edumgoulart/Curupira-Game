@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://bjvy3bys2toe0"]
+
+[ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_onca"]
+radius = 48.0
+
+[node name="InstintoSelvagem" type="Area2D"]
+collision_layer = 4
+collision_mask = 9
+script = ExtResource("1_proj")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_onca")
+
+[node name="VisualProvisorio" type="Polygon2D" parent="."]
+color = Color(1, 0.62, 0.15, 0.3)
+polygon = PackedVector2Array(68, 0, 65.1, 15, 56.5, 29, 42.8, 41, 25, 50.2, 4.3, 56, -18, 58, -40.3, 56, -61, 50.2, -78.8, 41, -92.5, 29, -101.1, 15, -104, 0, -101.1, -15, -92.5, -29, -78.8, -41, -61, -50.2, -40.3, -56, -18, -58, 4.3, -56, 25, -50.2, 42.8, -41, 56.5, -29, 65.1, -15)
+
+[node name="OrelhaTras" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.85, 0.5, 0.08, 1)
+polygon = PackedVector2Array(-34, -28, -26, -66, -6, -38)
+
+[node name="OrelhaFrente" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.85, 0.5, 0.08, 1)
+polygon = PackedVector2Array(0, -38, 14, -68, 26, -30)
+
+[node name="Cabeca" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(1, 0.72, 0.2, 1)
+polygon = PackedVector2Array(46, 0, 44.4, 10.9, 39.8, 21, 32.5, 29.7, 23, 36.4, 11.9, 40.6, 0, 42, -11.9, 40.6, -23, 36.4, -32.5, 29.7, -39.8, 21, -44.4, 10.9, -46, 0, -44.4, -10.9, -39.8, -21, -32.5, -29.7, -23, -36.4, -11.9, -40.6, -0, -42, 11.9, -40.6, 23, -36.4, 32.5, -29.7, 39.8, -21, 44.4, -10.9)
+
+[node name="Focinho" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(1, 0.86, 0.55, 1)
+polygon = PackedVector2Array(56, 12, 54.3, 18.1, 49.6, 23.3, 42.4, 26.8, 34, 28, 25.6, 26.8, 18.4, 23.3, 13.7, 18.1, 12, 12, 13.7, 5.9, 18.4, 0.7, 25.6, -2.8, 34, -4, 42.4, -2.8, 49.6, 0.7, 54.3, 5.9)
+
+[node name="Nariz" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.25, 0.1, 0.05, 1)
+polygon = PackedVector2Array(50, 2, 58, 6, 52, 12)
+
+[node name="Olho" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.2, 0.9, 0.35, 1)
+polygon = PackedVector2Array(23, -14, 22.1, -11.5, 19.5, -9.7, 16, -9, 12.5, -9.7, 9.9, -11.5, 9, -14, 9.9, -16.5, 12.5, -18.3, 16, -19, 19.5, -18.3, 22.1, -16.5)
+
+[node name="Pinta1" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.45, 0.22, 0.05, 1)
+polygon = PackedVector2Array(-21, -8, -22, -5.6, -24.5, -4.2, -27.5, -4.2, -30, -5.6, -31, -8, -30, -10.4, -27.5, -11.8, -24.5, -11.8, -22, -10.4)
+
+[node name="Pinta2" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.45, 0.22, 0.05, 1)
+polygon = PackedVector2Array(-9, 18, -10, 20.4, -12.5, 21.8, -15.5, 21.8, -18, 20.4, -19, 18, -18, 15.6, -15.5, 14.2, -12.5, 14.2, -10, 15.6)
+
+[node name="Pinta3" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.45, 0.22, 0.05, 1)
+polygon = PackedVector2Array(-25, 14, -26, 16.4, -28.5, 17.8, -31.5, 17.8, -34, 16.4, -35, 14, -34, 11.6, -31.5, 10.2, -28.5, 10.2, -26, 11.6)
+
+[node name="Pinta4" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.45, 0.22, 0.05, 1)
+polygon = PackedVector2Array(-3, -28, -4, -25.6, -6.5, -24.2, -9.5, -24.2, -12, -25.6, -13, -28, -12, -30.4, -9.5, -31.8, -6.5, -31.8, -4, -30.4)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-90, -70, 160, 140)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]

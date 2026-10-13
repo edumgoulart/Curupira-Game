@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EspecialData" format=3 uid="uid://7m4x3monsvjs"]
+
+[ext_resource type="Script" uid="uid://cj38o0p86nmco" path="res://scripts/especial_data.gd" id="1_esp"]
+[ext_resource type="PackedScene" uid="uid://bvw56o7kxr3em" path="res://scenes/feixe_canhao.tscn" id="2_feixe"]
+
+[resource]
+script = ExtResource("1_esp")
+nome = "Canhão Flamejante"
+dano = 200
+velocidade_projetil = 0.0
+duracao_disparo = 1.5
+pulsos = 10
+carga_necessaria = 100
+cena_projetil = ExtResource("2_feixe")
+fase_que_libera = "fase1"

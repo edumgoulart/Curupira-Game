@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://dhdy2sdg0h2bi"]
+
+[ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
+[ext_resource type="PackedScene" uid="uid://qlej0ru4rb3i" path="res://scenes/explosao.tscn" id="2_expl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bola"]
+radius = 20.0
+
+[node name="BolaDeFogo" type="Area2D"]
+collision_layer = 4
+collision_mask = 9
+script = ExtResource("1_proj")
+cena_impacto = ExtResource("2_expl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bola")
+
+[node name="VisualProvisorio" type="Polygon2D" parent="."]
+color = Color(0.95, 0.3, 0.05, 1)
+polygon = PackedVector2Array(-40, 0, -14, -18, 6, -22, 22, -10, 24, 10, 6, 22, -14, 18)
+
+[node name="Miolo" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(1, 0.82, 0.25, 1)
+polygon = PackedVector2Array(19, 0, 17.7, 5.6, 14.1, 10.2, 8.9, 12.7, 3.1, 12.7, -2.1, 10.2, -5.7, 5.6, -7, 0, -5.7, -5.6, -2.1, -10.2, 3.1, -12.7, 8.9, -12.7, 14.1, -10.2, 17.7, -5.6)
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-40, -24, 66, 48)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]

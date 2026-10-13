@@ -4,6 +4,3 @@
 
 [resource]
 script = ExtResource("1_vida")
-golpes = 4
-invencibilidade_apos_golpe = 1.5
-intervalo_piscar = 0.1

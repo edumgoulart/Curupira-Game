@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AtaqueData" format=3 uid="uid://n62yv37hnf11"]
+
+[ext_resource type="Script" uid="uid://ctxn0hif3pl2o" path="res://scripts/ataque_data.gd" id="1_atq"]
+[ext_resource type="PackedScene" uid="uid://dhdy2sdg0h2bi" path="res://scenes/projetil_bola_de_fogo.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1_atq")
+nome = "Bola de Fogo"
+dano = 12
+tiros_por_segundo = 1.5
+carga_por_acerto = 3
+velocidade_projetil = 1000.0
+cena_projetil = ExtResource("2_proj")
+fase_que_libera = "fase1"

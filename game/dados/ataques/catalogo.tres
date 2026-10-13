@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CatalogoAtaques" format=3 uid="uid://chdpvqr1wbey4"]
+
+[ext_resource type="Script" uid="uid://dqpy41tv33ci0" path="res://scripts/catalogo_ataques.gd" id="1_cat"]
+[ext_resource type="Resource" uid="uid://ccami2t22011l" path="res://dados/ataques/tiro_de_folha.tres" id="2_folha"]
+[ext_resource type="Resource" uid="uid://n62yv37hnf11" path="res://dados/ataques/bola_de_fogo.tres" id="3_bola"]
+[ext_resource type="Resource" uid="uid://clkijo3bqhq4m" path="res://dados/ataques/instinto_selvagem.tres" id="4_onca"]
+[ext_resource type="Resource" uid="uid://7m4x3monsvjs" path="res://dados/ataques/canhao_flamejante.tres" id="5_canhao"]
+[ext_resource type="Script" uid="uid://ctxn0hif3pl2o" path="res://scripts/ataque_data.gd" id="6_script_atq"]
+[ext_resource type="Script" uid="uid://cj38o0p86nmco" path="res://scripts/especial_data.gd" id="7_script_esp"]
+
+[resource]
+script = ExtResource("1_cat")
+basicos = Array[ExtResource("6_script_atq")]([ExtResource("2_folha"), ExtResource("3_bola")])
+especiais = Array[ExtResource("7_script_esp")]([ExtResource("4_onca"), ExtResource("5_canhao")])

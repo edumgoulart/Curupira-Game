@@ -15,3 +15,5 @@ extends Resource
 @export var velocidade_projetil: float = 1000.0
 ## Cena do projétil disparado.
 @export var cena_projetil: PackedScene
+## Fase cujo chefe libera este ataque ("" = ataque inicial). Ex.: "fase1" = Mula sem Cabeça.
+@export var fase_que_libera: String = ""

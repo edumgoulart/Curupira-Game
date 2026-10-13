@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Curupira — movimento lateral com gravidade, game feel, dash, ataque básico e vida.
+## Curupira — movimento lateral com gravidade, game feel, dash, ataques e vida.
 ##
 ## Animações usadas (criar no SpriteFrames do AnimatedSprite2D com estes nomes exatos):
 ##   idle   — parado no chão
@@ -7,10 +7,11 @@ extends CharacterBody2D
 ##   pular  — subindo no ar
 ##   cair   — descendo no ar
 ##   dash   — durante o dash (0,2 s)
+##   especial — parado disparando um especial contínuo (Canhão Flamejante, 1,5 s)
 ##   derrota — ao levar o último golpe (sem loop)
 ## Se uma animação ainda não existir, o código só não troca para ela (não dá erro).
 
-enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH, DERROTADO }
+enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH, ESPECIAL, DERROTADO }
 
 ## Emitido no último golpe. A arena escuta para mostrar a tela de derrota.
 signal derrotado
@@ -30,6 +31,7 @@ var _tempo_buffer_pulo: float = 0.0
 var _tempo_dash: float = 0.0
 var _tempo_recarga_dash: float = 0.0
 var _tempo_invencivel: float = 0.0
+var _tempo_especial: float = 0.0
 # No ar só pode um dash por pulo; volta a valer ao tocar o chão.
 var _dash_aereo_disponivel: bool = true
 
@@ -37,6 +39,7 @@ var _dash_aereo_disponivel: bool = true
 @onready var atirador: Atirador = $Atirador
 @onready var vida: Vida = $Vida
 @onready var hurtbox: Hurtbox = $Hurtbox
+@onready var carga: CargaEspecial = $CargaEspecial
 
 
 func _ready() -> void:
@@ -52,6 +55,11 @@ func _ready() -> void:
 	vida.zerou.connect(_ao_zerar_vida)
 	vida.configurar(dados_vida.golpes)
 
+	# Acerto do básico -> Atirador avisa -> carga do especial sobe.
+	atirador.acerto_basico.connect(carga.adicionar)
+	if atirador.especial:
+		carga.configurar(atirador.especial.carga_necessaria)
+
 
 func _physics_process(delta: float) -> void:
 	_atualizar_janelas(delta)
@@ -59,6 +67,8 @@ func _physics_process(delta: float) -> void:
 	match estado:
 		Estado.DASH:
 			_processar_dash(delta)
+		Estado.ESPECIAL:
+			_processar_especial(delta)
 		Estado.DERROTADO:
 			_processar_derrotado(delta)
 		_:
@@ -70,10 +80,18 @@ func _physics_process(delta: float) -> void:
 	_atualizar_invencibilidade(delta)
 
 	# Segurar o botão atira sem parar; a cadência fica com o Atirador.
-	# Não atira durante o dash nem derrotado.
-	var pode_atirar: bool = estado != Estado.DASH and estado != Estado.DERROTADO
+	# Não atira durante o dash, disparando um especial nem derrotado.
+	var pode_atirar: bool = estado != Estado.DASH and estado != Estado.ESPECIAL and estado != Estado.DERROTADO
 	if pode_atirar and Input.is_action_pressed("attack_basic"):
 		atirador.tentar_atirar(olhando_para)
+	# Especial: só com a barra cheia; disparar zera a barra.
+	if pode_atirar and Input.is_action_just_pressed("attack_special") and carga.esta_cheia():
+		atirador.atirar_especial(olhando_para)
+		carga.gastar()
+		# Especial contínuo (Canhão Flamejante): fica parado enquanto dispara (GDD).
+		if atirador.especial.duracao_disparo > 0.0:
+			estado = Estado.ESPECIAL
+			_tempo_especial = atirador.especial.duracao_disparo
 
 
 ## Chamado pela Hurtbox quando uma hitbox de inimigo encosta.
@@ -114,6 +132,16 @@ func _ao_zerar_vida() -> void:
 	estado = Estado.DERROTADO
 	_tempo_invencivel = 0.0
 	derrotado.emit()
+
+
+## Disparando especial contínuo: não anda, não pula, não dá dash, não vira.
+## A gravidade continua (se disparou no ar, cai com o feixe junto).
+func _processar_especial(delta: float) -> void:
+	velocity.x = 0.0
+	_aplicar_gravidade(delta)
+	_tempo_especial -= delta
+	if _tempo_especial <= 0.0 or is_zero_approx(_tempo_especial):
+		estado = Estado.CAINDO  # provisório; _atualizar_estado corrige depois do move_and_slide
 
 
 ## Derrotado: sem controle; só a gravidade age, para ele cair se estava no ar.
@@ -217,9 +245,10 @@ func _processar_dash(delta: float) -> void:
 
 
 ## O estado é derivado da física depois do move_and_slide.
-## Exceções: o dash só sai quando o tempo acaba (_processar_dash) e o derrotado não sai.
+## Exceções: dash e especial só saem quando o tempo acaba (_processar_dash/_processar_especial);
+## o derrotado não sai.
 func _atualizar_estado() -> void:
-	if estado == Estado.DASH or estado == Estado.DERROTADO:
+	if estado == Estado.DASH or estado == Estado.ESPECIAL or estado == Estado.DERROTADO:
 		return
 	if is_on_floor():
 		estado = Estado.CORRENDO if velocity.x != 0.0 else Estado.PARADO
@@ -239,6 +268,8 @@ func _atualizar_animacao() -> void:
 			_tocar(&"cair")
 		Estado.DASH:
 			_tocar(&"dash")
+		Estado.ESPECIAL:
+			_tocar(&"especial")
 		Estado.DERROTADO:
 			_tocar(&"derrota")
 

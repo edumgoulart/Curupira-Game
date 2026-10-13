@@ -8,6 +8,8 @@
 [ext_resource type="Script" uid="uid://ksseueomg1ru" path="res://scripts/vida.gd" id="7_vida"]
 [ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="8_hurt"]
 [ext_resource type="Resource" uid="uid://n8vp1eurw1hm" path="res://dados/curupira_vida.tres" id="9_dvida"]
+[ext_resource type="Script" uid="uid://cx2jichctvq18" path="res://scripts/carga_especial.gd" id="10_carga"]
+[ext_resource type="Resource" uid="uid://clkijo3bqhq4m" path="res://dados/ataques/instinto_selvagem.tres" id="11_especial"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
 animations = [{
@@ -56,6 +58,7 @@ shape = SubResource("CapsuleShape2D_ixury")
 position = Vector2(45, -2)
 script = ExtResource("5_atir")
 ataque = ExtResource("6_folha")
+especial = ExtResource("11_especial")
 
 [node name="Vida" type="Node" parent="."]
 script = ExtResource("7_vida")
@@ -68,3 +71,6 @@ script = ExtResource("8_hurt")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 shape = SubResource("CapsuleShape2D_hurtbox")
+
+[node name="CargaEspecial" type="Node" parent="."]
+script = ExtResource("10_carga")

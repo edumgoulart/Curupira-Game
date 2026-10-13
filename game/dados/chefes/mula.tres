@@ -6,22 +6,5 @@
 
 [resource]
 script = ExtResource("1_dados")
-nome = "Mula sem Cabeça"
-id_progresso = "fase1"
-recompensa = "Bola de Fogo e Canhão Flamejante"
-vida = 1200
-pausa_entre_ataques = 1.2
-golpes_contato = 1
-aviso_bolas = 0.5
-quantidade_bolas = 3
-golpes_bola = 1
-intervalo_bolas = 0.35
-velocidade_horizontal_bola = 700.0
-altura_bola = 60.0
 cena_bola = ExtResource("2_bola")
-aviso_meteoro = 1.0
-golpes_meteoro = 2
-parada_apos_meteoro = 1.5
-duracao_queda_meteoro = 0.3
-duracao_impacto_meteoro = 0.15
 cena_meteoro = ExtResource("3_met")
