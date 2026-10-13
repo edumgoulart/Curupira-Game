@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://ykd41u8qskm5" path="res://scenes/mula.tscn" id="6_mula"]
 [ext_resource type="PackedScene" uid="uid://2koum5on3ej0" path="res://scenes/menu_pausa.tscn" id="7_pausa"]
 [ext_resource type="PackedScene" uid="uid://ct14xo7td23v6" path="res://scenes/tela_derrota.tscn" id="8_derrota"]
+[ext_resource type="PackedScene" uid="uid://br6lsujf6wbes" path="res://scenes/tela_vitoria.tscn" id="9_vitoria"]
 [ext_resource type="PackedScene" uid="uid://bvnebvbn71xmw" path="res://scenes/hud.tscn" id="4_hud"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rsrsk"]
@@ -196,4 +197,8 @@ curupira = NodePath("../Curupira")
 [node name="MenuPausa" parent="." instance=ExtResource("7_pausa")]
 
 [node name="TelaDerrota" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("8_derrota")]
+curupira = NodePath("../Curupira")
+
+[node name="TelaVitoria" parent="." node_paths=PackedStringArray("chefe", "curupira") instance=ExtResource("9_vitoria")]
+chefe = NodePath("../Mula")
 curupira = NodePath("../Curupira")

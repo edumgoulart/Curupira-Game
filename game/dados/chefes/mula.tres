@@ -6,6 +6,9 @@
 
 [resource]
 script = ExtResource("1_dados")
+nome = "Mula sem Cabeça"
+id_progresso = "fase1"
+recompensa = "Bola de Fogo e Canhão Flamejante"
 vida = 1200
 pausa_entre_ataques = 1.2
 golpes_contato = 1

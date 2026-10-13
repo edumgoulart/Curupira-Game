@@ -11,6 +11,12 @@ const BOSS := "boss"
 var concluidas: Array[String] = []
 
 
+# Lê o save ao abrir o jogo: assim, vencer uma fase aberta direto (F6) não
+# grava por cima do arquivo e apaga o progresso que já existia.
+func _ready() -> void:
+	carregar()
+
+
 func tem_save() -> bool:
 	return FileAccess.file_exists(SAVE_PATH)
 
