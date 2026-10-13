@@ -7,6 +7,18 @@ extends Area2D
 
 signal golpe_recebido(amount: int, from: Node)
 
+## false = nenhuma hitbox enxerga esta hurtbox (ex.: Curupira invencível).
+## Desliga as formas de colisão, e não o monitorable: testado no Godot 4.7, religar o
+## monitorable NÃO faz a hitbox detectar de novo quem já estava encostado; religar a forma faz.
+var ligada: bool = true:
+	set(valor):
+		if valor == ligada:
+			return
+		ligada = valor
+		for filho in get_children():
+			if filho is CollisionShape2D or filho is CollisionPolygon2D:
+				filho.set_deferred("disabled", not valor)
+
 
 func take_damage(amount: int, from: Node) -> void:
 	golpe_recebido.emit(amount, from)

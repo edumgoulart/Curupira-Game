@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://gygbifqm2b8n"]
+
+[ext_resource type="Script" uid="uid://wv0gdiqnynhg" path="res://testes/teste_dano.gd" id="1_teste"]
+[ext_resource type="PackedScene" uid="uid://x5gtkowxmddu" path="res://scenes/level1.tscn" id="2_fase"]
+
+[node name="TesteDano" type="Node2D"]
+script = ExtResource("1_teste")
+
+[node name="Level1" parent="." instance=ExtResource("2_fase")]
+
+[node name="Texto" type="Label" parent="."]
+offset_left = -900.0
+offset_top = -500.0
+offset_right = -400.0
+offset_bottom = -440.0
+theme_override_font_sizes/font_size = 36

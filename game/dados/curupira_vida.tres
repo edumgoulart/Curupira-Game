@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="VidaJogadorData" format=3 uid="uid://n8vp1eurw1hm"]
+
+[ext_resource type="Script" uid="uid://cru5owa7ar7ur" path="res://scripts/vida_jogador_data.gd" id="1_vida"]
+
+[resource]
+script = ExtResource("1_vida")
+golpes = 4
+invencibilidade_apos_golpe = 1.5
+intervalo_piscar = 0.1

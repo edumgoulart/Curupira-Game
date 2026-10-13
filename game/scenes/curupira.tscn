@@ -5,6 +5,9 @@
 [ext_resource type="Script" uid="uid://clbs5p7o6xlh4" path="res://scripts/atirador.gd" id="5_atir"]
 [ext_resource type="Texture2D" uid="uid://3cvibx4pvx86" path="res://assets/curupira.png" id="5_b0kjx"]
 [ext_resource type="Resource" uid="uid://ccami2t22011l" path="res://dados/ataques/tiro_de_folha.tres" id="6_folha"]
+[ext_resource type="Script" uid="uid://ksseueomg1ru" path="res://scripts/vida.gd" id="7_vida"]
+[ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="8_hurt"]
+[ext_resource type="Resource" uid="uid://n8vp1eurw1hm" path="res://dados/curupira_vida.tres" id="9_dvida"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
 animations = [{
@@ -29,11 +32,16 @@ animations = [{
 radius = 20.0
 height = 128.0
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurtbox"]
+radius = 20.0
+height = 128.0
+
 [node name="Curupira" type="CharacterBody2D" unique_id=722028489]
 position = Vector2(-55, -351)
 collision_layer = 2
 script = ExtResource("1_38npl")
 dados = ExtResource("4_mov")
+dados_vida = ExtResource("9_dvida")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=188185585]
 position = Vector2(-4, -14)
@@ -48,3 +56,15 @@ shape = SubResource("CapsuleShape2D_ixury")
 position = Vector2(45, -2)
 script = ExtResource("5_atir")
 ataque = ExtResource("6_folha")
+
+[node name="Vida" type="Node" parent="."]
+script = ExtResource("7_vida")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+script = ExtResource("8_hurt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CapsuleShape2D_hurtbox")

@@ -2,8 +2,13 @@
 
 [ext_resource type="PackedScene" uid="uid://cgscaaxbomnlu" path="res://scenes/curupira.tscn" id="1_g2h75"]
 [ext_resource type="Texture2D" uid="uid://dasbg535p4lse" path="res://assets/placeholder/world/world_tileset.png" id="2_wwpf4"]
+[ext_resource type="Script" uid="uid://d3vtyqb5tvlwv" path="res://scripts/hitbox.gd" id="3_hitbox"]
+[ext_resource type="PackedScene" uid="uid://bvnebvbn71xmw" path="res://scenes/hud.tscn" id="4_hud"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rsrsk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_espinho"]
+size = Vector2(80, 40)
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_rsrsk"]
 
@@ -174,3 +179,19 @@ position = Vector2(-554, 217)
 position = Vector2(-3, 138)
 tile_map_data = PackedByteArray("AAD+/xEAAQAAAAAAAAD9/xEAAQAAAAAAAAD8/xEAAQAAAAAAAAD7/xEAAQAAAAAAAAD6/xEAAQAAAAAAAAD5/xEAAQAAAAAAAAD4/xEAAQAAAAAAAAD3/xEAAQAAAAAAAAD2/xEAAQAAAAAAAAD1/xEAAQAAAAAAAAD0/xEAAQAAAAAAAADz/xEAAQAAAAAAAADy/xEAAQAAAAAAAADx/xEAAQAAAAAAAADw/xEAAQAAAAAAAADv/xEAAQAAAAAAAADu/xEAAQAAAAAAAADt/xEAAQAAAAAAAADs/xEAAQAAAAAAAADr/xEAAQAAAAAAAADq/xEAAQAAAAAAAADp/xEAAQAAAAAAAADo/xEAAQAAAAAAAADn/xEAAQAAAAAAAADm/xEAAQAAAAAAAADl/xEAAQAAAAAAAADk/xEAAQAAAAAAAADj/xEAAQAAAAAAAADi/xEAAQAAAAAAAADh/xEAAQAAAAAAAADg/xEAAQAAAAAAAADf/xEAAQAAAAAAAADe/xEAAQAAAAAAAADd/xEAAQAAAAAAAADc/xEAAQAAAAAAAAD//xEAAQAAAAAAAAAAABEAAQAAAAAAAAABABEAAQAAAAAAAAACABEAAQAAAAAAAAADABEAAQAAAAAAAAAEABEAAQAAAAAAAAAFABEAAQAAAAAAAAAGABEAAQAAAAAAAAAHABEAAQAAAAAAAAAIABEAAQAAAAAAAAAJABEAAQAAAAAAAAAKABEAAQAAAAAAAAALABEAAQAAAAAAAAAMABEAAQAAAAAAAAANABEAAQAAAAAAAAAOABEAAQAAAAAAAAAPABEAAQAAAAAAAAAQABEAAQAAAAAAAAARABEAAQAAAAAAAAASABEAAQAAAAAAAAATABEAAQAAAAAAAAAUABEAAQAAAAAAAAAVABEAAQAAAAAAAAAWABEAAQAAAAAAAAAXABEAAQAAAAAAAAAYABEAAQAAAAAAAAAZABEAAQAAAAAAAAAaABEAAQAAAAAAAAAbABEAAQAAAAAAAAAcABEAAQAAAAAAAAAdABEAAQAAAAAAAAAeABEAAQAAAAAAAAAfABEAAQAAAAAAAAAgABEAAQAAAAAAAAAhABEAAQAAAAAAAAAiABEAAQAAAAAAAAAjABEAAQAAAAAAAAA=")
 tile_set = SubResource("TileSet_rsrsk")
+
+[node name="Espinho" type="Area2D" parent="."]
+position = Vector2(-150, 390)
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("3_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Espinho"]
+shape = SubResource("RectangleShape2D_espinho")
+
+[node name="Visual" type="Polygon2D" parent="Espinho"]
+color = Color(0.85, 0.2, 0.2, 1)
+polygon = PackedVector2Array(-40, 20, 0, -20, 40, 20)
+
+[node name="HUD" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("4_hud")]
+curupira = NodePath("../Curupira")

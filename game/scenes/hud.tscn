@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bvnebvbn71xmw"]
+
+[ext_resource type="Script" uid="uid://c5xktbnyjru57" path="res://scripts/hud.gd" id="1_hud"]
+[ext_resource type="Script" uid="uid://br377eq34q84q" path="res://scripts/hud_vida.gd" id="2_vida"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud")
+
+[node name="Vida" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -94.0
+offset_right = 400.0
+offset_bottom = -40.0
+grow_vertical = 0
+mouse_filter = 2
+script = ExtResource("2_vida")

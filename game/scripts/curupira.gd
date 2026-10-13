@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Curupira — movimento lateral com gravidade, game feel, dash e ataque básico.
+## Curupira — movimento lateral com gravidade, game feel, dash, ataque básico e vida.
 ##
 ## Animações usadas (criar no SpriteFrames do AnimatedSprite2D com estes nomes exatos):
 ##   idle   — parado no chão
@@ -7,12 +7,18 @@ extends CharacterBody2D
 ##   pular  — subindo no ar
 ##   cair   — descendo no ar
 ##   dash   — durante o dash (0,2 s)
+##   derrota — ao levar o último golpe (sem loop)
 ## Se uma animação ainda não existir, o código só não troca para ela (não dá erro).
 
-enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH }
+enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH, DERROTADO }
+
+## Emitido no último golpe. A arena escuta para mostrar a tela de derrota.
+signal derrotado
 
 ## Valores de movimento (velocidade, pulo, gravidade, dash, game feel). Editar o .tres no inspetor.
 @export var dados: MovimentoData
+## Valores de vida (golpes, invencibilidade depois do golpe). Editar o .tres no inspetor.
+@export var dados_vida: VidaJogadorData
 
 var estado: Estado = Estado.PARADO
 ## 1 = direita, -1 = esquerda. Define o lado para onde o Curupira atira e dá o dash.
@@ -23,17 +29,28 @@ var _tempo_coyote: float = 0.0
 var _tempo_buffer_pulo: float = 0.0
 var _tempo_dash: float = 0.0
 var _tempo_recarga_dash: float = 0.0
+var _tempo_invencivel: float = 0.0
 # No ar só pode um dash por pulo; volta a valer ao tocar o chão.
 var _dash_aereo_disponivel: bool = true
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var atirador: Atirador = $Atirador
+@onready var vida: Vida = $Vida
+@onready var hurtbox: Hurtbox = $Hurtbox
 
 
 func _ready() -> void:
 	if dados == null:
 		push_warning("Curupira sem MovimentoData no campo 'dados'; usando os valores padrão do GDD.")
 		dados = MovimentoData.new()
+	if dados_vida == null:
+		push_warning("Curupira sem VidaJogadorData no campo 'dados_vida'; usando os valores padrão do GDD.")
+		dados_vida = VidaJogadorData.new()
+
+	# Hurtbox avisa que algo encostou -> take_damage decide se conta -> Vida desconta.
+	hurtbox.golpe_recebido.connect(take_damage)
+	vida.zerou.connect(_ao_zerar_vida)
+	vida.configurar(dados_vida.golpes)
 
 
 func _physics_process(delta: float) -> void:
@@ -42,21 +59,67 @@ func _physics_process(delta: float) -> void:
 	match estado:
 		Estado.DASH:
 			_processar_dash(delta)
+		Estado.DERROTADO:
+			_processar_derrotado(delta)
 		_:
 			_processar_movimento_normal(delta)
 
 	move_and_slide()
 	_atualizar_estado()
 	_atualizar_animacao()
+	_atualizar_invencibilidade(delta)
 
-	# Segurar o botão atira sem parar; a cadência fica com o Atirador. Não atira durante o dash.
-	if estado != Estado.DASH and Input.is_action_pressed("attack_basic"):
+	# Segurar o botão atira sem parar; a cadência fica com o Atirador.
+	# Não atira durante o dash nem derrotado.
+	var pode_atirar: bool = estado != Estado.DASH and estado != Estado.DERROTADO
+	if pode_atirar and Input.is_action_pressed("attack_basic"):
 		atirador.tentar_atirar(olhando_para)
 
 
-## Usado pelo sistema de dano: enquanto true, o Curupira não leva golpe.
+## Chamado pela Hurtbox quando uma hitbox de inimigo encosta.
+## amount = golpes (1 ou 2, conforme o ataque do chefe).
+func take_damage(amount: int, _from: Node) -> void:
+	# A hurtbox só desliga no fim do frame (set_deferred); esta checagem impede
+	# que dois ataques encostando no mesmo frame tirem dois golpes.
+	if esta_invencivel():
+		return
+	vida.perder(amount)
+	if vida.esta_viva():
+		_tempo_invencivel = dados_vida.invencibilidade_apos_golpe
+
+
+## Enquanto true, o Curupira não leva golpe: no dash, logo depois de um golpe e derrotado.
 func esta_invencivel() -> bool:
-	return estado == Estado.DASH
+	if estado == Estado.DASH or estado == Estado.DERROTADO:
+		return true
+	return _tempo_invencivel > 0.0 and not is_zero_approx(_tempo_invencivel)
+
+
+## Liga/desliga a hurtbox pela física em vez de ignorar golpes com if:
+## com ela desligada as hitboxes não a enxergam; ao religar, se o Curupira ainda
+## estiver dentro de um ataque, conta como encostar de novo e ele leva o golpe.
+func _atualizar_invencibilidade(delta: float) -> void:
+	_tempo_invencivel -= delta
+	hurtbox.ligada = not esta_invencivel()
+
+	# Pisca só na invencibilidade depois do golpe (no dash e derrotado fica visível).
+	var piscando: bool = _tempo_invencivel > 0.0 and estado != Estado.DERROTADO
+	if piscando:
+		sprite.visible = int(_tempo_invencivel / dados_vida.intervalo_piscar) % 2 == 0
+	else:
+		sprite.visible = true
+
+
+func _ao_zerar_vida() -> void:
+	estado = Estado.DERROTADO
+	_tempo_invencivel = 0.0
+	derrotado.emit()
+
+
+## Derrotado: sem controle; só a gravidade age, para ele cair se estava no ar.
+func _processar_derrotado(delta: float) -> void:
+	velocity.x = 0.0
+	_aplicar_gravidade(delta)
 
 
 func _processar_movimento_normal(delta: float) -> void:
@@ -154,9 +217,9 @@ func _processar_dash(delta: float) -> void:
 
 
 ## O estado é derivado da física depois do move_and_slide.
-## O dash é a exceção: só sai dele quando o tempo acaba (_processar_dash).
+## Exceções: o dash só sai quando o tempo acaba (_processar_dash) e o derrotado não sai.
 func _atualizar_estado() -> void:
-	if estado == Estado.DASH:
+	if estado == Estado.DASH or estado == Estado.DERROTADO:
 		return
 	if is_on_floor():
 		estado = Estado.CORRENDO if velocity.x != 0.0 else Estado.PARADO
@@ -176,6 +239,8 @@ func _atualizar_animacao() -> void:
 			_tocar(&"cair")
 		Estado.DASH:
 			_tocar(&"dash")
+		Estado.DERROTADO:
+			_tocar(&"derrota")
 
 
 func _tocar(nome: StringName) -> void:
