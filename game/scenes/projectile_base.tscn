@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://d0jqbwe0xx7yu"]
+
+[ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_5bkip"]
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_1vb1h"]
+specular_color = Color(0.93046373, 0.59675264, 0.56647086, 1)
+
+[node name="ProjectileBase" type="Area2D" unique_id=1876905377]
+script = ExtResource("1_5bkip")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1449060370]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1906856156]
+texture = SubResource("CanvasTexture_1vb1h")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

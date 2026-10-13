@@ -2,7 +2,8 @@ extends CharacterBody2D
 
 
 const SPEED = 300.0
-const JUMP_VELOCITY = -400.0
+const JUMP_VELOCITY = -1500.0
+const PROJECTILE_SCENE = preload("res://scenes/projectile_base.tscn")
 
 
 func _physics_process(delta: float) -> void:
@@ -22,5 +23,14 @@ func _physics_process(delta: float) -> void:
 		$AnimatedSprite2D.flip_h = direction < 0
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
+		
+	if Input.is_action_just_pressed("shoot"):
+		shoot()
 
 	move_and_slide()
+
+func shoot() -> void:
+	var projectile = PROJECTILE_SCENE.instantiate()
+	get_parent().add_child(projectile)
+	projectile.global_position = global_position
+	projectile.direction = -1.0 if $AnimatedSprite2D.flip_h else 1.0

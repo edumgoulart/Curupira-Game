@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Jogo Curupira"
-run/main_scene="uid://8lhfspgqww72"
+run/main_scene="uid://d0wi6aunebvhx"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -21,6 +21,9 @@ GameState="*uid://bt6ju2vpqvxow"
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/mode=2
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
@@ -46,6 +49,7 @@ jump={
 [physics]
 
 3d/physics_engine="Jolt Physics"
+2d/default_gravity=3000.0
 
 [rendering]
 
