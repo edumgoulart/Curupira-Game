@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://dasbg535p4lse" path="res://assets/placeholder/world/world_tileset.png" id="2_wwpf4"]
 [ext_resource type="Texture2D" uid="uid://g6p5ydveb1ld" path="res://assets/fase_mula.png" id="5_fundo"]
 [ext_resource type="PackedScene" uid="uid://ykd41u8qskm5" path="res://scenes/mula.tscn" id="6_mula"]
+[ext_resource type="PackedScene" uid="uid://2koum5on3ej0" path="res://scenes/menu_pausa.tscn" id="7_pausa"]
+[ext_resource type="PackedScene" uid="uid://ct14xo7td23v6" path="res://scenes/tela_derrota.tscn" id="8_derrota"]
 [ext_resource type="PackedScene" uid="uid://bvnebvbn71xmw" path="res://scenes/hud.tscn" id="4_hud"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rsrsk"]
@@ -189,4 +191,9 @@ position = Vector2(620, 286)
 alvo = NodePath("../Curupira")
 
 [node name="HUD" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("4_hud")]
+curupira = NodePath("../Curupira")
+
+[node name="MenuPausa" parent="." instance=ExtResource("7_pausa")]
+
+[node name="TelaDerrota" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("8_derrota")]
 curupira = NodePath("../Curupira")

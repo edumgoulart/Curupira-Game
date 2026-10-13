@@ -5,6 +5,8 @@ extends Control
 func _ready() -> void:
 	# Desabilita o botao continuar se nao tem save
 	%Continuar.disabled = not GameState.tem_save()
+	# Foco no primeiro botão para dar para navegar com o controle.
+	get_node("%Novo Jogo").grab_focus()
 
 
 func _on_novo_jogo_pressed() -> void:

@@ -1,9 +1,9 @@
 [gd_scene format=3 uid="uid://8lhfspgqww72"]
 
 [ext_resource type="Script" uid="uid://b17bdgg2g31q1" path="res://scripts/main_menu.gd" id="1_l6cm7"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l6cm7"]
-bg_color = Color(1, 1, 1, 1)
+[ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
+[ext_resource type="PackedScene" uid="uid://bylaptpr0006w" path="res://scenes/fundo_menu.tscn" id="t_fundo"]
+[ext_resource type="Texture2D" uid="uid://3cvibx4pvx86" path="res://assets/curupira.png" id="t_curupira"]
 
 [node name="Main Menu" type="Control" unique_id=754559773]
 layout_mode = 3
@@ -12,58 +12,93 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("t_tema")
 script = ExtResource("1_l6cm7")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1673181407]
+[node name="Fundo" parent="." instance=ExtResource("t_fundo")]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
+
+[node name="Curupira" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = -860.0
+offset_right = 860.0
+offset_bottom = -40.0
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("t_curupira")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Coluna" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
 anchor_top = 0.5
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = -93.0
-offset_top = -107.125
-offset_right = 93.0
-offset_bottom = 107.125
-grow_horizontal = 2
+offset_left = -980.0
+offset_top = -400.0
+offset_right = -120.0
+offset_bottom = 400.0
+grow_horizontal = 0
 grow_vertical = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="Novo Jogo" type="Button" parent="VBoxContainer" unique_id=662351807]
+[node name="Titulo" type="Label" parent="Coluna"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
+theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
+theme_override_constants/outline_size = 20
+theme_override_font_sizes/font_size = 140
+text = "CURUPIRA"
+horizontal_alignment = 1
+
+[node name="Subtitulo" type="Label" parent="Coluna"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 46
+text = "O Protetor da Floresta"
+horizontal_alignment = 1
+
+[node name="Espaco" type="Control" parent="Coluna"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="Painel" type="PanelContainer" parent="Coluna"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Coluna/Painel" unique_id=1673181407]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Novo Jogo" type="Button" parent="Coluna/Painel/VBoxContainer" unique_id=662351807]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
 text = "Novo jogo"
 
-[node name="Continuar" type="Button" parent="VBoxContainer" unique_id=1833861900]
+[node name="Continuar" type="Button" parent="Coluna/Painel/VBoxContainer" unique_id=1833861900]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
 text = "Continuar jogo"
 
-[node name="Opcoes" type="Button" parent="VBoxContainer" unique_id=440763041]
+[node name="Opcoes" type="Button" parent="Coluna/Painel/VBoxContainer" unique_id=440763041]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
 text = "Opções"
 
-[node name="Sair" type="Button" parent="VBoxContainer" unique_id=983986114]
+[node name="Sair" type="Button" parent="Coluna/Painel/VBoxContainer" unique_id=983986114]
+custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_l6cm7")
 text = "Sair"
 
-[connection signal="pressed" from="VBoxContainer/Novo Jogo" to="." method="_on_novo_jogo_pressed"]
-[connection signal="pressed" from="VBoxContainer/Continuar" to="." method="_on_continuar_pressed"]
-[connection signal="pressed" from="VBoxContainer/Opcoes" to="." method="_on_opcoes_pressed"]
-[connection signal="pressed" from="VBoxContainer/Sair" to="." method="_on_sair_pressed"]
+[connection signal="pressed" from="Coluna/Painel/VBoxContainer/Novo Jogo" to="." method="_on_novo_jogo_pressed"]
+[connection signal="pressed" from="Coluna/Painel/VBoxContainer/Continuar" to="." method="_on_continuar_pressed"]
+[connection signal="pressed" from="Coluna/Painel/VBoxContainer/Opcoes" to="." method="_on_opcoes_pressed"]
+[connection signal="pressed" from="Coluna/Painel/VBoxContainer/Sair" to="." method="_on_sair_pressed"]

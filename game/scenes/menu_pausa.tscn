@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://2koum5on3ej0"]
+
+[ext_resource type="Script" uid="uid://cevibp2bqeqa5" path="res://scripts/menu_pausa.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
+
+[node name="MenuPausa" type="CanvasLayer"]
+process_mode = 3
+layer = 10
+script = ExtResource("1_script")
+
+[node name="Fundo" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.05, 0.02, 0.72)
+
+[node name="Painel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(600, 0)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("t_tema")
+
+[node name="Caixa" type="VBoxContainer" parent="Painel"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Titulo" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "Pausado"
+horizontal_alignment = 1
+
+[node name="Espaco" type="Control" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+
+[node name="Continuar" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "Continuar"
+
+[node name="TentarDeNovo" type="Button" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "Tentar de novo"
+
+[node name="Selecao" type="Button" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "Voltar para a seleção"
+
+[connection signal="pressed" from="Painel/Caixa/Continuar" to="." method="_on_continuar_pressed"]
+[connection signal="pressed" from="Painel/Caixa/TentarDeNovo" to="." method="_on_tentar_de_novo_pressed"]
+[connection signal="pressed" from="Painel/Caixa/Selecao" to="." method="_on_selecao_pressed"]

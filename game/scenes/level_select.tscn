@@ -1,9 +1,8 @@
 [gd_scene format=3 uid="uid://brtdf43dqujcv"]
 
 [ext_resource type="Script" uid="uid://ucex6d0x7u50" path="res://scripts/level_select.gd" id="1_3shnc"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_64kqf"]
-bg_color = Color(1, 1, 1, 1)
+[ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
+[ext_resource type="PackedScene" uid="uid://bylaptpr0006w" path="res://scenes/fundo_menu.tscn" id="t_fundo"]
 
 [node name="Control" type="Control" unique_id=555020724]
 layout_mode = 3
@@ -12,37 +11,96 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("t_tema")
 script = ExtResource("1_3shnc")
 
-[node name="voltar" type="Button" parent="." unique_id=1785121933]
+[node name="Fundo" parent="." instance=ExtResource("t_fundo")]
 layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.499
-anchor_top = 0.418
-anchor_right = 0.499
-anchor_bottom = 0.418
-offset_left = -48.848022
-offset_top = -13.864014
-offset_right = 49.151978
-offset_bottom = 14.135986
-size_flags_vertical = 3
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 20
-theme_override_styles/normal = SubResource("StyleBoxFlat_64kqf")
+
+[node name="Painel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(820, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Caixa" type="VBoxContainer" parent="Painel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Label" type="Label" parent="Painel/Caixa" unique_id=814406697]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
+theme_override_font_sizes/font_size = 60
+text = "Escolha o chefe"
+horizontal_alignment = 1
+
+[node name="Mula" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "Mula sem Cabeça"
+
+[node name="Cuca" type="Button" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+disabled = true
+text = "Cuca — em breve"
+
+[node name="Boto" type="Button" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+disabled = true
+text = "Boto cor-de-rosa — em breve"
+
+[node name="Maquina" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+disabled = true
+text = "Máquina de IA — derrote os três"
+
+[node name="Separador" type="HSeparator" parent="Painel/Caixa"]
+layout_mode = 2
+
+[node name="AtaquesTitulo" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.34, 1)
+theme_override_font_sizes/font_size = 34
+text = "Ataques levados para a luta"
+horizontal_alignment = 1
+
+[node name="Basico" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Básico: Tiro de Folha"
+horizontal_alignment = 1
+
+[node name="Especial" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Especial: Instinto Selvagem"
+horizontal_alignment = 1
+
+[node name="AtaquesAviso" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
+theme_override_font_sizes/font_size = 22
+text = "derrote chefes para liberar outros ataques"
+horizontal_alignment = 1
+
+[node name="Espaco" type="Control" parent="Painel/Caixa"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="voltar" type="Button" parent="Painel/Caixa" unique_id=1785121933]
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
 text = "Voltar"
 
-[node name="Label" type="Label" parent="." unique_id=814406697]
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.5034722
-anchor_top = 0.17283951
-anchor_right = 0.5034722
-anchor_bottom = 0.17283951
-offset_left = -148.0
-offset_top = -11.0
-offset_right = 149.0
-offset_bottom = 12.0
-text = "Selecione o boss que deseja enfrentar:"
-metadata/_edit_use_anchors_ = true
-
-[connection signal="pressed" from="voltar" to="." method="_on_voltar_pressed"]
+[connection signal="pressed" from="Painel/Caixa/Mula" to="." method="_on_mula_pressed"]
+[connection signal="pressed" from="Painel/Caixa/voltar" to="." method="_on_voltar_pressed"]
