@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://ykd41u8qskm5"]
+
+[ext_resource type="Script" uid="uid://5om6hx0l3mue" path="res://scripts/mula.gd" id="1_mula"]
+[ext_resource type="Resource" uid="uid://dcifq07t13sbr" path="res://dados/chefes/mula.tres" id="2_dados"]
+[ext_resource type="Script" uid="uid://ksseueomg1ru" path="res://scripts/vida.gd" id="3_vida"]
+[ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="4_hurt"]
+[ext_resource type="Script" uid="uid://d3vtyqb5tvlwv" path="res://scripts/hitbox.gd" id="5_hit"]
+[ext_resource type="Texture2D" uid="uid://ld8twxp6skf5" path="res://assets/mula.png" id="6_img"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_mula"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_img")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
+size = Vector2(270, 248)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_contato"]
+size = Vector2(230, 200)
+
+[node name="Mula" type="Node2D"]
+script = ExtResource("1_mula")
+dados = ExtResource("2_dados")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -86)
+scale = Vector2(0.36, 0.36)
+sprite_frames = SubResource("SpriteFrames_mula")
+animation = &"idle"
+flip_h = true
+
+[node name="Vida" type="Node" parent="."]
+script = ExtResource("3_vida")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("4_hurt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(-46, 0)
+shape = SubResource("RectangleShape2D_hurtbox")
+
+[node name="Contato" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_hit")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contato"]
+position = Vector2(-46, 10)
+shape = SubResource("RectangleShape2D_contato")
+
+[node name="Boca" type="Marker2D" parent="."]
+position = Vector2(-150, -110)
+
+[node name="Pe" type="Marker2D" parent="."]
+position = Vector2(0, 124)
