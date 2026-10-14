@@ -98,10 +98,10 @@ layout_mode = 2
 text = "Cuca"
 
 [node name="Boto" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 68)
 layout_mode = 2
-disabled = true
-text = "Boto cor-de-rosa — em breve"
+text = "Boto cor-de-rosa"
 
 [node name="Maquina" type="Button" parent="Painel/Caixa"]
 unique_name_in_owner = true
@@ -121,4 +121,5 @@ text = "Voltar"
 
 [connection signal="pressed" from="Painel/Caixa/Mula" to="." method="_on_mula_pressed"]
 [connection signal="pressed" from="Painel/Caixa/Cuca" to="." method="_on_cuca_pressed"]
+[connection signal="pressed" from="Painel/Caixa/Boto" to="." method="_on_boto_pressed"]
 [connection signal="pressed" from="Painel/Caixa/voltar" to="." method="_on_voltar_pressed"]

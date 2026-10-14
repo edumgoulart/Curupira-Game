@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="MaquinaData" format=3 uid="uid://bfmwcs6qaiyys"]
+
+[ext_resource type="Script" uid="uid://bsrrsnuwqumsf" path="res://scripts/maquina_data.gd" id="1_dados"]
+[ext_resource type="PackedScene" uid="uid://dafc1clobc5j1" path="res://scenes/laser_maquina.tscn" id="2_laser"]
+[ext_resource type="PackedScene" uid="uid://3fniu52xl0js" path="res://scenes/bomba_maquina.tscn" id="3_bomba"]
+
+[resource]
+script = ExtResource("1_dados")
+cena_laser = ExtResource("2_laser")
+cena_bomba = ExtResource("3_bomba")
+nome = "Máquina de IA"
+id_progresso = "boss"
+texto_vitoria = "Você derrotou a Máquina de IA e salvou a floresta!"
+vida = 2400

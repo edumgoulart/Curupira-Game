@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://dafc1clobc5j1"]
+
+[ext_resource type="Script" uid="uid://dxper68a4sh30" path="res://scripts/laser_maquina.gd" id="1_laser"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_laser"]
+size = Vector2(2600, 36)
+
+[node name="LaserMaquina" type="Area2D"]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1_laser")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_laser")
+
+[node name="Linha" type="Line2D" parent="."]
+width = 3.0
+default_color = Color(1, 0.1, 0.1, 0.85)
+
+[node name="Raio" type="Polygon2D" parent="."]
+color = Color(1, 0.15, 0.1, 0.85)
+polygon = PackedVector2Array(0, -20, 2600, -20, 2600, 20, 0, 20)
+
+[node name="Nucleo" type="Polygon2D" parent="Raio"]
+color = Color(1, 0.9, 0.85, 1)
+polygon = PackedVector2Array(0, -7, 2600, -7, 2600, 7, 0, 7)
+

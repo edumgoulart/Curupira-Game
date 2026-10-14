@@ -6,10 +6,14 @@ extends Resource
 @export_group("Identidade")
 ## Nome mostrado na tela de vitória.
 @export var nome: String = ""
+## Artigo do nome, para o texto da vitória ("a" Mula, "a" Cuca, "o" Boto).
+@export var artigo: String = "a"
 ## Id do progresso no GameState (fase1 = Mula, fase2 = Cuca, fase3 = Boto, boss = Máquina).
 @export var id_progresso: String = ""
-## Ataques que o Curupira ganha ao vencer (texto da tela de vitória).
+## Ataques que o Curupira ganha ao vencer (texto da tela de vitória). Vazio = não mostra.
 @export var recompensa: String = ""
+## Texto próprio da tela de vitória. Vazio = "Você libertou <artigo> <nome> do chip da máquina!".
+@export var texto_vitoria: String = ""
 
 @export_group("Geral")
 ## Vida do chefe (GDD).

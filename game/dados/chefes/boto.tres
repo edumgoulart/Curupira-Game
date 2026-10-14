@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BotoData" format=3 uid="uid://dm0un5sefuihm"]
+
+[ext_resource type="Script" uid="uid://dkm278cg1uisc" path="res://scripts/boto_data.gd" id="1_dados"]
+[ext_resource type="PackedScene" uid="uid://cll1vicvhq8pg" path="res://scenes/jato_boto.tscn" id="2_jato"]
+[ext_resource type="PackedScene" uid="uid://bav8rm38w8y0u" path="res://scenes/bolha_boto.tscn" id="3_bolha"]
+[ext_resource type="PackedScene" uid="uid://dx6y8p5eb5l8t" path="res://scenes/succao_boto.tscn" id="4_succao"]
+
+[resource]
+script = ExtResource("1_dados")
+cena_jato = ExtResource("2_jato")
+cena_succao = ExtResource("4_succao")
+cena_bolha = ExtResource("3_bolha")
+nome = "Boto cor-de-rosa"
+artigo = "o"
+id_progresso = "fase3"
+recompensa = "Bolha d'Água e Bolha Abissal"
+vida = 2000
+pausa_entre_ataques = 2.0

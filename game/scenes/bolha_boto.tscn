@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://bav8rm38w8y0u"]
+
+[ext_resource type="Script" uid="uid://coe842mlk03t2" path="res://scripts/bolha_boto.gd" id="1_bolha"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bolha"]
+radius = 26.0
+
+[node name="BolhaBoto" type="Area2D"]
+collision_layer = 16
+collision_mask = 3
+script = ExtResource("1_bolha")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bolha")
+
+[node name="VisualProvisorio" type="Polygon2D" parent="."]
+color = Color(0.55, 0.8, 1, 0.45)
+polygon = PackedVector2Array(28, 0, 26.6, 8.7, 22.7, 16.5, 16.5, 22.7, 8.7, 26.6, 0, 28, -8.7, 26.6, -16.5, 22.7, -22.7, 16.5, -26.6, 8.7, -28, 0, -26.6, -8.7, -22.7, -16.5, -16.5, -22.7, -8.7, -26.6, -0, -28, 8.7, -26.6, 16.5, -22.7, 22.7, -16.5, 26.6, -8.7)
+
+[node name="Brilho" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(1, 1, 1, 0.85)
+polygon = PackedVector2Array(-2, -10, -3.3, -7.1, -6.8, -5.2, -11.2, -5.2, -14.7, -7.1, -16, -10, -14.7, -12.9, -11.2, -14.8, -6.8, -14.8, -3.3, -12.9)
+

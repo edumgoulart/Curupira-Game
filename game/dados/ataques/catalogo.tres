@@ -7,10 +7,12 @@
 [ext_resource type="Resource" uid="uid://7m4x3monsvjs" path="res://dados/ataques/canhao_flamejante.tres" id="5_canhao"]
 [ext_resource type="Resource" uid="uid://g1pputhpptgw" path="res://dados/ataques/feitico_perseguidor.tres" id="8_perseguidor"]
 [ext_resource type="Resource" uid="uid://kk1faua6wkvr" path="res://dados/ataques/pocao_maldita.tres" id="9_pocao"]
+[ext_resource type="Resource" uid="uid://d1tlnjx60r35u" path="res://dados/ataques/bolha_agua.tres" id="10_agua"]
+[ext_resource type="Resource" uid="uid://b45r4jqki0bk5" path="res://dados/ataques/bolha_abissal.tres" id="11_abissal"]
 [ext_resource type="Script" uid="uid://ctxn0hif3pl2o" path="res://scripts/ataque_data.gd" id="6_script_atq"]
 [ext_resource type="Script" uid="uid://cj38o0p86nmco" path="res://scripts/especial_data.gd" id="7_script_esp"]
 
 [resource]
 script = ExtResource("1_cat")
-basicos = Array[ExtResource("6_script_atq")]([ExtResource("2_folha"), ExtResource("3_bola"), ExtResource("8_perseguidor")])
-especiais = Array[ExtResource("7_script_esp")]([ExtResource("4_onca"), ExtResource("5_canhao"), ExtResource("9_pocao")])
+basicos = Array[ExtResource("6_script_atq")]([ExtResource("2_folha"), ExtResource("3_bola"), ExtResource("8_perseguidor"), ExtResource("10_agua")])
+especiais = Array[ExtResource("7_script_esp")]([ExtResource("4_onca"), ExtResource("5_canhao"), ExtResource("9_pocao"), ExtResource("11_abissal")])

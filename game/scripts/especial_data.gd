@@ -22,6 +22,11 @@ extends Resource
 @export var veneno_por_segundo: int = 0
 ## Duração do veneno (s); reaplicar só renova o tempo. Poção Maldita (GDD): 8.
 @export var duracao_veneno: float = 0.0
+## Lentidão aplicada no chefe ao acertar (0,4 = 40% mais lento). 0 = sem lentidão.
+## Bolha Abissal (GDD): 40%.
+@export_range(0.0, 0.9, 0.05) var lentidao: float = 0.0
+## Duração da lentidão (s); reaplicar renova. Bolha Abissal (GDD): 6.
+@export var duracao_lentidao: float = 0.0
 ## Cena do especial: um Projetil (sai voando) ou um FeixeCanhao (preso ao Curupira).
 @export var cena_projetil: PackedScene
 ## Fase cujo chefe libera este especial ("" = especial inicial). Ex.: "fase1" = Mula sem Cabeça.

@@ -9,6 +9,8 @@ extends Control
 
 const CENA_MULA: String = "res://scenes/level1.tscn"
 const CENA_CUCA: String = "res://scenes/level2.tscn"
+const CENA_BOTO: String = "res://scenes/level3.tscn"
+const CENA_MAQUINA: String = "res://scenes/level4.tscn"
 const CATALOGO: CatalogoAtaques = preload("res://dados/ataques/catalogo.tres")
 
 var _basicos: Array[AtaqueData] = []
@@ -18,6 +20,7 @@ var _i_especial: int = 0
 
 @onready var mula: Button = %Mula
 @onready var cuca: Button = %Cuca
+@onready var boto: Button = %Boto
 @onready var maquina: Button = %Maquina
 @onready var basico: Button = %Basico
 @onready var especial: Button = %Especial
@@ -31,9 +34,13 @@ func _ready() -> void:
 		mula.text += "  (derrotada)"
 	if GameState.concluiu("fase2"):
 		cuca.text += "  (derrotada)"
-	# A Máquina só libera depois dos três; mesmo liberada, a fase ainda não existe.
+	if GameState.concluiu("fase3"):
+		boto.text += "  (derrotado)"
+	# A Máquina (chefe final) só libera depois dos três (GDD).
 	if GameState.boss_liberado():
-		maquina.text = "Máquina de IA — em breve"
+		maquina.disabled = false
+		maquina.text = "Máquina de IA" + ("  (derrotada)" if GameState.zerou() else "")
+		maquina.pressed.connect(func() -> void: get_tree().change_scene_to_file(CENA_MAQUINA))
 
 	_basicos.assign(CATALOGO.basicos.filter(func(a: AtaqueData) -> bool: return GameState.liberado(a.fase_que_libera)))
 	_especiais.assign(CATALOGO.especiais.filter(func(e: EspecialData) -> bool: return GameState.liberado(e.fase_que_libera)))
@@ -107,6 +114,8 @@ func _atualizar_textos() -> void:
 		detalhe_especial.text = "até %d de dano em %s s · fica parado disparando" % [e.dano, _numero(e.duracao_disparo)]
 	elif e.veneno_por_segundo > 0:
 		detalhe_especial.text = "%d de dano + veneno de %d/s por %s s" % [e.dano, e.veneno_por_segundo, _numero(e.duracao_veneno)]
+	elif e.lentidao > 0.0:
+		detalhe_especial.text = "%d de dano · chefe %d%% mais lento por %s s" % [e.dano, roundi(e.lentidao * 100.0), _numero(e.duracao_lentidao)]
 	else:
 		detalhe_especial.text = "%d de dano" % e.dano
 
@@ -130,6 +139,10 @@ func _on_mula_pressed() -> void:
 
 func _on_cuca_pressed() -> void:
 	get_tree().change_scene_to_file(CENA_CUCA)
+
+
+func _on_boto_pressed() -> void:
+	get_tree().change_scene_to_file(CENA_BOTO)
 
 
 func _on_voltar_pressed() -> void:

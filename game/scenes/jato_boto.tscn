@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cll1vicvhq8pg"]
+
+[ext_resource type="Script" uid="uid://unnfakvhfhyn" path="res://scripts/jato_boto.gd" id="1_jato"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jato"]
+size = Vector2(1900, 50)
+
+[node name="JatoBoto" type="Area2D"]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1_jato")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_jato")
+
+[node name="VisualProvisorio" type="Polygon2D" parent="."]
+color = Color(0.3, 0.6, 1, 0.75)
+polygon = PackedVector2Array(0, -28, 1900, -28, 1900, 28, 0, 28)
+
+[node name="Nucleo" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.8, 0.95, 1, 0.9)
+polygon = PackedVector2Array(0, -10, 1900, -10, 1900, 10, 0, 10)
+
+[node name="Respingo" type="Polygon2D" parent="VisualProvisorio"]
+color = Color(0.6, 0.85, 1, 0.9)
+polygon = PackedVector2Array(40, 0, 37, 13, 28.3, 24, 15.3, 31.4, 0, 34, -15.3, 31.4, -28.3, 24, -37, 13, -40, 0, -37, -13, -28.3, -24, -15.3, -31.4, -0, -34, 15.3, -31.4, 28.3, -24, 37, -13)
+

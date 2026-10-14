@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://c4ljlrw5gxf3c"]
+
+[ext_resource type="Script" uid="uid://b5jr3l1g7xfu3" path="res://scripts/maquina.gd" id="1_maq"]
+[ext_resource type="Resource" uid="uid://bfmwcs6qaiyys" path="res://dados/chefes/maquina.tres" id="2_dados"]
+[ext_resource type="Script" uid="uid://ksseueomg1ru" path="res://scripts/vida.gd" id="3_vida"]
+[ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="4_hurt"]
+[ext_resource type="Script" uid="uid://d3vtyqb5tvlwv" path="res://scripts/hitbox.gd" id="5_hit"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
+size = Vector2(300, 440)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_contato"]
+size = Vector2(280, 420)
+
+[node name="Maquina" type="Node2D"]
+script = ExtResource("1_maq")
+dados = ExtResource("2_dados")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -230)
+
+[node name="VisualProvisorio" type="Polygon2D" parent="AnimatedSprite2D"]
+color = Color(0.22, 0.24, 0.3, 1)
+polygon = PackedVector2Array(-160, -230, 160, -230, 160, 230, -160, 230)
+
+[node name="Painel" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio"]
+color = Color(0.3, 0.33, 0.4, 1)
+polygon = PackedVector2Array(-130, -200, 130, -200, 130, 200, -130, 200)
+
+[node name="Grade1" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio"]
+color = Color(0.15, 0.16, 0.2, 1)
+polygon = PackedVector2Array(-100, -170, 100, -170, 100, -162, -100, -162)
+
+[node name="Grade2" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio"]
+color = Color(0.15, 0.16, 0.2, 1)
+polygon = PackedVector2Array(-100, -150, 100, -150, 100, -142, -100, -142)
+
+[node name="Grade3" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio"]
+color = Color(0.15, 0.16, 0.2, 1)
+polygon = PackedVector2Array(-100, 140, 100, 140, 100, 148, -100, 148)
+
+[node name="Grade4" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio"]
+color = Color(0.15, 0.16, 0.2, 1)
+polygon = PackedVector2Array(-100, 160, 100, 160, 100, 168, -100, 168)
+
+[node name="Moldura" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio"]
+color = Color(0.12, 0.13, 0.16, 1)
+polygon = PackedVector2Array(60, 0, 58.5, 13.4, 54.1, 26, 46.9, 37.4, 37.4, 46.9, 26, 54.1, 13.4, 58.5, 0, 60, -13.4, 58.5, -26, 54.1, -37.4, 46.9, -46.9, 37.4, -54.1, 26, -58.5, 13.4, -60, 0, -58.5, -13.4, -54.1, -26, -46.9, -37.4, -37.4, -46.9, -26, -54.1, -13.4, -58.5, -0, -60, 13.4, -58.5, 26, -54.1, 37.4, -46.9, 46.9, -37.4, 54.1, -26, 58.5, -13.4)
+
+[node name="Led" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio"]
+color = Color(0.95, 0.08, 0.08, 1)
+polygon = PackedVector2Array(46, 0, 44.8, 10.2, 41.4, 20, 36, 28.7, 28.7, 36, 20, 41.4, 10.2, 44.8, 0, 46, -10.2, 44.8, -20, 41.4, -28.7, 36, -36, 28.7, -41.4, 20, -44.8, 10.2, -46, 0, -44.8, -10.2, -41.4, -20, -36, -28.7, -28.7, -36, -20, -41.4, -10.2, -44.8, -0, -46, 10.2, -44.8, 20, -41.4, 28.7, -36, 36, -28.7, 41.4, -20, 44.8, -10.2)
+
+[node name="Brilho" type="Polygon2D" parent="AnimatedSprite2D/VisualProvisorio/Led"]
+color = Color(1, 0.6, 0.6, 0.9)
+polygon = PackedVector2Array(-2, -16, -3.6, -11.5, -8, -8.2, -14, -7, -20, -8.2, -24.4, -11.5, -26, -16, -24.4, -20.5, -20, -23.8, -14, -25, -8, -23.8, -3.6, -20.5)
+
+[node name="Vida" type="Node" parent="."]
+script = ExtResource("3_vida")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("4_hurt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -230)
+shape = SubResource("RectangleShape2D_hurtbox")
+
+[node name="Contato" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("5_hit")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Contato"]
+position = Vector2(0, -225)
+shape = SubResource("RectangleShape2D_contato")
+
+[node name="Led" type="Marker2D" parent="."]
+position = Vector2(0, -230)
+
+[node name="Pe" type="Marker2D" parent="."]

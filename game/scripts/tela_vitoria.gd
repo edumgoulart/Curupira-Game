@@ -5,6 +5,8 @@ extends CanvasLayer
 ## Mesmo esquema da derrota: congela a luta e fica com process_mode "sempre".
 
 const CENA_SELECAO: String = "res://scenes/level_select.tscn"
+## Depois do chefe final, os créditos (GDD: aparecem logo depois que o chefe final é derrotado).
+const CENA_CREDITOS: String = "res://scenes/creditos.tscn"
 ## Espera antes de mostrar a tela, para o chefe sumir (ele some em 1 s). Só visual.
 const ATRASO: float = 1.5
 
@@ -33,8 +35,15 @@ func _ao_vencer() -> void:
 		return
 	var dados: Resource = chefe.dados
 	GameState.marcar_concluida(dados.id_progresso)
-	subtitulo.text = "Você libertou a %s do chip da máquina!" % dados.nome
+	if dados.texto_vitoria != "":
+		subtitulo.text = dados.texto_vitoria
+	else:
+		subtitulo.text = "Você libertou %s %s do chip da máquina!" % [dados.artigo, dados.nome]
+	# Chefe final não concede ataque (GDD): sem a linha de recompensa.
+	recompensa.visible = dados.recompensa != ""
 	recompensa.text = "Novos ataques: %s" % dados.recompensa
+	if _eh_chefe_final():
+		voltar.text = "Continuar"
 
 	# process_always = false: se o jogador pausar nesse tempo, a espera também pausa.
 	await get_tree().create_timer(ATRASO, false).timeout
@@ -45,4 +54,8 @@ func _ao_vencer() -> void:
 
 func _on_voltar_pressed() -> void:
 	get_tree().paused = false
-	get_tree().change_scene_to_file(CENA_SELECAO)
+	get_tree().change_scene_to_file(CENA_CREDITOS if _eh_chefe_final() else CENA_SELECAO)
+
+
+func _eh_chefe_final() -> bool:
+	return chefe != null and chefe.dados.id_progresso == GameState.BOSS

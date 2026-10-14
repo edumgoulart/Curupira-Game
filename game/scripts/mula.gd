@@ -43,6 +43,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	delta *= fator_tempo()  # Bolha Abissal: o relógio do chefe anda mais devagar
 	if estado == Estado.DERROTADA:
 		return
 	_tempo -= delta

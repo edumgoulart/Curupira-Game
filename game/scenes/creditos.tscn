@@ -1,0 +1,93 @@
+[gd_scene format=3 uid="uid://dxqdkce1585bn"]
+
+[ext_resource type="Script" uid="uid://c17ooenxuxomf" path="res://scripts/creditos.gd" id="1_cred"]
+[ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="2_tema"]
+[ext_resource type="PackedScene" uid="uid://bylaptpr0006w" path="res://scenes/fundo_menu.tscn" id="3_fundo"]
+
+[node name="Creditos" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_tema")
+script = ExtResource("1_cred")
+
+[node name="Fundo" parent="." instance=ExtResource("3_fundo")]
+layout_mode = 1
+
+[node name="Painel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(900, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Caixa" type="VBoxContainer" parent="Painel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Titulo" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
+theme_override_font_sizes/font_size = 64
+text = "Obrigado por jogar!"
+horizontal_alignment = 1
+
+[node name="Jogo" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Curupira: O Protetor da Floresta"
+horizontal_alignment = 1
+
+[node name="Historia" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
+theme_override_font_sizes/font_size = 26
+text = "A floresta está salva — por enquanto."
+horizontal_alignment = 1
+
+[node name="Separador" type="HSeparator" parent="Painel/Caixa"]
+layout_mode = 2
+
+[node name="Equipe" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.34, 1)
+theme_override_font_sizes/font_size = 34
+text = "Equipe"
+horizontal_alignment = 1
+
+[node name="Arthur" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Arthur Campello Gausmann — programação e negócios"
+horizontal_alignment = 1
+
+[node name="Eduardo" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Eduardo Maliszewski Goulart — programação e arte"
+horizontal_alignment = 1
+
+[node name="Separador2" type="HSeparator" parent="Painel/Caixa"]
+layout_mode = 2
+
+[node name="Ferramentas" type="Label" parent="Painel/Caixa"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
+theme_override_font_sizes/font_size = 22
+text = "Feito em Godot 4 com GDScript"
+horizontal_alignment = 1
+
+[node name="Voltar" type="Button" parent="Painel/Caixa"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+text = "Voltar ao menu"
+
+[connection signal="pressed" from="Painel/Caixa/Voltar" to="." method="_on_voltar_pressed"]

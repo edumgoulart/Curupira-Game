@@ -26,6 +26,9 @@ var duracao_maxima: float = 0.0
 ## Veneno aplicado na hurtbox atingida (dano por segundo e duração). 0 = sem veneno.
 var veneno_por_segundo: int = 0
 var duracao_veneno: float = 0.0
+## Lentidão aplicada na hurtbox atingida (0,4 = 40%) e duração. 0 = sem lentidão.
+var lentidao: float = 0.0
+var duracao_lentidao: float = 0.0
 
 var _velocidade: Vector2 = Vector2.ZERO
 var _tempo: float = 0.0
@@ -82,6 +85,8 @@ func _on_area_entered(area: Area2D) -> void:
 		area.take_damage(dano, self)
 		if veneno_por_segundo > 0 and area.has_method("aplicar_efeito"):
 			area.aplicar_efeito(&"veneno", veneno_por_segundo, duracao_veneno)
+		if lentidao > 0.0 and area.has_method("aplicar_efeito"):
+			area.aplicar_efeito(&"lentidao", lentidao, duracao_lentidao)
 		acertou.emit(area)
 	_impactar()
 

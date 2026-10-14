@@ -1,0 +1,303 @@
+[gd_scene format=3 uid="uid://dfwvdnt5g58eg"]
+
+[ext_resource type="PackedScene" uid="uid://cgscaaxbomnlu" path="res://scenes/curupira.tscn" id="2_curupira"]
+[ext_resource type="PackedScene" uid="uid://c4ljlrw5gxf3c" path="res://scenes/maquina.tscn" id="3_maquina"]
+[ext_resource type="PackedScene" uid="uid://bvnebvbn71xmw" path="res://scenes/hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" uid="uid://2koum5on3ej0" path="res://scenes/menu_pausa.tscn" id="5_pausa"]
+[ext_resource type="PackedScene" uid="uid://ct14xo7td23v6" path="res://scenes/tela_derrota.tscn" id="6_derrota"]
+[ext_resource type="PackedScene" uid="uid://br6lsujf6wbes" path="res://scenes/tela_vitoria.tscn" id="7_vitoria"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_chao"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_parede"]
+
+[node name="Level4" type="Node2D"]
+
+[node name="SalaBranca" type="Node2D" parent="."]
+z_index = -10
+
+[node name="Parede" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.95, 0.95, 0.96, 1)
+polygon = PackedVector2Array(-1000, -600, 1000, -600, 1000, 410, -1000, 410)
+
+[node name="Luz1" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.88, 0.95, 1, 1)
+polygon = PackedVector2Array(-870, -540, -650, -540, -650, -522, -870, -522)
+
+[node name="Luz2" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.88, 0.95, 1, 1)
+polygon = PackedVector2Array(-490, -540, -270, -540, -270, -522, -490, -522)
+
+[node name="Luz3" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.88, 0.95, 1, 1)
+polygon = PackedVector2Array(-110, -540, 110, -540, 110, -522, -110, -522)
+
+[node name="Luz4" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.88, 0.95, 1, 1)
+polygon = PackedVector2Array(270, -540, 490, -540, 490, -522, 270, -522)
+
+[node name="Luz5" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.88, 0.95, 1, 1)
+polygon = PackedVector2Array(650, -540, 870, -540, 870, -522, 650, -522)
+
+[node name="Servidor1" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.86, 0.87, 0.9, 1)
+polygon = PackedVector2Array(-790, 30, -610, 30, -610, 395, -790, 395)
+
+[node name="Gaveta1" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 60, -630, 60, -630, 86, -770, 86)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta1"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-652, 69, -642, 69, -642, 77, -652, 77)
+
+[node name="Gaveta2" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 105, -630, 105, -630, 131, -770, 131)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta2"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-652, 114, -642, 114, -642, 122, -652, 122)
+
+[node name="Gaveta3" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 150, -630, 150, -630, 176, -770, 176)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta3"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-652, 159, -642, 159, -642, 167, -652, 167)
+
+[node name="Gaveta4" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 195, -630, 195, -630, 221, -770, 221)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta4"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-652, 204, -642, 204, -642, 212, -652, 212)
+
+[node name="Gaveta5" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 240, -630, 240, -630, 266, -770, 266)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta5"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-652, 249, -642, 249, -642, 257, -652, 257)
+
+[node name="Gaveta6" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 285, -630, 285, -630, 311, -770, 311)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta6"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-652, 294, -642, 294, -642, 302, -652, 302)
+
+[node name="Gaveta7" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 330, -630, 330, -630, 356, -770, 356)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta7"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-652, 339, -642, 339, -642, 347, -652, 347)
+
+[node name="Gaveta8" type="Polygon2D" parent="SalaBranca/Servidor1"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-770, 375, -630, 375, -630, 401, -770, 401)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor1/Gaveta8"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-652, 384, -642, 384, -642, 392, -652, 392)
+
+[node name="Servidor2" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.86, 0.87, 0.9, 1)
+polygon = PackedVector2Array(-560, 30, -380, 30, -380, 395, -560, 395)
+
+[node name="Gaveta1" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 60, -400, 60, -400, 86, -540, 86)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta1"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-422, 69, -412, 69, -412, 77, -422, 77)
+
+[node name="Gaveta2" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 105, -400, 105, -400, 131, -540, 131)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta2"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-422, 114, -412, 114, -412, 122, -422, 122)
+
+[node name="Gaveta3" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 150, -400, 150, -400, 176, -540, 176)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta3"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-422, 159, -412, 159, -412, 167, -422, 167)
+
+[node name="Gaveta4" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 195, -400, 195, -400, 221, -540, 221)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta4"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-422, 204, -412, 204, -412, 212, -422, 212)
+
+[node name="Gaveta5" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 240, -400, 240, -400, 266, -540, 266)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta5"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-422, 249, -412, 249, -412, 257, -422, 257)
+
+[node name="Gaveta6" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 285, -400, 285, -400, 311, -540, 311)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta6"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-422, 294, -412, 294, -412, 302, -422, 302)
+
+[node name="Gaveta7" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 330, -400, 330, -400, 356, -540, 356)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta7"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-422, 339, -412, 339, -412, 347, -422, 347)
+
+[node name="Gaveta8" type="Polygon2D" parent="SalaBranca/Servidor2"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-540, 375, -400, 375, -400, 401, -540, 401)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor2/Gaveta8"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-422, 384, -412, 384, -412, 392, -422, 392)
+
+[node name="Servidor3" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.86, 0.87, 0.9, 1)
+polygon = PackedVector2Array(-330, 30, -150, 30, -150, 395, -330, 395)
+
+[node name="Gaveta1" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 60, -170, 60, -170, 86, -310, 86)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta1"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-192, 69, -182, 69, -182, 77, -192, 77)
+
+[node name="Gaveta2" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 105, -170, 105, -170, 131, -310, 131)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta2"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-192, 114, -182, 114, -182, 122, -192, 122)
+
+[node name="Gaveta3" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 150, -170, 150, -170, 176, -310, 176)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta3"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-192, 159, -182, 159, -182, 167, -192, 167)
+
+[node name="Gaveta4" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 195, -170, 195, -170, 221, -310, 221)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta4"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-192, 204, -182, 204, -182, 212, -192, 212)
+
+[node name="Gaveta5" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 240, -170, 240, -170, 266, -310, 266)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta5"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-192, 249, -182, 249, -182, 257, -192, 257)
+
+[node name="Gaveta6" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 285, -170, 285, -170, 311, -310, 311)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta6"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-192, 294, -182, 294, -182, 302, -192, 302)
+
+[node name="Gaveta7" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 330, -170, 330, -170, 356, -310, 356)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta7"]
+color = Color(0.3, 0.85, 0.45, 1)
+polygon = PackedVector2Array(-192, 339, -182, 339, -182, 347, -192, 347)
+
+[node name="Gaveta8" type="Polygon2D" parent="SalaBranca/Servidor3"]
+color = Color(0.78, 0.8, 0.84, 1)
+polygon = PackedVector2Array(-310, 375, -170, 375, -170, 401, -310, 401)
+
+[node name="Luzinha" type="Polygon2D" parent="SalaBranca/Servidor3/Gaveta8"]
+color = Color(1, 0.3, 0.25, 1)
+polygon = PackedVector2Array(-192, 384, -182, 384, -182, 392, -192, 392)
+
+[node name="Janela" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.82, 0.88, 0.94, 1)
+polygon = PackedVector2Array(60, -380, 520, -380, 520, -60, 60, -60)
+
+[node name="Vidro" type="Polygon2D" parent="SalaBranca/Janela"]
+color = Color(0.9, 0.94, 0.98, 1)
+polygon = PackedVector2Array(80, -360, 500, -360, 500, -80, 80, -80)
+
+[node name="Rodape" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.72, 0.74, 0.78, 1)
+polygon = PackedVector2Array(-1000, 392, 1000, 392, 1000, 410, -1000, 410)
+
+[node name="Piso" type="Polygon2D" parent="SalaBranca"]
+color = Color(0.84, 0.85, 0.88, 1)
+polygon = PackedVector2Array(-1000, 410, 1000, 410, 1000, 700, -1000, 700)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(0, 410)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("WorldBoundaryShape2D_chao")
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(-965, 9)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+rotation = 1.5707964
+shape = SubResource("WorldBoundaryShape2D_parede")
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(959, 3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+rotation = 4.712389
+shape = SubResource("WorldBoundaryShape2D_parede")
+
+[node name="Curupira" parent="." instance=ExtResource("2_curupira")]
+position = Vector2(-554, 217)
+
+[node name="Maquina" parent="." node_paths=PackedStringArray("alvo") instance=ExtResource("3_maquina")]
+position = Vector2(680, 410)
+alvo = NodePath("../Curupira")
+
+[node name="HUD" parent="." node_paths=PackedStringArray("curupira", "chefe") instance=ExtResource("4_hud")]
+curupira = NodePath("../Curupira")
+chefe = NodePath("../Maquina")
+
+[node name="MenuPausa" parent="." instance=ExtResource("5_pausa")]
+
+[node name="TelaDerrota" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("6_derrota")]
+curupira = NodePath("../Curupira")
+
+[node name="TelaVitoria" parent="." node_paths=PackedStringArray("chefe", "curupira") instance=ExtResource("7_vitoria")]
+chefe = NodePath("../Maquina")
+curupira = NodePath("../Curupira")

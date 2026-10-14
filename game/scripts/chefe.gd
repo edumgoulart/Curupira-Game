@@ -14,8 +14,9 @@ signal chefe_derrotado
 
 ## Cor do brilho durante os avisos (telegrafo visual). Só visual.
 const COR_AVISO: Color = Color(1.6, 0.9, 0.5)
-## Cor do chefe enquanto está envenenado. Só visual.
+## Cor do chefe enquanto está envenenado / lento. Só visual.
 const COR_VENENO: Color = Color(0.6, 1.25, 0.55)
+const COR_LENTO: Color = Color(0.65, 0.8, 1.45)
 ## Envenenamento: um pulso de dano por segundo (GDD: "20 de dano por segundo").
 const INTERVALO_VENENO: float = 1.0
 
@@ -29,6 +30,9 @@ var _veneno_por_pulso: int = 0
 var _pulsos_veneno: int = 0
 var _timer_veneno: Timer
 var _tween_pisca: Tween
+# Lentidão (Bolha Abissal): quanto o relógio do chefe desacelera (0,4 = 40%) enquanto o timer roda.
+var _lentidao: float = 0.0
+var _timer_lentidao: Timer
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var vida: Vida = $Vida
@@ -46,6 +50,11 @@ func _ready() -> void:
 	_timer_veneno.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	_timer_veneno.timeout.connect(_pulso_veneno)
 	add_child(_timer_veneno)
+	_timer_lentidao = Timer.new()
+	_timer_lentidao.one_shot = true
+	_timer_lentidao.process_callback = Timer.TIMER_PROCESS_PHYSICS
+	_timer_lentidao.timeout.connect(_fim_lentidao)
+	add_child(_timer_lentidao)
 	vida.zerou.connect(_ao_zerar_vida)
 	vida.configurar(dados.vida)
 	contato.dano = dados.golpes_contato
@@ -64,16 +73,23 @@ func take_damage(amount: int, _from: Node) -> void:
 func _piscar() -> void:
 	if _tween_pisca:
 		_tween_pisca.kill()
-	sprite.self_modulate = Color(2.0, 2.0, 2.0)
+	var visual: CanvasItem = _visual_colorido()
+	visual.self_modulate = Color(2.0, 2.0, 2.0)
 	_tween_pisca = create_tween()
-	_tween_pisca.tween_property(sprite, "self_modulate", _cor_base(), 0.06)
+	_tween_pisca.tween_property(visual, "self_modulate", _cor_base(), 0.06)
 
 
 ## Muda a cor base (ex.: ficou envenenado) sem um pisca em andamento desfazer a mudança.
 func _atualizar_cor() -> void:
 	if _tween_pisca:
 		_tween_pisca.kill()
-	sprite.self_modulate = _cor_base()
+	_visual_colorido().self_modulate = _cor_base()
+
+
+## O que pisca ao levar dano e fica verde/azul com veneno/lentidão: o sprite.
+## Um chefe ainda sem arte (Máquina) devolve o desenho provisório no lugar.
+func _visual_colorido() -> CanvasItem:
+	return sprite
 
 
 ## Onde os projéteis que perseguem miram: o centro da hurtbox.
@@ -85,8 +101,24 @@ func esta_envenenado() -> bool:
 	return _pulsos_veneno > 0
 
 
+func esta_lento() -> bool:
+	return not _timer_lentidao.is_stopped()
+
+
+## Multiplicador do relógio do chefe: 1 = normal; 0,6 = 40% mais lento (Bolha Abissal).
+## Cada chefe multiplica o delta por isto: pausas, avisos, pulos e cadência ficam mais lentos.
+## Projéteis que o chefe já soltou não são afetados.
+func fator_tempo() -> float:
+	return 1.0 - _lentidao if esta_lento() else 1.0
+
+
 func _cor_base() -> Color:
-	return COR_VENENO if esta_envenenado() else Color.WHITE
+	var cor: Color = Color.WHITE
+	if esta_envenenado():
+		cor *= COR_VENENO
+	if esta_lento():
+		cor *= COR_LENTO
+	return cor
 
 
 ## Efeitos vindos dos ataques do Curupira pela Hurtbox.
@@ -101,6 +133,16 @@ func _ao_receber_efeito(efeito: StringName, intensidade: float, duracao: float) 
 			if _timer_veneno.is_stopped():
 				_timer_veneno.start()
 			_atualizar_cor()
+		&"lentidao":
+			# GDD: 40% mais lento por 6 s. Reaplicar renova o tempo.
+			_lentidao = clampf(intensidade, 0.0, 0.9)
+			_timer_lentidao.start(duracao)
+			_atualizar_cor()
+
+
+func _fim_lentidao() -> void:
+	_lentidao = 0.0
+	_atualizar_cor()
 
 
 func _pulso_veneno() -> void:
@@ -146,6 +188,7 @@ func _ao_zerar_vida() -> void:
 	derrotado = true
 	_pulsos_veneno = 0
 	_timer_veneno.stop()
+	_timer_lentidao.stop()
 	_atualizar_cor()
 	avisar(false)
 	hurtbox.ligada = false

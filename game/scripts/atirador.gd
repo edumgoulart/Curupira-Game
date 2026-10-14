@@ -67,6 +67,8 @@ func atirar_especial(direcao: int) -> void:
 		var projetil: Projetil = _criar(especial.cena_projetil, especial.dano, especial.velocidade_projetil, direcao)
 		projetil.veneno_por_segundo = especial.veneno_por_segundo
 		projetil.duracao_veneno = especial.duracao_veneno
+		projetil.lentidao = especial.lentidao
+		projetil.duracao_lentidao = especial.duracao_lentidao
 		_lancar(projetil)
 
 
