@@ -4,6 +4,7 @@
 [ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
 [ext_resource type="PackedScene" uid="uid://bylaptpr0006w" path="res://scenes/fundo_menu.tscn" id="t_fundo"]
 [ext_resource type="Texture2D" uid="uid://3cvibx4pvx86" path="res://assets/curupira.png" id="t_curupira"]
+[ext_resource type="Texture2D" uid="uid://ttjptodqhb7u" path="res://assets/titulo.png" id="t_titulo"]
 
 [node name="Main Menu" type="Control" unique_id=754559773]
 layout_mode = 3
@@ -49,19 +50,13 @@ grow_vertical = 2
 theme_override_constants/separation = 10
 alignment = 1
 
-[node name="Titulo" type="Label" parent="Coluna"]
+[node name="Titulo" type="TextureRect" parent="Coluna"]
+custom_minimum_size = Vector2(0, 380)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
-theme_override_constants/outline_size = 20
-theme_override_font_sizes/font_size = 140
-text = "CURUPIRA"
-horizontal_alignment = 1
-
-[node name="Subtitulo" type="Label" parent="Coluna"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 46
-text = "O Protetor da Floresta"
-horizontal_alignment = 1
+mouse_filter = 2
+texture = ExtResource("t_titulo")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Espaco" type="Control" parent="Coluna"]
 custom_minimum_size = Vector2(0, 30)

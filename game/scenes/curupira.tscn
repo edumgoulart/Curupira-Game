@@ -10,6 +10,8 @@
 [ext_resource type="Resource" uid="uid://n8vp1eurw1hm" path="res://dados/curupira_vida.tres" id="9_dvida"]
 [ext_resource type="Script" uid="uid://cx2jichctvq18" path="res://scripts/carga_especial.gd" id="10_carga"]
 [ext_resource type="Resource" uid="uid://clkijo3bqhq4m" path="res://dados/ataques/instinto_selvagem.tres" id="11_especial"]
+[ext_resource type="Texture2D" uid="uid://bejwotqf3tcq" path="res://assets/curupira_subindo_mao.png" id="12_subindo"]
+[ext_resource type="Texture2D" uid="uid://bjf4f4uw82ecr" path="res://assets/curupira_mao_atacando.png" id="13_atacando"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
 animations = [{
@@ -28,26 +30,36 @@ animations = [{
 "loop": 1,
 "name": &"jump",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_subindo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_atacando")
+}],
+"loop": false,
+"name": &"atacar",
+"speed": 10.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ixury"]
-radius = 20.0
-height = 128.0
+radius = 30.0
+height = 192.0
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurtbox"]
-radius = 20.0
-height = 128.0
+radius = 30.0
+height = 192.0
 
 [node name="Curupira" type="CharacterBody2D" unique_id=722028489]
-position = Vector2(-55, -351)
 collision_layer = 2
 script = ExtResource("1_38npl")
 dados = ExtResource("4_mov")
 dados_vida = ExtResource("9_dvida")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=188185585]
-position = Vector2(-4, -14)
-scale = Vector2(0.13476874, 0.13476874)
+position = Vector2(0, -21)
+scale = Vector2(0.20215311, 0.20215311)
 sprite_frames = SubResource("SpriteFrames_wrsmq")
 animation = &"idle"
 
@@ -55,7 +67,7 @@ animation = &"idle"
 shape = SubResource("CapsuleShape2D_ixury")
 
 [node name="Atirador" type="Marker2D" parent="." unique_id=700014690]
-position = Vector2(45, -2)
+position = Vector2(91.5, -30.5)
 script = ExtResource("5_atir")
 ataque = ExtResource("6_folha")
 especial = ExtResource("11_especial")

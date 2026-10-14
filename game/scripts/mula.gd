@@ -12,7 +12,7 @@ extends Chefe
 ## Animações usadas (criar no SpriteFrames do AnimatedSprite2D com estes nomes exatos):
 ##   idle          — esperando entre ataques
 ##   aviso_bolas   — preparando as bolas de fogo (0,5 s)
-##   bolas         — cuspindo as bolas
+##   bolas         — cuspindo as bolas (segue até um intervalo depois da última bola)
 ##   meteoro       — lançando o meteoro para cima (dura o aviso, 1 s)
 ##   parada        — cansada depois do meteoro (1,5 s)
 ##   derrota       — derrotada (sem loop)
@@ -59,7 +59,12 @@ func _physics_process(delta: float) -> void:
 			_entrar(Estado.BOLAS, 0.0)
 			_lancar_proxima_bola()
 		Estado.BOLAS:
-			_lancar_proxima_bola()
+			if _bolas_restantes > 0:
+				_lancar_proxima_bola()
+			else:
+				# A pose de cuspir já durou um intervalo depois da última bola; esse tempo
+				# sai da pausa, então o ritmo da luta é o mesmo de antes.
+				_entrar(Estado.ESPERANDO, maxf(_d.pausa_entre_ataques - _d.intervalo_bolas, 0.0))
 		Estado.METEORO:
 			_entrar(Estado.PARADA, _d.parada_apos_meteoro)
 		Estado.PARADA:
@@ -100,10 +105,9 @@ func _lancar_proxima_bola() -> void:
 	lancar_na_cena(bola)
 
 	_bolas_restantes -= 1
-	if _bolas_restantes > 0:
-		_tempo = _d.intervalo_bolas
-	else:
-		_entrar(Estado.ESPERANDO, _d.pausa_entre_ataques)
+	# Também depois da última: sem esse intervalo, a Mula voltaria à idle no mesmo
+	# frame em que a última bola sai, e ela pareceria sair da Mula parada.
+	_tempo = _d.intervalo_bolas
 
 
 func _soltar_meteoro() -> void:

@@ -7,6 +7,8 @@ extends Marker2D
 
 ## Avisa que um tiro BÁSICO acertou, com quanto ele carrega o especial (GDD: carga por acerto).
 signal acerto_basico(carga: int)
+## Avisa que um ataque saiu de fato (básico ou especial). O Curupira usa para tocar a animação de ataque.
+signal disparou
 
 ## Ataque básico equipado. Depois a tela de seleção troca este recurso antes da fase.
 @export var ataque: AtaqueData
@@ -49,6 +51,7 @@ func tentar_atirar(direcao: int, multiplicador: float = 1.0) -> void:
 	# Só o básico carrega o especial: cada acerto soma a carga do ataque equipado.
 	var carga: int = ataque.carga_por_acerto
 	projetil.acertou.connect(func(_alvo: Area2D) -> void: acerto_basico.emit(carga))
+	disparou.emit()
 
 
 ## Dispara o especial. Quem confere se a barra está cheia é o Curupira.
@@ -70,6 +73,7 @@ func atirar_especial(direcao: int) -> void:
 		projetil.lentidao = especial.lentidao
 		projetil.duracao_lentidao = especial.duracao_lentidao
 		_lancar(projetil)
+	disparou.emit()
 
 
 ## Cria o projétil SEM pôr na cena: quem chama ainda preenche curva/veneno antes,

@@ -9,7 +9,9 @@ extends CharacterBody2D
 ##   dash   — durante o dash (0,2 s)
 ##   especial — parado disparando um especial contínuo (Canhão Flamejante, 1,5 s)
 ##   derrota — ao levar o último golpe (sem loop)
-## Se uma animação ainda não existir, o código só não troca para ela (não dá erro).
+##   atacar — mão subindo e soltando o ataque (sem loop); recomeça a cada tiro
+## Se uma animação ainda não existir, toca a idle no lugar (não dá erro).
+## Sem "especial", o especial contínuo usa a "atacar" (o feixe sai da mão).
 
 enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH, ESPECIAL, DERROTADO }
 
@@ -20,6 +22,10 @@ signal derrotado
 @export var dados: MovimentoData
 ## Valores de vida (golpes, invencibilidade depois do golpe). Editar o .tres no inspetor.
 @export var dados_vida: VidaJogadorData
+
+## Quanto tempo a pose de ataque fica na tela depois de soltar o botão (s).
+## Com o botão segurado ela não cai entre um tiro e outro, mesmo com cadência lenta.
+const DURACAO_POSE_ATAQUE: float = 0.3
 
 var estado: Estado = Estado.PARADO
 ## 1 = direita, -1 = esquerda. Define o lado para onde o Curupira atira e dá o dash.
@@ -32,6 +38,7 @@ var _tempo_dash: float = 0.0
 var _tempo_recarga_dash: float = 0.0
 var _tempo_invencivel: float = 0.0
 var _tempo_especial: float = 0.0
+var _tempo_ataque: float = 0.0
 # No ar só pode um dash por pulo; volta a valer ao tocar o chão.
 var _dash_aereo_disponivel: bool = true
 # Lentidão ativa: quem está deixando lento (ex.: poça da Cuca) -> fator de velocidade.
@@ -61,6 +68,8 @@ func _ready() -> void:
 	atirador.acerto_basico.connect(carga.adicionar)
 	if atirador.especial:
 		carga.configurar(atirador.especial.carga_necessaria)
+	# Ataque saiu (básico ou especial) -> Atirador avisa -> animação de ataque.
+	atirador.disparou.connect(_ao_disparar)
 
 
 func _physics_process(delta: float) -> void:
@@ -82,10 +91,10 @@ func _physics_process(delta: float) -> void:
 	_atualizar_invencibilidade(delta)
 
 	# Segurar o botão atira sem parar; a cadência fica com o Atirador.
-	# Não atira durante o dash, disparando um especial nem derrotado.
-	var pode_atirar: bool = estado != Estado.DASH and estado != Estado.ESPECIAL and estado != Estado.DERROTADO
+	var pode_atirar: bool = _pode_atirar()
 	if pode_atirar and Input.is_action_pressed("attack_basic"):
 		atirador.tentar_atirar(olhando_para, fator_lentidao())
+		_tempo_ataque = maxf(_tempo_ataque, DURACAO_POSE_ATAQUE)
 	# Especial: só com a barra cheia; disparar zera a barra.
 	if pode_atirar and Input.is_action_just_pressed("attack_special") and carga.esta_cheia():
 		atirador.atirar_especial(olhando_para)
@@ -157,6 +166,22 @@ func _ao_zerar_vida() -> void:
 	derrotado.emit()
 
 
+## Não atira durante o dash, disparando um especial nem derrotado.
+func _pode_atirar() -> bool:
+	return estado != Estado.DASH and estado != Estado.ESPECIAL and estado != Estado.DERROTADO
+
+
+## Chamado pelo Atirador a cada ataque que sai. O projétil já nasce na mão (posição do
+## Atirador = mão estendida do frame "mao_atacando"); aqui só entra a animação.
+func _ao_disparar() -> void:
+	_tempo_ataque = maxf(_tempo_ataque, DURACAO_POSE_ATAQUE)
+	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(&"atacar"):
+		return
+	# Recomeça do primeiro frame a cada tiro, mesmo com a pose do tiro anterior ainda na tela.
+	sprite.play(&"atacar")
+	sprite.set_frame_and_progress(0, 0.0)
+
+
 ## Disparando especial contínuo: não anda, não pula, não dá dash, não vira.
 ## A gravidade continua (se disparou no ar, cai com o feixe junto).
 func _processar_especial(delta: float) -> void:
@@ -184,7 +209,7 @@ func _processar_movimento_normal(delta: float) -> void:
 
 ## Coyote time: recarrega enquanto está no chão e vai esvaziando no ar.
 ## Jump buffer: abre a cada aperto de pulo e vai esvaziando.
-## Também recarrega o dash aéreo ao tocar o chão e conta a recarga do dash.
+## Também recarrega o dash aéreo ao tocar o chão e conta a recarga do dash e a pose de ataque.
 func _atualizar_janelas(delta: float) -> void:
 	if is_on_floor():
 		_tempo_coyote = dados.coyote_time
@@ -198,6 +223,7 @@ func _atualizar_janelas(delta: float) -> void:
 		_tempo_buffer_pulo -= delta
 
 	_tempo_recarga_dash -= delta
+	_tempo_ataque -= delta
 
 
 func _aplicar_gravidade(delta: float) -> void:
@@ -246,6 +272,8 @@ func _tentar_dash() -> bool:
 
 	estado = Estado.DASH
 	_tempo_dash = dados.duracao_dash
+	# O dash corta a pose de ataque; sem isso, o resto dela voltaria a tocar ao fim do dash.
+	_tempo_ataque = 0.0
 	# Dash reto na horizontal, para o lado em que está olhando
 	# (_mover_horizontal já virou o Curupira se havia direção apertada).
 	velocity = Vector2(olhando_para * dados.distancia_dash / dados.duracao_dash, 0.0)
@@ -280,6 +308,10 @@ func _atualizar_estado() -> void:
 
 
 func _atualizar_animacao() -> void:
+	# Pose de ataque por cima de parado/correndo/pulando/caindo (onde dá para atirar).
+	if _tempo_ataque > 0.0 and _pode_atirar():
+		_tocar(&"atacar")
+		return
 	match estado:
 		Estado.PARADO:
 			_tocar(&"idle")
@@ -292,13 +324,24 @@ func _atualizar_animacao() -> void:
 		Estado.DASH:
 			_tocar(&"dash")
 		Estado.ESPECIAL:
-			_tocar(&"especial")
+			_tocar(&"especial", &"atacar")
 		Estado.DERROTADO:
 			_tocar(&"derrota")
 
 
-func _tocar(nome: StringName) -> void:
-	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(nome):
+## Se a animação ainda não existir no SpriteFrames, toca a reserva (idle por padrão):
+## sem isso o sprite ficaria preso na última animação tocada (ex.: mão estendida do ataque).
+func _tocar(nome: StringName, reserva: StringName = &"idle") -> void:
+	if sprite.sprite_frames == null:
 		return
-	if sprite.animation != nome or not sprite.is_playing():
-		sprite.play(nome)
+	if not sprite.sprite_frames.has_animation(nome):
+		if not sprite.sprite_frames.has_animation(reserva):
+			return
+		nome = reserva
+	if sprite.animation == nome:
+		# Já é esta. Com loop, só garante que está tocando. Sem loop e já terminada, fica no
+		# último frame: chamar play() de novo faria ela recomeçar do zero (virando um loop).
+		if not sprite.is_playing() and sprite.sprite_frames.get_animation_loop(nome):
+			sprite.play(nome)
+		return
+	sprite.play(nome)

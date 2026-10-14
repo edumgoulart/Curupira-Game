@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="4_hurt"]
 [ext_resource type="Script" uid="uid://d3vtyqb5tvlwv" path="res://scripts/hitbox.gd" id="5_hit"]
 [ext_resource type="Texture2D" uid="uid://ld8twxp6skf5" path="res://assets/mula.png" id="6_img"]
+[ext_resource type="Texture2D" uid="uid://b2yoxyn7yq8yk" path="res://assets/mula_bolas.png" id="7_bolas"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_mula"]
 animations = [{
@@ -15,6 +16,14 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_bolas")
+}],
+"loop": true,
+"name": &"bolas",
 "speed": 5.0
 }]
 
