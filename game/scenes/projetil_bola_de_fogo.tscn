@@ -2,6 +2,11 @@
 
 [ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
 [ext_resource type="PackedScene" uid="uid://qlej0ru4rb3i" path="res://scenes/explosao.tscn" id="2_expl"]
+[ext_resource type="Script" uid="uid://bku4kjgoguonj" path="res://scripts/animacao_quadros.gd" id="3_anim"]
+[ext_resource type="Texture2D" uid="uid://grmul6fqqoss" path="res://assets/efeitos/bola_fogo_1.png" id="4_q1"]
+[ext_resource type="Texture2D" uid="uid://ipshq213mrv1" path="res://assets/efeitos/bola_fogo_2.png" id="5_q2"]
+[ext_resource type="Texture2D" uid="uid://tyms2spomxyj" path="res://assets/efeitos/bola_fogo_3.png" id="6_q3"]
+[ext_resource type="Texture2D" uid="uid://b50cfwdrp6605" path="res://assets/efeitos/bola_fogo_4.png" id="7_q4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bola"]
 radius = 20.0
@@ -15,13 +20,13 @@ cena_impacto = ExtResource("2_expl")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_bola")
 
-[node name="VisualProvisorio" type="Polygon2D" parent="."]
-color = Color(0.95, 0.3, 0.05, 1)
-polygon = PackedVector2Array(-40, 0, -14, -18, 6, -22, 22, -10, 24, 10, 6, 22, -14, 18)
-
-[node name="Miolo" type="Polygon2D" parent="VisualProvisorio"]
-color = Color(1, 0.82, 0.25, 1)
-polygon = PackedVector2Array(19, 0, 17.7, 5.6, 14.1, 10.2, 8.9, 12.7, 3.1, 12.7, -2.1, 10.2, -5.7, 5.6, -7, 0, -5.7, -5.6, -2.1, -10.2, 3.1, -12.7, 8.9, -12.7, 14.1, -10.2, 17.7, -5.6)
+[node name="Fogo" type="Sprite2D" parent="."]
+scale = Vector2(0.35, 0.35)
+texture = ExtResource("4_q1")
+offset = Vector2(-136, -31)
+script = ExtResource("3_anim")
+quadros = Array[Texture2D]([ExtResource("4_q1"), ExtResource("5_q2"), ExtResource("6_q3"), ExtResource("7_q4")])
+fps = 16.0
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 rect = Rect2(-40, -24, 66, 48)

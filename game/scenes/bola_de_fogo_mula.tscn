@@ -1,9 +1,14 @@
 [gd_scene format=3 uid="uid://dq5ys8hoiy2ft"]
 
 [ext_resource type="Script" uid="uid://cys4ni1fuabwx" path="res://scripts/bola_de_fogo_mula.gd" id="1_bola"]
+[ext_resource type="Script" uid="uid://bku4kjgoguonj" path="res://scripts/animacao_quadros.gd" id="2_anim"]
+[ext_resource type="Texture2D" uid="uid://grmul6fqqoss" path="res://assets/efeitos/bola_fogo_1.png" id="3_q1"]
+[ext_resource type="Texture2D" uid="uid://ipshq213mrv1" path="res://assets/efeitos/bola_fogo_2.png" id="4_q2"]
+[ext_resource type="Texture2D" uid="uid://tyms2spomxyj" path="res://assets/efeitos/bola_fogo_3.png" id="5_q3"]
+[ext_resource type="Texture2D" uid="uid://b50cfwdrp6605" path="res://assets/efeitos/bola_fogo_4.png" id="6_q4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bola"]
-radius = 28.0
+radius = 21.0
 
 [node name="BolaDeFogoMula" type="Area2D"]
 collision_layer = 16
@@ -13,10 +18,10 @@ script = ExtResource("1_bola")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_bola")
 
-[node name="VisualProvisorio" type="Polygon2D" parent="."]
-color = Color(0.95, 0.35, 0.05, 1)
-polygon = PackedVector2Array(28, 0, 26.6, 8.7, 22.7, 16.5, 16.5, 22.7, 8.7, 26.6, 0, 28, -8.7, 26.6, -16.5, 22.7, -22.7, 16.5, -26.6, 8.7, -28, 0, -26.6, -8.7, -22.7, -16.5, -16.5, -22.7, -8.7, -26.6, -0, -28, 8.7, -26.6, 16.5, -22.7, 22.7, -16.5, 26.6, -8.7)
-
-[node name="Miolo" type="Polygon2D" parent="VisualProvisorio"]
-color = Color(1, 0.85, 0.2, 1)
-polygon = PackedVector2Array(15, 0, 14.3, 4.6, 12.1, 8.8, 8.8, 12.1, 4.6, 14.3, 0, 15, -4.6, 14.3, -8.8, 12.1, -12.1, 8.8, -14.3, 4.6, -15, 0, -14.3, -4.6, -12.1, -8.8, -8.8, -12.1, -4.6, -14.3, -0, -15, 4.6, -14.3, 8.8, -12.1, 12.1, -8.8, 14.3, -4.6)
+[node name="Fogo" type="Sprite2D" parent="."]
+scale = Vector2(0.38, 0.38)
+texture = ExtResource("3_q1")
+offset = Vector2(-136, -31)
+script = ExtResource("2_anim")
+quadros = Array[Texture2D]([ExtResource("3_q1"), ExtResource("4_q2"), ExtResource("5_q3"), ExtResource("6_q4")])
+fps = 14.0

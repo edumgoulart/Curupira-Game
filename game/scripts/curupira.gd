@@ -11,6 +11,7 @@ extends CharacterBody2D
 ##   derrota — ao levar o último golpe (sem loop)
 ##   atacar — mão subindo e soltando o ataque (sem loop); recomeça a cada tiro
 ## Se uma animação ainda não existir, toca a idle no lugar (não dá erro).
+## O dash tem efeito próprio (fantasmas, folhas, vento, corpo esticado) no node EfeitoDash.
 ## Sem "especial", o especial contínuo usa a "atacar" (o feixe sai da mão).
 
 enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH, ESPECIAL, DERROTADO }
@@ -49,6 +50,7 @@ var _lentidoes: Dictionary = {}
 @onready var vida: Vida = $Vida
 @onready var hurtbox: Hurtbox = $Hurtbox
 @onready var carga: CargaEspecial = $CargaEspecial
+@onready var efeito_dash: EfeitoDash = $EfeitoDash
 
 
 func _ready() -> void:
@@ -277,6 +279,7 @@ func _tentar_dash() -> bool:
 	# Dash reto na horizontal, para o lado em que está olhando
 	# (_mover_horizontal já virou o Curupira se havia direção apertada).
 	velocity = Vector2(olhando_para * dados.distancia_dash / dados.duracao_dash, 0.0)
+	efeito_dash.comecar(olhando_para, dados.duracao_dash)
 	return true
 
 
@@ -292,6 +295,7 @@ func _processar_dash(delta: float) -> void:
 	estado = Estado.CAINDO  # provisório; _atualizar_estado corrige depois do move_and_slide
 	velocity = Vector2.ZERO
 	_tempo_recarga_dash = dados.recarga_dash
+	efeito_dash.terminar()
 	_processar_movimento_normal(delta)
 
 

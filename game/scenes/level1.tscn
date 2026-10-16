@@ -188,12 +188,11 @@ tile_map_data = PackedByteArray("AAD+/xEAAQAAAAAAAAD9/xEAAQAAAAAAAAD8/xEAAQAAAAA
 tile_set = SubResource("TileSet_rsrsk")
 
 [node name="Mula" parent="." unique_id=1371985556 node_paths=PackedStringArray("alvo") instance=ExtResource("6_mula")]
-position = Vector2(620, 286)
+position = Vector2(720, 286)
 alvo = NodePath("../Curupira")
 
-[node name="HUD" parent="." unique_id=617932235 node_paths=PackedStringArray("curupira", "chefe") instance=ExtResource("4_hud")]
+[node name="HUD" parent="." unique_id=617932235 node_paths=PackedStringArray("curupira") instance=ExtResource("4_hud")]
 curupira = NodePath("../Curupira")
-chefe = NodePath("../Mula")
 
 [node name="MenuPausa" parent="." unique_id=1737279760 instance=ExtResource("7_pausa")]
 

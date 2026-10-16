@@ -56,9 +56,8 @@ alvo = NodePath("../Curupira")
 lado_esquerdo = NodePath("../LadoEsquerdo")
 lado_direito = NodePath("../LadoDireito")
 
-[node name="HUD" parent="." node_paths=PackedStringArray("curupira", "chefe") instance=ExtResource("4_hud")]
+[node name="HUD" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("4_hud")]
 curupira = NodePath("../Curupira")
-chefe = NodePath("../Boto")
 
 [node name="MenuPausa" parent="." instance=ExtResource("5_pausa")]
 

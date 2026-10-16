@@ -12,6 +12,7 @@
 [ext_resource type="Resource" uid="uid://clkijo3bqhq4m" path="res://dados/ataques/instinto_selvagem.tres" id="11_especial"]
 [ext_resource type="Texture2D" uid="uid://bejwotqf3tcq" path="res://assets/curupira_subindo_mao.png" id="12_subindo"]
 [ext_resource type="Texture2D" uid="uid://bjf4f4uw82ecr" path="res://assets/curupira_mao_atacando.png" id="13_atacando"]
+[ext_resource type="PackedScene" path="res://scenes/efeito_dash.tscn" id="14_dash"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
 animations = [{
@@ -86,3 +87,6 @@ shape = SubResource("CapsuleShape2D_hurtbox")
 
 [node name="CargaEspecial" type="Node" parent="."]
 script = ExtResource("10_carga")
+
+[node name="EfeitoDash" parent="." node_paths=PackedStringArray("sprite") instance=ExtResource("14_dash")]
+sprite = NodePath("../AnimatedSprite2D")
