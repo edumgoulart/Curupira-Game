@@ -13,6 +13,14 @@
 [ext_resource type="Texture2D" uid="uid://bejwotqf3tcq" path="res://assets/curupira_subindo_mao.png" id="12_subindo"]
 [ext_resource type="Texture2D" uid="uid://bjf4f4uw82ecr" path="res://assets/curupira_mao_atacando.png" id="13_atacando"]
 [ext_resource type="PackedScene" path="res://scenes/efeito_dash.tscn" id="14_dash"]
+[ext_resource type="Texture2D" uid="uid://dndu617mpdkha" path="res://assets/curupira_corrida_01.png" id="15_corrida01"]
+[ext_resource type="Texture2D" uid="uid://0bged0dry828" path="res://assets/curupira_corrida_02.png" id="16_corrida02"]
+[ext_resource type="Texture2D" uid="uid://goapydd4e325" path="res://assets/curupira_corrida_03.png" id="17_corrida03"]
+[ext_resource type="Texture2D" uid="uid://b4eq6tnqeqtdk" path="res://assets/curupira_corrida_04.png" id="18_corrida04"]
+[ext_resource type="Texture2D" uid="uid://dnvftgox4uyuk" path="res://assets/curupira_corrida_05.png" id="19_corrida05"]
+[ext_resource type="Texture2D" uid="uid://ckd3tnm262bt7" path="res://assets/curupira_corrida_06.png" id="20_corrida06"]
+[ext_resource type="Texture2D" uid="uid://boaylovifp3wo" path="res://assets/curupira_corrida_07.png" id="21_corrida07"]
+[ext_resource type="Texture2D" uid="uid://eylfvm47npl6" path="res://assets/curupira_corrida_08.png" id="22_corrida08"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
 animations = [{
@@ -42,6 +50,35 @@ animations = [{
 "loop": false,
 "name": &"atacar",
 "speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_corrida01")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_corrida02")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_corrida03")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_corrida04")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_corrida05")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_corrida06")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_corrida07")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_corrida08")
+}],
+"loop": true,
+"name": &"correr",
+"speed": 15.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ixury"]

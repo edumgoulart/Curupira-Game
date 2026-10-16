@@ -127,3 +127,18 @@ Depois de cada mudança:
 - Explicar o **porquê** das decisões de arquitetura — o Arthur precisa conseguir explicar o código na apresentação.
 - Não refatorar o que não foi pedido.
 - Ordem sugerida: movimento com game feel (coyote time, jump buffer, pulo variável) → dash com invencibilidade → projétil básico + hitbox/hurtbox → vida/dano/derrota → primeiro chefe completo → HUD → menus/seleção → save → demais chefes.
+
+---
+
+## Combinados da dupla
+
+- Eduardo e Arthur (os dois com Claude Code) **não trabalham em paralelo**. Quem termina uma
+  tarefa commita, e o outro começa a partir desse commit. Não é preciso alertar sobre
+  conflito de `.tscn` entre os dois.
+- **Arte fica num lugar só.** `art/` guarda a fonte que ainda não está no jogo e
+  `game/assets/` guarda o que o jogo usa. Quando uma arte entra no jogo, ela sai de `art/`
+  (o original continua no histórico do Git).
+- **Pendências** que um deixou para o outro conferir ou decidir ficam em `PENDENCIAS.md`,
+  importado abaixo. Ao resolver um item, apague-o de lá no mesmo commit.
+
+@PENDENCIAS.md
