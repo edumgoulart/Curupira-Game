@@ -23,6 +23,15 @@ extends Resource
 ## Golpes tirados do Curupira ao encostar no corpo do chefe. Provisório (combinado): 1.
 @export var golpes_contato: int = 1
 
+@export_group("Caixas de dano")
+## As caixas acompanham a pose: a cada animação, Hurtbox e Contato ganham o tamanho do
+## desenho (caixa da animação no .json da folha) vezes estas frações.
+## Hurtbox (onde o tiro do Curupira acerta), centrada no desenho. Provisório: 0,8 × 0,85.
+@export var fracao_hurtbox: Vector2 = Vector2(0.8, 0.85)
+## Contato (o corpo que machuca), presa embaixo do desenho, para o fogo, o cabelo e o chapéu
+## não machucarem. Provisório: 0,55 × 0,7.
+@export var fracao_contato: Vector2 = Vector2(0.55, 0.7)
+
 @export_group("Fases")
 ## Fração da vida em que começa a fase 2 (0,667 = quando perde um terço).
 ## Proposta do GDD (Q16): a cada terço da vida.

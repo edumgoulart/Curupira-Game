@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bylaptpr0006w" path="res://scenes/fundo_menu.tscn" id="t_fundo"]
 
 [node name="Control" type="Control" unique_id=555020724]
+texture_filter = 1
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,7 +36,7 @@ theme_override_constants/separation = 10
 [node name="AtaquesTitulo" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.34, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 36
 text = "Ataques levados para a luta"
 horizontal_alignment = 1
 
@@ -49,7 +50,7 @@ text = "Básico: Tiro de Folha"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = ""
 horizontal_alignment = 1
 
@@ -63,7 +64,7 @@ text = "Especial: Instinto Selvagem"
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = ""
 horizontal_alignment = 1
 
@@ -71,7 +72,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = "derrote chefes para liberar outros ataques"
 horizontal_alignment = 1
 
@@ -81,7 +82,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Painel/Caixa" unique_id=814406697]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
-theme_override_font_sizes/font_size = 52
+theme_override_font_sizes/font_size = 48
 text = "Escolha o chefe"
 horizontal_alignment = 1
 

@@ -12,7 +12,7 @@
 [ext_resource type="Texture2D" path="res://assets/pixel/cuca/efeitos/pocao_lentidao_4.png" id="10"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1"]
-radius = 14.0
+radius = 18.0
 
 [node name="PocaoCuca" type="Area2D"]
 collision_layer = 16

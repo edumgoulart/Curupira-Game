@@ -72,3 +72,13 @@ static func duracao(sprite: AnimatedSprite2D, animacao: StringName) -> float:
 		return 0.0
 	var fps: float = sprite.sprite_frames.get_animation_speed(animacao)
 	return sprite.sprite_frames.get_frame_count(animacao) / fps if fps > 0.0 else 0.0
+
+
+## Caixa que a animação ocupa (todos os quadros juntos), em pixels da arte, relativa à âncora.
+## Rect2 vazio se o .json não tem a caixa.
+static func caixa(sprite: AnimatedSprite2D, animacao: StringName) -> Rect2:
+	var anim: Dictionary = dados(sprite).get("por_nome", {}).get(animacao, {})
+	var c: Array = anim.get("caixa", [])
+	if c.size() != 4:
+		return Rect2()
+	return Rect2(c[0], c[1], c[2] - c[0], c[3] - c[1])

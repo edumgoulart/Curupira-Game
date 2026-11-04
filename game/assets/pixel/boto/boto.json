@@ -10,6 +10,12 @@
    "quadros": 29,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -37,
+    -85,
+    18,
+    23
+   ],
    "pontos": {
     "bico": [
      [-36, -57],
@@ -81,6 +87,12 @@
    "quadros": 10,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -72,
+    -81,
+    19,
+    25
+   ],
    "pontos": {
     "bico": [
      [-36, -57],
@@ -115,6 +127,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -35,
+    -78,
+    19,
+    24
+   ],
    "pontos": {
     "bico": [
      [-35, -56],
@@ -141,6 +159,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -36,
+    -81,
+    19,
+    24
+   ],
    "pontos": {
     "bico": [
      [-35, -56],
@@ -166,6 +190,12 @@
    "quadros": 5,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -36,
+    -80,
+    19,
+    24
+   ],
    "pontos": {
     "bico": [
      [-36, -57],
@@ -189,6 +219,12 @@
    "quadros": 5,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -36,
+    -79,
+    19,
+    24
+   ],
    "pontos": {
     "bico": [
      [-36, -60],
@@ -213,6 +249,12 @@
    "quadros": 5,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -36,
+    -82,
+    19,
+    21
+   ],
    "pontos": {
     "bico": [
      [-36, -62],
@@ -236,6 +278,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -34,
+    -91,
+    19,
+    23
+   ],
    "pontos": {
     "bico": [
      [-34, -60],
@@ -262,6 +310,12 @@
    "quadros": 2,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -39,
+    -74,
+    22,
+    23
+   ],
    "pontos": {
     "bico": [
      [-36, -56],
@@ -279,6 +333,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -36,
+    -75,
+    18,
+    23
+   ],
    "pontos": {
     "bico": [
      [-36, -57],
@@ -305,6 +365,12 @@
    "quadros": 2,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -36,
+    -82,
+    18,
+    20
+   ],
    "pontos": {
     "bico": [
      [-36, -58],
@@ -322,6 +388,12 @@
    "quadros": 5,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -36,
+    -81,
+    18,
+    44
+   ],
    "pontos": {
     "bico": [
      [-36, -57],
@@ -345,6 +417,12 @@
    "quadros": 13,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -47,
+    -90,
+    57,
+    23
+   ],
    "pontos": {
     "bico": [
      [-37, -56],
@@ -385,6 +463,12 @@
    "quadros": 4,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -35,
+    -80,
+    41,
+    44
+   ],
    "pontos": {
     "bico": [
      [11, 67],
@@ -406,6 +490,12 @@
    "quadros": 36,
    "fps": 10,
    "loop": false,
+   "caixa": [
+    -36,
+    -98,
+    66,
+    33
+   ],
    "pontos": {
     "bico": [
      [-36, -57],

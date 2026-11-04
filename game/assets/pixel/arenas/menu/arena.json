@@ -1,0 +1,8 @@
+{
+ "fps": 4,
+ "quadros": 8,
+ "tem_frente": false,
+ "chao_y": 220,
+ "curupira_x": 110,
+ "tamanho": [480, 270]
+}

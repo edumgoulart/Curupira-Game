@@ -1,6 +1,11 @@
 [gd_scene format=3 uid="uid://c8hi7hdk43ref"]
 
 [ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
+[ext_resource type="Script" uid="uid://bku4kjgoguonj" path="res://scripts/animacao_quadros.gd" id="9_anim"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feitico_1.png" id="10_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feitico_2.png" id="11_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feitico_3.png" id="12_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feitico_4.png" id="13_q"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_perseguidor"]
 radius = 14.0
@@ -13,17 +18,15 @@ script = ExtResource("1_proj")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_perseguidor")
 
-[node name="VisualProvisorio" type="Polygon2D" parent="."]
-color = Color(0.45, 0.95, 0.35, 0.5)
-polygon = PackedVector2Array(-36, 0, -10, -12, 8, -14, 18, 0, 8, 14, -10, 12)
-
-[node name="Orbe" type="Polygon2D" parent="VisualProvisorio"]
-color = Color(0.4, 0.95, 0.3, 1)
-polygon = PackedVector2Array(17, 0, 15.7, 5.6, 12.1, 10.2, 6.9, 12.7, 1.1, 12.7, -4.1, 10.2, -7.7, 5.6, -9, 0, -7.7, -5.6, -4.1, -10.2, 1.1, -12.7, 6.9, -12.7, 12.1, -10.2, 15.7, -5.6)
-
-[node name="Miolo" type="Polygon2D" parent="VisualProvisorio"]
-color = Color(0.75, 0.5, 1, 1)
-polygon = PackedVector2Array(12, 0, 10.9, 3.5, 7.9, 5.7, 4.1, 5.7, 1.1, 3.5, 0, 0, 1.1, -3.5, 4.1, -5.7, 7.9, -5.7, 10.9, -3.5)
+[node name="Visual" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("10_q")
+centered = false
+offset = Vector2(-12, -5)
+script = ExtResource("9_anim")
+quadros = Array[Texture2D]([ExtResource("10_q"), ExtResource("11_q"), ExtResource("12_q"), ExtResource("13_q")])
+fps = 16.0
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 rect = Rect2(-38, -16, 58, 32)

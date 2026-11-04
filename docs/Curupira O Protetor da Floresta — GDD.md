@@ -216,7 +216,7 @@ O jogo é controlado por gamepad, com teclado como alternativa. As ações usam 
 | Andar | Direcional | A e D | `move_left`, `move_right` |
 | Mirar para cima | Direcional para cima | W | A definir (proposta: `aim_up`) |
 | Abaixar e mirar para baixo | Direcional para baixo | S | A definir (proposta: `crouch`) |
-| Travar a mira | RB (proposta, Q15) | Shift (proposta, Q15) | A definir (proposta: `aim_lock`) |
+| Travar a mira | A definir (Q15) | Shift | `aim_lock` |
 | Pular | A | Espaço | `jump` |
 | Ataque básico | X | J | `attack_basic` |
 | Especial | Y | K | `attack_special` |
@@ -281,7 +281,7 @@ O Curupira atira em oito direções, com o projétil saindo da mão. Segurar o b
 
 - **De pé, parado ou andando:** para a frente, para a frente com cima na diagonal para cima e só cima reto para cima. Andando, ele atira para a frente ou na diagonal para cima.
 - **Agachado:** baixo no chão agacha. Agachado, o Curupira fica com cerca de 40% da altura, não anda e atira para a frente, rente ao chão. Agachar serve para desviar de ataques altos, como o jato do Boto e a primeira varredura da Máquina.
-- **Mira travada:** segurando o botão de travar a mira, ele fica parado no lugar e pode mirar em qualquer direção do chão, inclusive a diagonal para baixo. O botão ainda não foi escolhido (Q15).
+- **Mira travada:** segurando o botão de travar a mira, ele fica parado no lugar e pode mirar em qualquer direção do chão, inclusive a diagonal para baixo. No teclado é o Shift; no controle o botão ainda não foi escolhido (Q15).
 - **No ar:** atira em cinco direções, de cima até baixo: cima, diagonal para cima, frente, diagonal para baixo e baixo. Para baixo reto só existe no ar.
 - **Direção:** a frente é o lado para onde ele está olhando, e as diagonais são a 45°.
 
@@ -501,7 +501,7 @@ Ideias fora do MVP, ainda não adotadas:
 Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do documento apontam para esta lista.
 
 - [ ] **Q14. Áudio.** Bibliotecas, faixas e efeitos usados, com a fonte e a licença de cada um.
-- [ ] **Q15. Travar a mira.** Qual botão trava a mira (proposta: RB no controle e Shift no teclado) e o nome da ação no Input Map.
+- [ ] **Q15. Travar a mira no controle.** No teclado ficou o Shift (ação `aim_lock`). Falta o botão do controle.
 - [ ] **Q16. Fases e ataques novos.** Em que ponto da vida cada fase começa (proposta: a cada terço) e o aviso, a duração, a velocidade e os golpes dos ataques marcados como "a definir".
 
 ### Resolvidas

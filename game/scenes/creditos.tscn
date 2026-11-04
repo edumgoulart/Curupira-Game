@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bylaptpr0006w" path="res://scenes/fundo_menu.tscn" id="3_fundo"]
 
 [node name="Creditos" type="Control"]
+texture_filter = 1
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -35,7 +36,7 @@ theme_override_constants/separation = 14
 [node name="Titulo" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 60
 text = "Obrigado por jogar!"
 horizontal_alignment = 1
 
@@ -48,7 +49,7 @@ horizontal_alignment = 1
 [node name="Historia" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 36
 text = "A floresta está salva — por enquanto."
 horizontal_alignment = 1
 
@@ -58,19 +59,19 @@ layout_mode = 2
 [node name="Equipe" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.34, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 36
 text = "Equipe"
 horizontal_alignment = 1
 
 [node name="Arthur" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 36
 text = "Arthur Campello Gausmann — programação e negócios"
 horizontal_alignment = 1
 
 [node name="Eduardo" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 36
 text = "Eduardo Maliszewski Goulart — programação e arte"
 horizontal_alignment = 1
 
@@ -80,7 +81,7 @@ layout_mode = 2
 [node name="Ferramentas" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = "Feito em Godot 4 com GDScript"
 horizontal_alignment = 1
 

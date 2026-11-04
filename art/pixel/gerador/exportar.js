@@ -32,12 +32,18 @@ function montarFolha(nome, ancora, anims, celulaFixa) {
   const meta = { imagem: nome + '.png', celula: [W, H], ancora: [ax, ay], escala_no_jogo: 4, animacoes: [] };
   anims.forEach((A, linha) => {
     const pontos = {};
+    // caixa: o que todos os quadros da animação ocupam, relativo à âncora [x0, y0, x1, y1]
+    // (x1 e y1 exclusivos). O jogo usa para a área de dano acompanhar a pose.
+    let cx0 = Infinity, cy0 = Infinity, cx1 = -Infinity, cy1 = -Infinity;
     A.quadros.forEach((q, col) => {
       const t = q.cam.paraTela();
       ctx.drawImage(t, ancora.x - ax, ancora.y - ay, W, H, col * W, linha * H, W, H);
       for (const [k, p] of Object.entries(q.pontos || {})) (pontos[k] = pontos[k] || []).push(rel(p, ancora));
+      const c = q.cam;
+      if (c.x1 >= 0) { cx0 = Math.min(cx0, c.x0); cy0 = Math.min(cy0, c.y0); cx1 = Math.max(cx1, c.x1 + 1); cy1 = Math.max(cy1, c.y1 + 1); }
     });
-    meta.animacoes.push({ nome: A.nome, linha, quadros: A.quadros.length, fps: Math.round(A.fps * 10) / 10, loop: A.loop, ...(Object.keys(pontos).length ? { pontos } : {}), ...(A.nota ? { nota: A.nota } : {}) });
+    const caixa = cx1 > cx0 ? [cx0 - ancora.x, cy0 - ancora.y, cx1 - ancora.x, cy1 - ancora.y] : [0, 0, 0, 0];
+    meta.animacoes.push({ nome: A.nome, linha, quadros: A.quadros.length, fps: Math.round(A.fps * 10) / 10, loop: A.loop, caixa, ...(Object.keys(pontos).length ? { pontos } : {}), ...(A.nota ? { nota: A.nota } : {}) });
   });
   saida.personagens[nome] = { meta, png: png(tela) };
 }
@@ -272,7 +278,7 @@ function exportarArenas() {
 }
 
 try {
-  exportarCurupira(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas();
+  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu();
   document.getElementById('saida').textContent = JSON.stringify(saida);
   document.title = 'pronto';
 } catch (e) { document.getElementById('saida').textContent = 'ERRO ' + e.stack; }

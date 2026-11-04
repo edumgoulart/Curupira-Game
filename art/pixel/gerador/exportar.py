@@ -45,4 +45,16 @@ for nome, a in dados['arenas'].items():
         for i, q in enumerate(a['frente'], 1):
             gravar(f'{destino}/arenas/{nome}/frente_{i}.png', q)
     gravar_json(f'{destino}/arenas/{nome}/arena.json', {'fps': a['fps'], 'quadros': len(a['fundo']), 'tem_frente': bool(a['frente']), 'chao_y': a['chao_y'], 'curupira_x': a['curupira_x'], 'tamanho': [480, 270]})
+# fonte em BMFont (texto): o Godot importa o .fnt como FontFile
+for nome, f in dados.get('fontes', {}).items():
+    gravar(f'{destino}/ui/fonte_{nome}.png', f['png'])
+    linhas = [f'info face="{nome}" size={f["tamanho"]} bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=0 aa=1 padding=0,0,0,0 spacing=1,1',
+              f'common lineHeight={f["altura_linha"]} base={f["base"]} scaleW={f["largura"]} scaleH={f["altura"]} pages=1 packed=0',
+              f'page id=0 file="fonte_{nome}.png"', f'chars count={len(f["glifos"])}']
+    for g in f['glifos']:
+        linhas.append(f'char id={g["id"]} x={g["x"]} y={g["y"]} width={g["w"]} height={g["h"]} xoffset={g["xoffset"]} yoffset={g["yoffset"]} xadvance={g["xadvance"]} page=0 chnl=15')
+    with open(f'{destino}/ui/fonte_{nome}.fnt', 'w', encoding='utf-8') as arq:
+        arq.write('\n'.join(linhas) + '\n')
+for nome, u in dados.get('ui', {}).items():
+    gravar(f'{destino}/ui/{nome}.png', u['png'])
 print('ok', len(dados['personagens']), 'personagens,', len(dados['efeitos']), 'efeitos,', len(dados['arenas']), 'arenas')

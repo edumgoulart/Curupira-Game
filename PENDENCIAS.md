@@ -10,30 +10,37 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   - Mudaram: `curupira`, os 4 chefes, `level1..4`, os projéteis e efeitos dos chefes,
     `projectile_base`, `projetil_bola_de_fogo` e `projetil_instinto_selvagem`. O guia está
     em `docs/tdd.md`, seções 9 e 10.
+  - Na segunda rodada mudaram também os ataques ganhos (feitiço, bolhas, poção, canhão e os
+    respingos), o menu e as outras telas (tema, fonte, fundo), as caixas de dano dos chefes e
+    a hurtbox do Curupira.
   - Os `*_frames.tres` são gerados por script (`art/pixel/gerar_spriteframes.gd`). É exceção
     à regra do `CLAUDE.md` (SpriteFrames é do Arthur): mudar o desenho no gerador e gerar
     de novo, em vez de editar à mão.
   - As cenas novas usam `ext_resource` só com caminho; o Godot completa os `uid` ao salvar.
-- **Formas de colisão.** Ninguém ajustou as formas à arte nova. Com `Debug > Visible Collision Shapes`, conferir:
-  - **Curupira:** o desenho tem ~204 px de altura de pé e ~112 px agachado. As cápsulas
-    continuam as antigas (raio 30, altura 192), e a agachada é criada pelo código com metade
-    da altura (`ALTURA_AGACHADO`, `curupira.gd:30`).
-  - **Chefes:** `Hurtbox` e `Contato` de cada um. Na Máquina, os dois ficam no `Nucleo`, que segue a lente.
-  - **Ataques:** projéteis e perigos dos chefes (`onda_fogo_mula`, `nota_cuca`, `coracao_boto`, `chapeu_boto`, `placa_maquina` etc.). As formas têm o tamanho aproximado do desenho.
+- **Caixas de dano.** Ajustadas à arte nova pelo Claude. Conferir com
+  `Debug > Visible Collision Shapes`:
+  - **Chefes:** `Hurtbox` e `Contato` agora acompanham a pose (a `caixa` de cada animação no
+    `.json`). O tamanho é uma fração do desenho, `fracao_hurtbox` e `fracao_contato` no
+    `.tres` de cada chefe. A Máquina continua com as caixas fixas no `Nucleo`.
+  - **Curupira:** a hurtbox ficou um pouco menor que o corpo (raio 24, altura 172).
+  - **Ataques:** `onda_fogo_mula` mais larga (100×72) e `pocao_cuca` com raio 18.
 - **Teste de cada luta (F6).** Nada da pixel art foi visto rodando; só passou no teste
   headless (`game/testes/teste_lutas.gd`), que não acusa erro de script. Rodar `level1..4`
   e observar:
   - a âncora: os pés no chão (y = 340) e o Boto na linha d'água;
   - os tiros saindo da mão do Curupira nas 8 direções, dos dois lados, agachado e no ar;
   - os tiros dos chefes saindo do lugar certo: bola da boca da Mula, feitiço da garra da Cuca, jato do bico do Boto, laser da lente da Máquina;
-  - a fase 2 (com 2/3 da vida) e a fase 3 (com 1/3) trazendo o ataque novo logo em seguida.
+  - a fase 2 (com 2/3 da vida) e a fase 3 (com 1/3) trazendo o ataque novo logo em seguida;
+  - os ataques ganhos: com `LIBERAR_TUDO_PARA_TESTE` (`game_state.gd`) todos já aparecem
+    na seleção, e a Máquina também. Pôr `false` para testar a progressão de verdade.
 
 ## Decisões em aberto
 
 - **Valores "provisório".** Os ataques novos (pisoteio, investida, bote, ninar, beijos,
   chapéu, pistões, varredura) e os limiares das fases (0,667 e 0,333) estão marcados
   "provisório" nos `*_data.gd`. Fechar no GDD (Q16) depois de testar.
-- **Trava de mira.** Ficou no RB / Shift (`aim_lock`), como propõe a Q15 do GDD. Confirmar.
+- **Trava de mira no controle.** A trava ficou só no Shift, a pedido do Eduardo. No controle
+  ela não tem botão (era RB). Escolher um botão (GDD, Q15).
 - **Coração do Boto carrega o especial.** Estourar um coração com tiro conta como acerto,
   porque a hurtbox dele está na layer `enemy`. Decidir se é desejado.
 - **Regras desatualizadas.** O resumo de regras do `CLAUDE.md` e do `AGENTS.md` ainda diz
@@ -50,18 +57,13 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 
 ## Arte
 
-- **Ataques liberados sem pixel art.** Feitiço Perseguidor, Bolha d'Água, Canhão
-  Flamejante, Poção Maldita e Bolha Abissal ainda são `Polygon2D` provisórios. A Bola de
-  Fogo do jogador usa a bola da Mula, mas só tem o desenho de lado: na diagonal e para cima
-  ela voa de lado. Desenhar no gerador, com uma imagem por direção como a folha.
-- **HUD e menus** continuam com a arte antiga. Por isso o filtro padrão do projeto ainda é
-  `Linear` (TDD 10.3).
-- **Arte antiga sem uso.** Nenhuma cena usa mais estes arquivos de `game/assets/`:
-  `boto.png`, `cuca.png`, `mula.png`, `mula_bolas.png`, `curupira_corrida_01..08.png`,
-  `curupira_subindo_mao.png`, `curupira_mao_atacando.png`, `fase_boto.png`, `fase_cuca.png`,
-  `efeitos/bola_fogo_1..4.png` e `placeholder/` (personagem e tileset). Apagar quando a
-  dupla confirmar (o original fica no histórico do Git). `curupira.png`, `titulo.png` e
-  `fase_mula.png` continuam em uso no menu.
+- **Bola de Fogo do jogador.** Usa a bola da Mula, que só tem o desenho de lado: na
+  diagonal e para cima ela voa de lado. Desenhar no gerador, com uma imagem por direção,
+  como a folha.
+- **HUD** ainda é desenhado por código (círculos e barra lisos), fora do estilo pixel.
+- **Arte antiga.** Foi para `art/antiga/` e saiu do jogo. Só as folhas do dash
+  (`game/assets/efeitos/folha.png`) continuam em uso, e por isso o filtro padrão do projeto
+  ainda é `Linear`.
 - **GDD, Q5.** O GDD já registra a pixel art em 480×270 ×4. Conferir se a Q5 (tamanho dos
   sprites) pode ser fechada.
 

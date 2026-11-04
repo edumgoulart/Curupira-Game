@@ -10,6 +10,12 @@
    "quadros": 29,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -48,
+    -108,
+    52,
+    2
+   ],
    "pontos": {
     "boca": [
      [-36, -85],
@@ -112,6 +118,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -89,
+    -101,
+    49,
+    2
+   ],
    "pontos": {
     "boca": [
      [-36, -85],
@@ -146,6 +158,12 @@
    "quadros": 5,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -99,
+    -48,
+    49,
+    2
+   ],
    "pontos": {
     "boca": [
      [-60, -24],
@@ -177,6 +195,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -86,
+    -107,
+    46,
+    2
+   ],
    "pontos": {
     "boca": [
      [-60, -30],
@@ -210,6 +234,12 @@
    "quadros": 7,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -47,
+    -146,
+    56,
+    2
+   ],
    "pontos": {
     "boca": [
      [-36, -85],
@@ -246,6 +276,12 @@
    "quadros": 4,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -32,
+    -142,
+    56,
+    2
+   ],
    "pontos": {
     "boca": [
      [11, -106],
@@ -274,6 +310,12 @@
    "quadros": 8,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -61,
+    -134,
+    56,
+    2
+   ],
    "pontos": {
     "boca": [
      [13, -106],
@@ -314,6 +356,12 @@
    "quadros": 11,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -83,
+    -101,
+    50,
+    2
+   ],
    "pontos": {
     "boca": [
      [-37, -84],
@@ -363,6 +411,12 @@
    "quadros": 6,
    "fps": 27,
    "loop": true,
+   "caixa": [
+    -59,
+    -69,
+    50,
+    2
+   ],
    "pontos": {
     "boca": [
      [-46, -55],
@@ -396,6 +450,12 @@
    "quadros": 3,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -60,
+    -100,
+    49,
+    2
+   ],
    "pontos": {
     "boca": [
      [-45, -78],
@@ -420,6 +480,12 @@
    "quadros": 7,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -43,
+    -97,
+    46,
+    2
+   ],
    "pontos": {
     "boca": [
      [-30, -84],
@@ -457,6 +523,12 @@
    "quadros": 6,
    "fps": 16,
    "loop": true,
+   "caixa": [
+    -50,
+    -106,
+    49,
+    2
+   ],
    "pontos": {
     "boca": [
      [-37, -86],
@@ -491,6 +563,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -47,
+    -152,
+    54,
+    2
+   ],
    "pontos": {
     "boca": [
      [-36, -85],
@@ -524,6 +602,12 @@
    "quadros": 7,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -35,
+    -152,
+    54,
+    2
+   ],
    "pontos": {
     "boca": [
      [-12, -100],
@@ -561,6 +645,12 @@
    "quadros": 12,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -46,
+    -101,
+    52,
+    2
+   ],
    "pontos": {
     "boca": [
      [-33, -85],
@@ -612,6 +702,12 @@
    "quadros": 36,
    "fps": 10,
    "loop": false,
+   "caixa": [
+    -56,
+    -101,
+    69,
+    7
+   ],
    "pontos": {
     "boca": [
      [-37, -81],

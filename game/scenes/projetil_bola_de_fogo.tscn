@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dhdy2sdg0h2bi"]
 
 [ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
-[ext_resource type="PackedScene" uid="uid://qlej0ru4rb3i" path="res://scenes/explosao.tscn" id="2_expl"]
+[ext_resource type="PackedScene" path="res://scenes/explosao_mula.tscn" id="2_expl"]
 [ext_resource type="Script" uid="uid://bku4kjgoguonj" path="res://scripts/animacao_quadros.gd" id="3_anim"]
 [ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/bola_fogo_1.png" id="4_q1"]
 [ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/bola_fogo_2.png" id="5_q2"]

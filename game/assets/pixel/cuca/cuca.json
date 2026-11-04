@@ -10,6 +10,12 @@
    "quadros": 29,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -40,
+    -94,
+    49,
+    2
+   ],
    "pontos": {
     "garra": [
      [-24, -48],
@@ -81,6 +87,12 @@
    "quadros": 9,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -39,
+    -112,
+    49,
+    2
+   ],
    "pontos": {
     "garra": [
      [-24, -48],
@@ -113,6 +125,12 @@
    "quadros": 3,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -49,
+    -104,
+    49,
+    2
+   ],
    "pontos": {
     "garra": [
      [-22, -96],
@@ -133,6 +151,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -49,
+    -94,
+    46,
+    2
+   ],
    "pontos": {
     "garra": [
      [-40, -60],
@@ -158,6 +182,12 @@
    "quadros": 9,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -39,
+    -106,
+    49,
+    2
+   ],
    "pontos": {
     "garra": [
      [-24, -48],
@@ -190,6 +220,12 @@
    "quadros": 2,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -50,
+    -100,
+    49,
+    2
+   ],
    "pontos": {
     "garra": [
      [15, -96],
@@ -208,6 +244,12 @@
    "quadros": 6,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -50,
+    -94,
+    47,
+    2
+   ],
    "pontos": {
     "garra": [
      [-42, -78],
@@ -233,6 +275,12 @@
    "quadros": 7,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -54,
+    -94,
+    49,
+    2
+   ],
    "pontos": {
     "garra": [
      [-24, -48],
@@ -261,6 +309,12 @@
    "quadros": 8,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -78,
+    -33,
+    54,
+    9
+   ],
    "pontos": {
     "garra": [
      [-30, -6],
@@ -291,6 +345,12 @@
    "quadros": 4,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -78,
+    -95,
+    51,
+    8
+   ],
    "pontos": {
     "garra": [
      [-30, -6],
@@ -312,6 +372,12 @@
    "quadros": 15,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -39,
+    -95,
+    48,
+    2
+   ],
    "pontos": {
     "garra": [
      [-22, -47],
@@ -356,6 +422,12 @@
    "quadros": 4,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -45,
+    -94,
+    48,
+    2
+   ],
    "pontos": {
     "garra": [
      [-24, -48],
@@ -377,6 +449,12 @@
    "quadros": 19,
    "fps": 12,
    "loop": true,
+   "caixa": [
+    -45,
+    -93,
+    49,
+    2
+   ],
    "pontos": {
     "garra": [
      [-26, -76],
@@ -429,6 +507,12 @@
    "quadros": 5,
    "fps": 12,
    "loop": false,
+   "caixa": [
+    -39,
+    -93,
+    47,
+    2
+   ],
    "pontos": {
     "garra": [
      [-26, -79],
@@ -452,6 +536,12 @@
    "quadros": 36,
    "fps": 10,
    "loop": false,
+   "caixa": [
+    -39,
+    -94,
+    70,
+    2
+   ],
    "pontos": {
     "garra": [
      [-20, -48],

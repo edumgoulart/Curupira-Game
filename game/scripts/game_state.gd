@@ -7,6 +7,9 @@ const SAVE_PATH := "user://save.cfg"
 # A ordem aqui define a ordem no level_select.
 const FASES := ["fase1", "fase2", "fase3"]
 const BOSS := "boss"
+# Para testar: com true, a Máquina e todos os ataques ficam liberados na seleção, sem
+# precisar vencer as fases. Só vale rodando pelo editor (debug); o jogo exportado ignora.
+const LIBERAR_TUDO_PARA_TESTE := true
 
 var concluidas: Array[String] = []
 # Ataques escolhidos na seleção (caminho do .tres). "" = usa o padrão do Curupira
@@ -36,6 +39,8 @@ func marcar_concluida(id: String) -> void:
 
 
 func boss_liberado() -> bool:
+	if _liberar_para_teste():
+		return true
 	for fase in FASES:
 		if not concluiu(fase):
 			return false
@@ -48,7 +53,11 @@ func zerou() -> bool:
 
 ## Um ataque está liberado se é inicial ("") ou se a fase que o libera foi concluída.
 func liberado(fase_que_libera: String) -> bool:
-	return fase_que_libera == "" or concluiu(fase_que_libera)
+	return fase_que_libera == "" or concluiu(fase_que_libera) or _liberar_para_teste()
+
+
+func _liberar_para_teste() -> bool:
+	return LIBERAR_TUDO_PARA_TESTE and OS.is_debug_build()
 
 
 ## Guarda a escolha da tela de seleção (só pode trocar antes da fase, GDD).

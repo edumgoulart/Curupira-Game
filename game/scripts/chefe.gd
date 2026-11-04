@@ -87,6 +87,7 @@ func _ready() -> void:
 	vida.configurar(dados.vida)
 	contato.dano = dados.golpes_contato
 	FolhaSprites.preparar(sprite)
+	_preparar_caixas()
 	_sorteio.randomize()
 	# Começa no próximo frame: o _ready do chefe (filho desta classe) ainda está rodando.
 	_lutar.call_deferred()
@@ -194,6 +195,7 @@ func ponto(nome: String) -> Vector2:
 ## O desenho olha para a esquerda; true vira para a direita (espelha o sprite e os pontos).
 func virar(para_direita: bool) -> void:
 	sprite.scale.x = -absf(sprite.scale.x) if para_direita else absf(sprite.scale.x)
+	_ajustar_caixas()
 
 
 func olhando_para_direita() -> bool:
@@ -338,6 +340,41 @@ func tocar(nome: StringName) -> void:
 		return
 	if sprite.animation != nome or not sprite.is_playing():
 		sprite.play(nome)
+
+
+## Caixas de dano que acompanham a pose. Só quando Hurtbox e Contato são filhos diretos do
+## chefe: a Máquina guarda os dois no Nucleo, que segue a lente, e tem caixas fixas.
+func _preparar_caixas() -> void:
+	if hurtbox.get_parent() != self or contato.get_parent() != self:
+		return
+	# Formas próprias desta instância (a cena compartilha os sub_resources).
+	for area: Area2D in [hurtbox, contato]:
+		var forma := area.get_child(0) as CollisionShape2D
+		forma.shape = RectangleShape2D.new()
+	sprite.animation_changed.connect(_ajustar_caixas)
+	_ajustar_caixas()
+
+
+func _ajustar_caixas() -> void:
+	if hurtbox.get_parent() != self or not sprite.animation_changed.is_connected(_ajustar_caixas):
+		return
+	var arte: Rect2 = FolhaSprites.caixa(sprite, sprite.animation)
+	if arte.size == Vector2.ZERO:
+		return
+	# Da arte (relativa à âncora = origem do sprite) para o chefe, com escala e espelhamento.
+	var a: Vector2 = sprite.position + arte.position * sprite.scale
+	var b: Vector2 = sprite.position + arte.end * sprite.scale
+	var caixa := Rect2(a, Vector2.ZERO).expand(b)
+	var tam_h: Vector2 = caixa.size * dados.fracao_hurtbox
+	_por_caixa(hurtbox, caixa.get_center(), tam_h)
+	var tam_c: Vector2 = caixa.size * dados.fracao_contato
+	_por_caixa(contato, Vector2(caixa.get_center().x, caixa.end.y - tam_c.y / 2.0), tam_c)
+
+
+func _por_caixa(area: Area2D, centro: Vector2, tamanho: Vector2) -> void:
+	var forma := area.get_child(0) as CollisionShape2D
+	(forma.shape as RectangleShape2D).size = tamanho
+	forma.position = centro
 
 
 ## Cada chefe sobrescreve para limpar o que é dele (ex.: voltar ao lugar).

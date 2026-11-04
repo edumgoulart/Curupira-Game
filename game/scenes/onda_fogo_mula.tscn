@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
-size = Vector2(70, 72)
+size = Vector2(100, 72)
 
 [node name="OndaFogoMula" type="Area2D"]
 collision_layer = 16

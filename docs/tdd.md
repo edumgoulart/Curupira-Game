@@ -18,6 +18,7 @@ Este documento descreve **como** o jogo é construído. O **o quê** (regras, n�
 - Projéteis e efeitos são **modulares**: uma imagem por projétil, e o código cria quantos o ataque pedir (seção 10.5).
 - As arenas trocaram o fundo antigo por `FundoArena` e o chão foi para y = 340 (seção 9).
 - O Input Map ganhou `aim_up`, `crouch` e `aim_lock` (seção 12).
+- Os ataques ganhos dos chefes, os menus (fonte, botões, título, fundo) e as áreas de dano passaram para a pixel art; a arte antiga foi para `art/antiga/` (seções 7, 10 e 11).
 
 ---
 
@@ -29,12 +30,12 @@ Revisão v0.3 feita sobre a pasta `game/` (branch `movimento-curupira`), depois 
 |---|---|
 | Curupira (movimento, coyote, jump buffer, pulo variável, dash, vida, invencibilidade) | Pronto |
 | Curupira: mira em 8 direções, agachar, poses de tiro por direção | Pronto (falta teste manual) |
-| Ataques básicos (4) e especiais (4), carga do especial | Pronto; só Tiro de Folha, Bola de Fogo e Instinto Selvagem têm arte em pixel |
+| Ataques básicos (4) e especiais (4), carga do especial | Pronto, todos em pixel art (a Bola de Fogo só tem o desenho de lado) |
 | Chefes: Mula, Cuca, Boto, Máquina, 3 fases × 4 ataques | Pronto (falta teste manual e balanceamento) |
 | Arte em pixel: Curupira, 4 chefes, efeitos dos chefes, 4 arenas | Pronta, ligada nas cenas |
 | Efeitos de estado (veneno, lentidão) no chefe e no Curupira | Pronto, sem componente `StatusEffects` (ver 7.6) |
 | Arenas (4), HUD, pausa, derrota, vitória, créditos | Pronto |
-| Menu inicial, seleção de fase e ataques | Pronto (arte antiga, não pixel) |
+| Menu inicial, seleção de fase e ataques | Pronto, em pixel art |
 | Save de progresso e equipamento | Pronto (formato `ConfigFile`, ver 14) |
 | **Opções (volume, tela cheia)** | **Não feito** (tela é só um aviso "em breve") |
 | **Áudio (barramentos, músicas, SFX)** | **Não feito** |
@@ -56,7 +57,7 @@ Boss-rush de plataforma 2D em visão lateral. Quatro arenas de tela única (1920
 | Resolução base | 1920×1080. A arte é desenhada em 480×270 e ampliada 4× (seção 10) |
 | Stretch | Mode `canvas_items`, aspect `expand` **[Implementado]** |
 | Tela | **[Aberto]** `window/size/mode = 2` (maximizada). O GDD pede tela cheia por padrão (modo 3), alternável nas Opções |
-| Filtro de textura | **[Divergente]** Pixel art usa `Nearest`. As raízes das arenas (`level1..4`) têm `texture_filter = Nearest`, e os filhos herdam. O padrão do projeto continua `Linear` enquanto menus e HUD usarem a arte antiga (10.3) |
+| Filtro de textura | **[Divergente]** Pixel art usa `Nearest`. As raízes das arenas (`level1..4`) têm `texture_filter = Nearest`, e os filhos herdam. Os menus também (raiz de cada tela). O padrão do projeto continua `Linear` por causa das folhas do dash, a última arte antiga em uso (10.3) |
 | Snap 2D to pixel | Desligado **[Assumido]** |
 | Física | 60 ticks/s (padrão). O combate roda no `_physics_process`, em ritmo fixo **[Implementado]** |
 | Gravidade global | `2d/default_gravity = 3000` no projeto, **não usada**: o Curupira usa a própria (2800) e os chefes não usam gravidade |
@@ -75,13 +76,14 @@ jogo-curupira/
 ├── docs/                      # GDD, tdd.md
 ├── art/
 │   ├── source/                # .kra do Krita (arte antiga)
+│   ├── antiga/                # PNGs da arte antiga e placeholders, fora do jogo (só consulta)
 │   └── pixel/                 # gerador de pixel art (JS), exportador, gerar_spriteframes.gd
 ├── teaser/                    # scripts e vídeos do teaser
 └── game/                      # <- a Godot abre aqui
     ├── project.godot
     ├── assets/
-    │   ├── pixel/             # arte em uso: <personagem>/ (folha, .json, _frames.tres, efeitos/), arenas/<chefe>/
-    │   └── ...                # arte antiga (menus, HUD, alguns projéteis); sai conforme for trocada
+    │   ├── pixel/             # arte em uso: <personagem>/ (folha, .json, _frames.tres, efeitos/), arenas/<chefe>/, arenas/menu/, ui/
+    │   └── efeitos/folha.png  # arte antiga ainda em uso (folhas do dash)
     ├── scenes/                # todas as cenas, sem subpastas
     ├── scripts/               # todos os scripts, sem subpastas
     ├── dados/
@@ -157,7 +159,7 @@ Curupira (CharacterBody2D)        # layer: player (2); origem no centro do corpo
 └── EfeitoDash (instância)        # fantasmas, folhas, vento, corpo esticado (só visual)
 ```
 
-- **[Divergente]** O `SpriteFrames` agora é **gerado** pelo gerador de pixel art (`curupira_frames.tres`), não montado à mão no editor. As shapes de colisão continuam sendo do Arthur.
+- **[Divergente]** O `SpriteFrames` agora é **gerado** pelo gerador de pixel art (`curupira_frames.tres`), não montado à mão no editor. A hurtbox é uma cápsula um pouco menor que o corpo (raio 24, altura 172, 10 px abaixo do centro), para golpe de raspão no cabelo não contar.
 - O sprite fica nos pés (`y = +96`) porque a âncora da folha é o pé (10.4).
 - **Virar**: `sprite.scale.x = ±4`, não `flip_h` (10.4). O `EfeitoDash` mantém o sinal da escala quando estica o corpo.
 
@@ -259,9 +261,9 @@ Um `.tres` (`AtaqueData`) por ataque em `dados/ataques/`. Segurar o botão atira
 | Ataque | Dano | Tiros/s | Carga por acerto | Velocidade (px/s) | Comportamento | Arte |
 |---|---|---|---|---|---|---|
 | Tiro de Folha (inicial) | 4 | 5 | +1 | 1800 | Reto | Pixel, um desenho por direção |
-| Bola de Fogo (Mula) | 12 | 1,5 | +3 | 1000 | Reto; explosão no impacto (`explosao.tscn`) | Pixel (a bola da Mula), só de lado |
-| Feitiço Perseguidor (Cuca) | 3 | 4 | +1 | 900 | Persegue o chefe: curva 540°/s, vida máxima 3 s | `Polygon2D` provisório |
-| Bolha d'Água (Boto) | 26 | 0,8 | +6 | 600 | Lento, reto | `Polygon2D` provisório |
+| Bola de Fogo (Mula) | 12 | 1,5 | +3 | 1000 | Reto; explosão no impacto (`explosao_mula.tscn`) | Pixel (a bola da Mula), só de lado |
+| Feitiço Perseguidor (Cuca) | 3 | 4 | +1 | 900 | Persegue o chefe: curva 540°/s, vida máxima 3 s | Pixel (`feitico`), gira com o voo |
+| Bolha d'Água (Boto) | 26 | 0,8 | +6 | 600 | Lento, reto; respingo no impacto | Pixel (`bolha_agua`, `respingo_agua`) |
 
 **Desenho por direção**: pixel art não gira bem. O projétil reto escolhe os quadros pelo ângulo (`quadros_cima` acima de 67°, `quadros_diagonal` acima de 22°, o de lado no resto), espelha com o lado e vira de cabeça para baixo para os tiros para baixo. O perseguidor gira inteiro, porque muda de direção no voo.
 
@@ -281,9 +283,9 @@ Um `.tres` (`EspecialData`) por especial. Duas cenas: projétil que voa, ou `Fei
 | Especial | Efeito técnico | Arte |
 |---|---|---|
 | Instinto Selvagem (inicial) | Projétil grande, reto, 150 de dano, 1200 px/s | Pixel (onça) |
-| Canhão Flamejante (Mula) | Feixe preso ao Curupira, 1,5 s, 200 de dano em **10 pulsos de 20**; Curupira parado (6.7) | `Polygon2D` provisório |
-| Poção Maldita (Cuca) | Projétil **reto** a 1000 px/s; 40 de dano no impacto + veneno 20/s por 8 s | `Polygon2D` provisório |
-| Bolha Abissal (Boto) | Projétil reto a 700 px/s; 60 de dano + lentidão de 40% por 6 s | `Polygon2D` provisório |
+| Canhão Flamejante (Mula) | Feixe preso ao Curupira, 1,5 s, 200 de dano em **10 pulsos de 20**; Curupira parado (6.7) | Pixel: `feixe_meio` repetido em `region` (como o jato do Boto) + `feixe_boca` na mão |
+| Poção Maldita (Cuca) | Projétil **reto** a 1000 px/s; 40 de dano no impacto + veneno 20/s por 8 s | Pixel (`pocao_maldita` girando, `respingo_veneno`) |
+| Bolha Abissal (Boto) | Projétil reto a 700 px/s; 60 de dano + lentidão de 40% por 6 s | Pixel (`bolha_abissal`, `respingo_agua`) |
 
 ### 7.6 Efeitos de estado
 
@@ -441,17 +443,18 @@ A arte é pixel art em 480×270, ampliada 4× para 1920×1080. Ela é desenhada 
 ### 10.2 Arquivos
 
 - `game/assets/pixel/<personagem>/<personagem>.png`: folha do personagem, uma linha por animação, todas as células do mesmo tamanho.
-- `<personagem>.json`: `celula` (largura e altura da célula), `ancora` (pixel da célula que fica na posição do node: os pés, a linha d'água ou o ponto do teto) e, por animação, `fps`, `loop`, `quadros` e `pontos`.
+- `<personagem>.json`: `celula` (largura e altura da célula), `ancora` (pixel da célula que fica na posição do node: os pés, a linha d'água ou o ponto do teto) e, por animação, `fps`, `loop`, `quadros`, `pontos` e `caixa` (o retângulo que os quadros da animação ocupam, relativo à âncora, `[x0, y0, x1, y1]`).
 - `pontos` são por quadro e relativos à âncora, em pixels da arte: `mao` (Curupira), `boca` e `frente` (Mula), `boca` e `garra` (Cuca), `bico` e `nadadeira` (Boto), `lente` (Máquina).
 - `<personagem>_frames.tres`: `SpriteFrames` gerado da folha, com os mesmos nomes de animação do JSON.
 - `<personagem>/efeitos/<efeito>_<n>.png`: projéteis e efeitos em quadros soltos, descritos em `efeitos/efeitos.json` (fps, loop, tamanho, centro).
-- `arenas/<chefe>/fundo_<n>.png` e `frente_<n>.png`: 8 quadros de 480×270.
+- `arenas/<chefe>/fundo_<n>.png` e `frente_<n>.png`: 8 quadros de 480×270. `arenas/menu/` é a floresta do fundo dos menus.
+- `ui/fonte_pixel.fnt` + `.png`: fonte BMFont (11 linhas: acento, maiúscula de 7 e descendente), com o contorno escuro já desenhado. `ui/titulo.png` e `ui/botao_<estado>.png` (normal, foco, hover, apertado, desabilitado, painel) já vêm ampliados 4×, para o `StyleBoxTexture` usar no tamanho da tela.
 
 ### 10.3 Importação e filtro
 
 - Importação padrão do Godot (`compress/mode = Lossless`, sem mipmaps).
 - Todo node que mostra pixel art usa `texture_filter = Nearest` e `scale = (4, 4)`. Nas arenas isso vem da raiz do nível; cenas que podem ser abertas sozinhas (projéteis, efeitos, chefes) também definem no próprio node.
-- O filtro padrão do projeto (`rendering/textures/canvas_textures/default_texture_filter`) só deve virar `Nearest` quando a arte antiga (menus, HUD) tiver saído.
+- O filtro padrão do projeto (`rendering/textures/canvas_textures/default_texture_filter`) continua `Linear` por causa das folhas do dash (`assets/efeitos/folha.png`), a última arte antiga em uso. Os menus põem `Nearest` na raiz de cada tela (ou no `Painel`, nas telas que são `CanvasLayer`).
 - As coordenadas do jogo continuam em 1920×1080: velocidades, pulo, dash e posições do GDD não mudam.
 - **Export**: o `.json` não é recurso do Godot. Incluir `*.json` no filtro "arquivos não-recurso" do preset de export, senão os pontos e a âncora somem no build.
 
@@ -462,6 +465,7 @@ A arte é pixel art em 480×270, ampliada 4× para 1920×1080. Ela é desenhada 
 - `preparar(sprite)`: liga `Nearest` e põe a âncora na origem do node (`centered = true`, `offset = celula/2 − ancora`). A base `Chefe` chama no `_ready`.
 - `ponto(sprite, nome, padrao)`: posição no mundo do ponto `nome` no quadro que está na tela, já com escala e espelhamento. É assim que o tiro sai da mão do Curupira, a bola sai da boca da Mula, o feitiço da garra da Cuca e o jato do bico do Boto, em qualquer quadro.
 - `duracao(sprite, anim)`: duração da animação em segundos.
+- `caixa(sprite, anim)`: a `caixa` da animação, em pixels da arte. A base `Chefe` usa para que `Hurtbox` e `Contato` acompanhem a pose: a cada troca de animação (e ao virar), as duas viram retângulos com uma fração do desenho (`fracao_hurtbox`, centrada; `fracao_contato`, presa embaixo, nos pés), definidas no `ChefeData`. A Máquina fica de fora: as caixas dela estão no `Nucleo`, que segue a lente.
 
 Regras:
 - **Virar o personagem**: `scale.x = −4` no node do sprite, não `flip_h`. O `flip_h` espelha em volta do centro da textura e a âncora sairia do lugar.
@@ -494,6 +498,7 @@ Cenas de ataque dos chefes:
 | Cuca | `feitico_cuca`, `pocao_cuca`, `poca_cuca`, `nota_cuca`, `vidro_cuca` |
 | Boto | `jato_boto` (meio repetido em `region` + ponta), `coracao_boto`, `coracao_estoura_boto`, `chapeu_boto`, `bolha_boto`, `respingo_boto` |
 | Máquina | `laser_maquina`, `bomba_maquina`, `explosao_maquina`, `placa_maquina`, `alcapao_maquina`, `faiscas_maquina` |
+| Curupira (ataques ganhos) | `projetil_feitico_perseguidor`, `projetil_bolha_agua`, `projetil_bolha_abissal`, `projetil_pocao_maldita`, `feixe_canhao`, `respingo_agua`, `respingo_veneno`; a Bola de Fogo usa a bola e a explosão da Mula |
 
 **[Divergente]** `succao_boto` (aviso antigo do jato) saiu: o aviso agora é a animação `aviso_jato` do Boto.
 
@@ -517,7 +522,7 @@ Canto inferior esquerdo: vida do Curupira (4) e barra do especial (`hud_vida.gd`
 | Créditos | Pronto (tela + voltar ao menu); **[Aberto]** conteúdo real dos créditos |
 
 ### 11.3 Navegação de menus **[Implementado]**
-Menus são `Control`/`CanvasLayer` com tema compartilhado (`dados/tema_menus.tres`) e fundo (`fundo_menu.tscn`). Usam `ui_*`, nunca as ações de jogo (exceto `pause` na luta). O primeiro botão recebe `grab_focus()` ao abrir. `ui_accept` e `ui_cancel` foram redefinidos no projeto (Enter/Espaço/A e Esc/B).
+Menus são `Control`/`CanvasLayer` com tema compartilhado (`dados/tema_menus.tres`) e fundo (`fundo_menu.tscn`: `FundoArena` com a floresta de `arenas/menu` e brasas de 4 px). O tema usa a fonte em pixel e `StyleBoxTexture` em 9 fatias (margem de 12 px = 3 px da arte). A fonte tem 12 px de altura de linha e é importada com `scaling_mode = Integer Only`: os tamanhos de fonte das telas são múltiplos de 12 (24, 36, 48, 60, 72), senão os pixels saem desiguais. O contorno vem desenhado na fonte, então `outline_size = 0`. O menu inicial mostra o Curupira da folha (`idle`) em pé no chão da floresta. Usam `ui_*`, nunca as ações de jogo (exceto `pause` na luta). O primeiro botão recebe `grab_focus()` ao abrir. `ui_accept` e `ui_cancel` foram redefinidos no projeto (Enter/Espaço/A e Esc/B).
 
 ## 12. Input Map
 
@@ -526,7 +531,7 @@ Menus são `Control`/`CanvasLayer` com tema compartilhado (`dados/tema_menus.tre
 | `move_left` / `move_right` | Direcional e analógico esquerdo | A / D |
 | `aim_up` | Direcional ↑ e analógico ↑ | W / ↑ |
 | `crouch` | Direcional ↓ e analógico ↓ | S / ↓ |
-| `aim_lock` | RB | Shift |
+| `aim_lock` | — (sem botão) | Shift |
 | `jump` | A | Espaço |
 | `attack_basic` | X | J |
 | `attack_special` | Y | K |
@@ -534,7 +539,7 @@ Menus são `Control`/`CanvasLayer` com tema compartilhado (`dados/tema_menus.tre
 | `pause` | Start | Esc |
 
 - `aim_up` e `crouch` também servem para mirar no ar (6.3).
-- **[Aberto]** O GDD (Q15) deixa em aberto se a trava de mira fica no RB/Shift; foi a escolha provisória.
+- Trava de mira só no Shift, decisão do Eduardo. **[Aberto]** No controle a trava ficou sem botão (era RB); falta escolher um (GDD Q15).
 - O analógico usa deadzone 0,5 nas ações de movimento e mira.
 
 ## 13. Áudio — **[Aberto, não iniciado]**
@@ -586,12 +591,13 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 - Cenas de teste em `game/testes/`: `teste_dano`, `teste_tiro`, `alvo_teste`.
 - `Debug > Visible Collision Shapes` para conferir hitboxes; aba Remote para valores em execução.
 - Validação headless: `godot --headless --path game --quit-after 120`. Depois de criar scripts com `class_name` ou PNGs novos, importar antes (`--headless --editor --quit`).
+- **Liberar tudo para testar**: `GameState.LIBERAR_TUDO_PARA_TESTE = true` libera a Máquina e todos os ataques na seleção, sem vencer as fases. Só vale em build de debug (`OS.is_debug_build()`); o jogo exportado ignora. Pôr `false` para testar a progressão de verdade.
 - **`testes/teste_lutas.gd`** **[Implementado]**: roda as quatro arenas por 60 s cada, com o Curupira invencível, andando, agachando, mirando e atirando, e tira vida do chefe aos poucos. Imprime as trocas de fase e os ataques que apareceram; qualquer erro de script aparece no log. Rodar com o editor fechado (ou numa cópia de `game/`):
   `godot --headless --path game --script res://testes/teste_lutas.gd`
 - **Cheats de debug (`OS.is_debug_build()`): não implementados [Aberto]**: invencibilidade, carga total do especial, pular para a fase 2/3 do chefe, desbloquear todos os ataques. Sugestão: autoload `Debug` removível do build.
 
 ### 15.4 Créditos
-`CREDITS.md` com fonte, autor e licença de cada asset: **não existe [Aberto]**. Há assets em `game/assets/placeholder/` cuja origem e licença precisam ser registradas.
+`CREDITS.md` com fonte, autor e licença de cada asset: **não existe [Aberto]**. Há placeholders antigos em `art/antiga/placeholder/` (fora do jogo) cuja origem e licença precisam ser registradas.
 
 ## 16. Ordem de implementação
 
@@ -607,19 +613,18 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 10. ~~Cuca, Boto, Máquina (lógica)~~
 11. ~~Pixel art: personagens, efeitos, arenas; 3 fases × 4 ataques; mira em 8 direções; agachar~~
 12. **Agora**: teste manual de cada luta e balanceamento dos valores provisórios.
-13. **Restante**: pixel art dos ataques liberados (Feitiço, Bolha, especiais), HUD e menus em pixel, áudio, Opções, abertura, conteúdo dos créditos, cheats de debug, `CREDITS.md`, `main_scene` = menu, export Linux/Windows.
+13. **Restante**: HUD em pixel, áudio, Opções, abertura, conteúdo dos créditos, cheats de debug, `CREDITS.md`, `main_scene` = menu, export Linux/Windows.
 
 ## 17. Pendências
 
 | Item | Impacto | Sugestão |
 |---|---|---|
 | Teste manual das 4 lutas | Nada da pixel art foi visto rodando no Godot | Rodar cada `levelN` com F6 (ver `PENDENCIAS.md`) |
-| Formas de colisão para a arte nova | Cápsulas e hitboxes ainda são as antigas ou placeholders | Arthur ajusta no editor com `Visible Collision Shapes` |
 | Valores "provisório" dos ataques novos | Combate pode estar fácil ou difícil demais | Fechar no GDD (Q16) depois de testar |
 | Limiares das fases (0,667 / 0,333) | Ritmo da luta | Fechar no GDD (Q16) |
-| Trava de mira no RB/Shift | Controle | Fechar no GDD (Q15) |
+| Trava de mira sem botão no controle | Controle | Escolher o botão (GDD Q15) |
 | Coração do Boto carrega o especial | Pode ser exploit | Decidir; se não, tirar a hurtbox do coração do sinal de acerto |
-| Pixel art dos ataques liberados e do HUD/menus | Mistura de estilos | Gerar no `art/pixel/gerador` |
+| HUD e folhas do dash com a arte antiga | Mistura de estilos | Gerar no `art/pixel/gerador` |
 | `CLAUDE.md` diz "chefes com estado único" | Instrução desatualizada | Atualizar o resumo de regras do `CLAUDE.md` |
 | Opções (volume, tela cheia) | Requisito do GDD | 2 sliders + toggle; salvar no `GameState` (14.2) |
 | Áudio (barramentos, faixas, SFX) | Requisito do GDD | Criar buses; lista de assets (Q14) |
