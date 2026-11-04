@@ -3,6 +3,10 @@ extends Area2D
 ## Poção da Cuca: arremessada em arco para cair onde o Curupira estava. Não machuca
 ## por si só; ao bater no chão vira uma poça (veneno ou lentidão).
 ## Layer enemy_hitbox; mask world (só precisa saber quando bate no chão).
+## O frasco gira por quadros (Veneno/Lentidao são AnimacaoQuadros), sem girar o node.
+
+## Vidro quebrando no chão. Só visual.
+const CENA_VIDRO: PackedScene = preload("res://scenes/vidro_cuca.tscn")
 
 var tipo: PocaCuca.Tipo = PocaCuca.Tipo.VENENO
 var dados: CucaData
@@ -36,7 +40,6 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_velocidade.y += _gravidade * delta
 	position += _velocidade * delta
-	rotation += 8.0 * delta  # gira no ar (só visual)
 
 
 func _ao_bater(_corpo: Node2D) -> void:
@@ -46,4 +49,7 @@ func _ao_bater(_corpo: Node2D) -> void:
 	# call_deferred: estamos dentro de um sinal de colisão, e o Godot não deixa criar
 	# áreas de colisão no meio do cálculo da física ("flushing queries"). Adia para o fim do frame.
 	get_tree().current_scene.add_child.call_deferred(poca)
+	var vidro: Node2D = CENA_VIDRO.instantiate()
+	vidro.global_position = global_position
+	get_tree().current_scene.add_child.call_deferred(vidro)
 	queue_free()

@@ -1,7 +1,8 @@
 class_name Atirador
 extends Marker2D
 ## Dispara o ataque básico e o especial equipados. Filho do Curupira; a posição deste Marker2D
-## é o ponto de onde o projétil sai (ajustar no editor, com o Curupira olhando para a direita).
+## é o ponto de onde o projétil sai. O Curupira põe ele na mão a cada frame (ponto "mao" da
+## folha de pixel art); sem isso, vale a posição do editor, espelhada pelo lado.
 ##
 ## Cuida só da cadência e de criar o projétil. Quem decide QUANDO tentar atirar é o Curupira.
 
@@ -15,6 +16,8 @@ signal disparou
 ## Especial equipado. Depois a tela de seleção troca este recurso antes da fase.
 @export var especial: EspecialData
 
+## true = o Curupira põe o Atirador na mão a cada frame (não espelha pela posição do editor).
+var seguindo_mao: bool = false
 var _tempo_recarga: float = 0.0
 # Distância horizontal do ponto de tiro ao centro do Curupira, olhando para a direita.
 var _x_base: float = 0.0
@@ -36,7 +39,8 @@ func _physics_process(delta: float) -> void:
 ## Chamado a cada frame enquanto o botão de ataque está segurado.
 ## Só dispara se a recarga (1 / tiros_por_segundo) já passou.
 ## multiplicador < 1 deixa a cadência mais lenta (lentidão da poça da Cuca).
-func tentar_atirar(direcao: int, multiplicador: float = 1.0) -> void:
+## angulo: mira em graus (0 = frente, -90 = cima, 90 = baixo).
+func tentar_atirar(direcao: int, multiplicador: float = 1.0, angulo: float = 0.0) -> void:
 	if ataque == null:
 		return
 	# is_zero_approx: mesmo motivo do dash — 0,2 - 12 × (1/60) não dá 0 exato em float.
@@ -44,7 +48,7 @@ func tentar_atirar(direcao: int, multiplicador: float = 1.0) -> void:
 		return
 	_tempo_recarga = 1.0 / (ataque.tiros_por_segundo * multiplicador)
 
-	var projetil: Projetil = _criar(ataque.cena_projetil, ataque.dano, ataque.velocidade_projetil, direcao)
+	var projetil: Projetil = _criar(ataque.cena_projetil, ataque.dano, ataque.velocidade_projetil, direcao, angulo)
 	projetil.curva = ataque.curva
 	projetil.duracao_maxima = ataque.duracao_maxima
 	_lancar(projetil)
@@ -62,7 +66,8 @@ func atirar_especial(direcao: int) -> void:
 		return
 	var no: Node = especial.cena_projetil.instantiate()
 	if no is FeixeCanhao:
-		position.x = _x_base * direcao
+		if not seguindo_mao:
+			position.x = _x_base * direcao
 		no.configurar(especial, float(direcao))
 		add_child(no)
 	else:
@@ -78,10 +83,11 @@ func atirar_especial(direcao: int) -> void:
 
 ## Cria o projétil SEM pôr na cena: quem chama ainda preenche curva/veneno antes,
 ## porque o _ready do projétil já usa esses valores.
-func _criar(cena: PackedScene, dano: int, velocidade: float, direcao: int) -> Projetil:
-	position.x = _x_base * direcao
+func _criar(cena: PackedScene, dano: int, velocidade: float, direcao: int, angulo: float = 0.0) -> Projetil:
+	if not seguindo_mao:
+		position.x = _x_base * direcao
 	var projetil: Projetil = cena.instantiate()
-	projetil.configurar(dano, velocidade, float(direcao))
+	projetil.configurar(dano, velocidade, float(direcao), angulo)
 	projetil.global_position = global_position
 	return projetil
 

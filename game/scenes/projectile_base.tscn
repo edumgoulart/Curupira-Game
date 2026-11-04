@@ -1,27 +1,37 @@
 [gd_scene format=3 uid="uid://d0jqbwe0xx7yu"]
 
-[ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_5bkip"]
+[ext_resource type="Script" path="res://scripts/projectile_base.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_cima_1.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_cima_2.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_diag_cima_1.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_diag_cima_2.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_lado_1.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_lado_2.png" id="7"]
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="8"]
 
-[sub_resource type="CanvasTexture" id="CanvasTexture_1vb1h"]
-specular_color = Color(0.93046373, 0.59675264, 0.56647086, 1)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_folha"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
 radius = 12.0
 
-[node name="ProjectileBase" type="Area2D" unique_id=1876905377]
+[node name="ProjectileBase" type="Area2D"]
 collision_layer = 4
 collision_mask = 9
-script = ExtResource("1_5bkip")
+script = ExtResource("1")
+quadros_cima = Array[Texture2D]([ExtResource("2"), ExtResource("3")])
+quadros_diagonal = Array[Texture2D]([ExtResource("4"), ExtResource("5")])
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1449060370]
-shape = SubResource("CircleShape2D_folha")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1906856156]
-texture = SubResource("CanvasTexture_1vb1h")
-
-[node name="VisualProvisorio" type="Polygon2D" parent="."]
-color = Color(0.3, 0.75, 0.25, 1)
-polygon = PackedVector2Array(-16, 0, -4, -8, 16, 0, -4, 8)
+[node name="Visual" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("6")
+centered = false
+offset = Vector2(-6, -3)
+script = ExtResource("8")
+quadros = Array[Texture2D]([ExtResource("6"), ExtResource("7")])
+fps = 12.0
+loop = true
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 

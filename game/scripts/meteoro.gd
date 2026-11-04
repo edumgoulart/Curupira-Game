@@ -10,8 +10,6 @@ signal impactou
 
 ## Altura de onde o fogo começa a cair, acima do chão (px). Só visual.
 const ALTURA_QUEDA: float = 1200.0
-## Tamanho da explosão do impacto (1 = a da Bola de Fogo do Curupira). Só visual.
-const TAMANHO_ESTOURO: float = 1.5
 
 ## Explosão criada no impacto. Só visual.
 @export var cena_estouro: PackedScene
@@ -23,7 +21,7 @@ var _golpes: int = 2
 var _tempo: float = 0.0
 var _impactou: bool = false
 
-@onready var sombra: Polygon2D = $Sombra
+@onready var sombra: AnimacaoQuadros = $Sombra
 @onready var fogo: Node2D = $Fogo
 @onready var impacto: Hitbox = $Impacto
 @onready var forma_impacto: CollisionShape2D = $Impacto/CollisionShape2D
@@ -61,9 +59,8 @@ func _physics_process(delta: float) -> void:
 
 
 func _atualizar_visual() -> void:
-	var progresso: float = clampf(_tempo / _aviso, 0.0, 1.0)
-	sombra.scale = Vector2.ONE * lerpf(0.3, 1.0, progresso)
-	sombra.modulate.a = lerpf(0.35, 0.85, progresso)
+	# A sombra cresce pelos quadros da animação (pixel art não escala nem fica transparente).
+	sombra.mostrar_progresso(clampf(_tempo / _aviso, 0.0, 1.0))
 	var inicio_queda: float = _aviso - _queda
 	if _tempo >= inicio_queda and not _impactou:
 		fogo.visible = true
@@ -78,7 +75,6 @@ func _estourar() -> void:
 	if cena_estouro == null:
 		return
 	var estouro: Node2D = cena_estouro.instantiate()
-	estouro.scale = Vector2.ONE * TAMANHO_ESTOURO
 	estouro.position = position + Vector2(0.0, -40.0)
 	get_parent().add_child.call_deferred(estouro)
 

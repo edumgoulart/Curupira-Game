@@ -3,83 +3,14 @@
 [ext_resource type="Script" uid="uid://b254wjgbq6vsd" path="res://scripts/curupira.gd" id="1_38npl"]
 [ext_resource type="Resource" uid="uid://b8r8xbjv8wljx" path="res://dados/curupira_movimento.tres" id="4_mov"]
 [ext_resource type="Script" uid="uid://clbs5p7o6xlh4" path="res://scripts/atirador.gd" id="5_atir"]
-[ext_resource type="Texture2D" uid="uid://3cvibx4pvx86" path="res://assets/curupira.png" id="5_b0kjx"]
 [ext_resource type="Resource" uid="uid://ccami2t22011l" path="res://dados/ataques/tiro_de_folha.tres" id="6_folha"]
 [ext_resource type="Script" uid="uid://ksseueomg1ru" path="res://scripts/vida.gd" id="7_vida"]
 [ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="8_hurt"]
 [ext_resource type="Resource" uid="uid://n8vp1eurw1hm" path="res://dados/curupira_vida.tres" id="9_dvida"]
 [ext_resource type="Script" uid="uid://cx2jichctvq18" path="res://scripts/carga_especial.gd" id="10_carga"]
 [ext_resource type="Resource" uid="uid://clkijo3bqhq4m" path="res://dados/ataques/instinto_selvagem.tres" id="11_especial"]
-[ext_resource type="Texture2D" uid="uid://bejwotqf3tcq" path="res://assets/curupira_subindo_mao.png" id="12_subindo"]
-[ext_resource type="Texture2D" uid="uid://bjf4f4uw82ecr" path="res://assets/curupira_mao_atacando.png" id="13_atacando"]
 [ext_resource type="PackedScene" path="res://scenes/efeito_dash.tscn" id="14_dash"]
-[ext_resource type="Texture2D" uid="uid://dndu617mpdkha" path="res://assets/curupira_corrida_01.png" id="15_corrida01"]
-[ext_resource type="Texture2D" uid="uid://0bged0dry828" path="res://assets/curupira_corrida_02.png" id="16_corrida02"]
-[ext_resource type="Texture2D" uid="uid://goapydd4e325" path="res://assets/curupira_corrida_03.png" id="17_corrida03"]
-[ext_resource type="Texture2D" uid="uid://b4eq6tnqeqtdk" path="res://assets/curupira_corrida_04.png" id="18_corrida04"]
-[ext_resource type="Texture2D" uid="uid://dnvftgox4uyuk" path="res://assets/curupira_corrida_05.png" id="19_corrida05"]
-[ext_resource type="Texture2D" uid="uid://ckd3tnm262bt7" path="res://assets/curupira_corrida_06.png" id="20_corrida06"]
-[ext_resource type="Texture2D" uid="uid://boaylovifp3wo" path="res://assets/curupira_corrida_07.png" id="21_corrida07"]
-[ext_resource type="Texture2D" uid="uid://eylfvm47npl6" path="res://assets/curupira_corrida_08.png" id="22_corrida08"]
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("5_b0kjx")
-}],
-"loop": 1,
-"name": &"idle",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("5_b0kjx")
-}],
-"loop": 1,
-"name": &"jump",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("12_subindo")
-}, {
-"duration": 1.0,
-"texture": ExtResource("13_atacando")
-}],
-"loop": false,
-"name": &"atacar",
-"speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("15_corrida01")
-}, {
-"duration": 1.0,
-"texture": ExtResource("16_corrida02")
-}, {
-"duration": 1.0,
-"texture": ExtResource("17_corrida03")
-}, {
-"duration": 1.0,
-"texture": ExtResource("18_corrida04")
-}, {
-"duration": 1.0,
-"texture": ExtResource("19_corrida05")
-}, {
-"duration": 1.0,
-"texture": ExtResource("20_corrida06")
-}, {
-"duration": 1.0,
-"texture": ExtResource("21_corrida07")
-}, {
-"duration": 1.0,
-"texture": ExtResource("22_corrida08")
-}],
-"loop": true,
-"name": &"correr",
-"speed": 15.0
-}]
+[ext_resource type="SpriteFrames" path="res://assets/pixel/curupira/curupira_frames.tres" id="15_quadros"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ixury"]
 radius = 30.0
@@ -96,9 +27,10 @@ dados = ExtResource("4_mov")
 dados_vida = ExtResource("9_dvida")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=188185585]
-position = Vector2(0, -21)
-scale = Vector2(0.20215311, 0.20215311)
-sprite_frames = SubResource("SpriteFrames_wrsmq")
+texture_filter = 1
+position = Vector2(0, 96)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("15_quadros")
 animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1661674320]

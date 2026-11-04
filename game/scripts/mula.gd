@@ -1,139 +1,147 @@
 extends Chefe
-## Mula sem Cabeça — primeiro chefe. Fica parada; alterna entre dois ataques:
-##   - três bolas de fogo retas, rente ao chão (aviso 0,5 s, 1 golpe cada);
-##   - meteoro com sombra no chão (aviso 1 s, 2 golpes), depois fica parada 1,5 s.
-## Estado único (sem fases dentro da luta) e leva dano o tempo todo (regras do GDD).
-## Vida, dano recebido, contato e derrota vêm da classe base Chefe (chefe.gd).
+## Mula sem Cabeça — primeiro chefe. Três fases (vida em mula.tres):
+##   fase 1: bolas, pisoteio;   fase 2: + investida;   fase 3: + meteoros.
+## Leva dano o tempo todo. Vida, fases, sorteio e derrota vêm da classe base Chefe.
 ##
-## Ciclo da máquina de estados:
-##   ESPERANDO --sorteio--> AVISO_BOLAS -> BOLAS --------------> ESPERANDO
-##                     \--> METEORO -> PARADA --(sem pausa extra)--> sorteio
+## Cada ataque, na ordem em que acontece:
+##   bolas      — abaixa o peito (aviso) e cospe N bolas rente ao chão, com coice a cada uma;
+##   pisoteio   — empina e segura no alto (aviso), bate as patas e solta a onda de fogo;
+##   investida  — raspa o casco (aviso), corre até a parede, fica tonta e volta trotando;
+##   meteoros   — empina com o fogo para cima, lança N meteoros (sombra no chão de cada um)
+##                e fica cansada (janela para atacar).
+## Os tiros saem do ponto "boca" do desenho (a ponta do fogo do pescoço, quadro a quadro).
 ##
-## Animações usadas (criar no SpriteFrames do AnimatedSprite2D com estes nomes exatos):
-##   idle          — esperando entre ataques
-##   aviso_bolas   — preparando as bolas de fogo (0,5 s)
-##   bolas         — cuspindo as bolas (segue até um intervalo depois da última bola)
-##   meteoro       — lançando o meteoro para cima (dura o aviso, 1 s)
-##   parada        — cansada depois do meteoro (1,5 s)
-##   derrota       — derrotada (sem loop)
-## Se uma animação ainda não existir, o código só não troca para ela (não dá erro).
+## Animações usadas (mula_frames.tres, gerado pelo gerador de pixel art):
+##   idle, aviso_bolas, bolas, fim_bolas, aviso_pisoteio, pisoteio_alto, pisoteio,
+##   aviso_investida, galope, batida, tonta, trote, aviso_meteoros, meteoros, cansada, derrota
 
-enum Estado { ESPERANDO, AVISO_BOLAS, BOLAS, METEORO, PARADA, DERROTADA }
-enum Ataque { NENHUM, BOLAS, METEORO }
-
-var estado: Estado = Estado.ESPERANDO
-var _tempo: float = 0.0
-var _bolas_restantes: int = 0
-var _ultimo_ataque: Ataque = Ataque.NENHUM
-var _sorteio := RandomNumberGenerator.new()
+## Quadro da animação "pisoteio" em que as patas batem no chão (sai a onda).
+const QUADRO_PISADA: int = 2
 
 ## Os dados com o tipo da Mula (o campo "dados" da base é do tipo genérico ChefeData).
 @onready var _d: MulaData = dados as MulaData
-## De onde saem as bolas de fogo, na horizontal (a altura vem de altura_bola).
-@onready var boca: Marker2D = $Boca
-## Altura do chão (pés da Mula): base da altura das bolas e onde o meteoro cai.
-@onready var pe: Marker2D = $Pe
+## Onde a Mula fica entre os ataques (volta para cá depois da investida).
+@onready var _x_inicial: float = global_position.x
 
 
-func _ready() -> void:
-	super._ready()
-	_sorteio.randomize()
-	# Começa esperando: dá um respiro ao jogador antes do primeiro ataque.
-	_entrar(Estado.ESPERANDO, _d.pausa_entre_ataques)
+func _executar(nome: StringName) -> void:
+	match nome:
+		&"bolas":
+			await _bolas()
+		&"pisoteio":
+			await _pisoteio()
+		&"investida":
+			await _investida()
+		&"meteoros":
+			await _meteoros()
 
 
-func _physics_process(delta: float) -> void:
-	delta *= fator_tempo()  # Bolha Abissal: o relógio do chefe anda mais devagar
-	if estado == Estado.DERROTADA:
+func _bolas() -> void:
+	avisar(true)
+	tocar(&"aviso_bolas")
+	if not await esperar(_d.aviso_bolas):
 		return
-	_tempo -= delta
-	if _tempo > 0.0 and not is_zero_approx(_tempo):
-		return
-
-	# O tempo do estado atual acabou: decide o próximo.
-	match estado:
-		Estado.ESPERANDO:
-			_escolher_ataque()
-		Estado.AVISO_BOLAS:
-			_bolas_restantes = _d.quantidade_bolas
-			_entrar(Estado.BOLAS, 0.0)
-			_lancar_proxima_bola()
-		Estado.BOLAS:
-			if _bolas_restantes > 0:
-				_lancar_proxima_bola()
-			else:
-				# A pose de cuspir já durou um intervalo depois da última bola; esse tempo
-				# sai da pausa, então o ritmo da luta é o mesmo de antes.
-				_entrar(Estado.ESPERANDO, maxf(_d.pausa_entre_ataques - _d.intervalo_bolas, 0.0))
-		Estado.METEORO:
-			_entrar(Estado.PARADA, _d.parada_apos_meteoro)
-		Estado.PARADA:
-			# A parada já é a pausa depois do meteoro: sorteia o próximo direto.
-			_escolher_ataque()
+	avisar(false)
+	for i in _d.quantidade_bolas:
+		reiniciar(&"bolas")  # um coice por bola
+		_lancar_bola()
+		if not await esperar(_d.intervalo_bolas):
+			return
+	await tocar_e_esperar(&"fim_bolas")
 
 
-## Sorteia o próximo ataque; nunca dois meteoros seguidos.
-func _escolher_ataque() -> void:
-	var ataque: Ataque = Ataque.BOLAS
-	if _ultimo_ataque != Ataque.METEORO and _sorteio.randi_range(0, 1) == 1:
-		ataque = Ataque.METEORO
-	_ultimo_ataque = ataque
-
-	match ataque:
-		Ataque.BOLAS:
-			_entrar(Estado.AVISO_BOLAS, _d.aviso_bolas)
-		Ataque.METEORO:
-			# A sombra aparece já (é o aviso); o impacto acontece quando o estado acabar.
-			_soltar_meteoro()
-			_entrar(Estado.METEORO, _d.aviso_meteoro)
-
-
-func _entrar(novo_estado: Estado, duracao: float) -> void:
-	estado = novo_estado
-	_tempo = duracao
-	avisar(estado == Estado.AVISO_BOLAS or estado == Estado.METEORO)
-	_atualizar_animacao()
-
-
-func _lancar_proxima_bola() -> void:
+func _lancar_bola() -> void:
 	var bola: BolaDeFogoMula = _d.cena_bola.instantiate()
 	bola.dano = _d.golpes_bola
-	# Sai na frente da Mula, rente ao chão, e vai reta para o lado do Curupira.
-	bola.global_position = Vector2(boca.global_position.x, pe.global_position.y - _d.altura_bola)
-	var direcao: float = 1.0 if x_do_alvo() > boca.global_position.x else -1.0
-	bola.lancar(direcao, _d.velocidade_horizontal_bola)
+	# Sai da boca de fogo, na altura rente ao chão (a origem da Mula fica nos pés).
+	bola.global_position = Vector2(ponto("boca").x, global_position.y - _d.altura_bola)
+	bola.lancar(lado_do_alvo(), _d.velocidade_horizontal_bola)
 	lancar_na_cena(bola)
 
-	_bolas_restantes -= 1
-	# Também depois da última: sem esse intervalo, a Mula voltaria à idle no mesmo
-	# frame em que a última bola sai, e ela pareceria sair da Mula parada.
-	_tempo = _d.intervalo_bolas
+
+func _pisoteio() -> void:
+	avisar(true)
+	if not await tocar_e_esperar(&"aviso_pisoteio"):
+		return
+	# Segura no alto o resto do aviso.
+	tocar(&"pisoteio_alto")
+	if not await esperar(maxf(_d.aviso_pisoteio - FolhaSprites.duracao(sprite, &"aviso_pisoteio"), 0.0)):
+		return
+	avisar(false)
+	reiniciar(&"pisoteio")
+	var fps: float = sprite.sprite_frames.get_animation_speed(&"pisoteio")
+	if not await esperar(QUADRO_PISADA / fps):
+		return
+	for i in _d.quantidade_ondas:
+		_soltar_onda()
+		if i < _d.quantidade_ondas - 1 and not await esperar(_d.intervalo_ondas):
+			return
+	await esperar(maxf(FolhaSprites.duracao(sprite, &"pisoteio") - QUADRO_PISADA / fps, 0.0))
 
 
-func _soltar_meteoro() -> void:
+func _soltar_onda() -> void:
+	var onda: OndaFogoMula = _d.cena_onda.instantiate()
+	onda.dano = _d.golpes_onda
+	# Nasce no chão, na frente das patas, e corre para o lado do Curupira.
+	onda.global_position = Vector2(ponto("frente").x, global_position.y)
+	onda.lancar(lado_do_alvo(), _d.velocidade_onda)
+	lancar_na_cena(onda)
+
+
+func _investida() -> void:
+	var lado: float = lado_do_alvo()
+	avisar(true)
+	tocar(&"aviso_investida")
+	if not await esperar(_d.aviso_investida):
+		return
+	avisar(false)
+	# Corre até a parede do lado do Curupira; o corpo (Contato) é que machuca.
+	contato.dano = _d.golpes_investida
+	virar(lado > 0.0)
+	tocar(&"galope")
+	var parede: float = lado * (ARENA_MEIA_LARGURA - _d.margem_parede)
+	if not await andar_ate(parede, _d.velocidade_investida):
+		return
+	contato.dano = dados.golpes_contato
+	if not await tocar_e_esperar(&"batida"):
+		return
+	tocar(&"tonta")
+	if not await esperar(_d.tempo_tonta):
+		return
+	# Volta trotando para o lugar, de frente para onde vai.
+	virar(_x_inicial > global_position.x)
+	tocar(&"trote")
+	if not await andar_ate(_x_inicial, _d.velocidade_volta):
+		return
+	virar(x_do_alvo() > global_position.x)
+
+
+func _meteoros() -> void:
+	avisar(true)
+	if not await tocar_e_esperar(&"aviso_meteoros"):
+		return
+	tocar(&"meteoros")
+	var centro: float = x_do_alvo()
+	for i in _d.quantidade_meteoros:
+		# O primeiro no Curupira; os outros alternando dos lados (0, -d, +d, -2d...).
+		var passo_lado: int = (i + 1) / 2
+		var lado: float = -1.0 if i % 2 == 1 else 1.0
+		var x: float = clampf(centro + lado * passo_lado * _d.distancia_meteoros, -ARENA_MEIA_LARGURA + 80.0, ARENA_MEIA_LARGURA - 80.0)
+		_soltar_meteoro(x)
+		if not await esperar(_d.intervalo_meteoros):
+			return
+	avisar(false)
+	# Espera o último cair, cansada.
+	tocar(&"cansada")
+	await esperar(_d.aviso_meteoro - _d.intervalo_meteoros + _d.parada_apos_meteoro)
+
+
+func _soltar_meteoro(x: float) -> void:
 	var meteoro: Meteoro = _d.cena_meteoro.instantiate()
 	meteoro.configurar(_d)
-	# Cai onde o Curupira está quando a sombra aparece.
-	meteoro.global_position = Vector2(x_do_alvo(), pe.global_position.y)
+	meteoro.global_position = Vector2(x, global_position.y)
 	lancar_na_cena(meteoro)
 
 
 func _ao_ser_derrotado() -> void:
-	estado = Estado.DERROTADA
-	_atualizar_animacao()
-
-
-func _atualizar_animacao() -> void:
-	match estado:
-		Estado.ESPERANDO:
-			tocar(&"idle")
-		Estado.AVISO_BOLAS:
-			tocar(&"aviso_bolas")
-		Estado.BOLAS:
-			tocar(&"bolas")
-		Estado.METEORO:
-			tocar(&"meteoro")
-		Estado.PARADA:
-			tocar(&"parada")
-		Estado.DERROTADA:
-			tocar(&"derrota")
+	contato.dano = dados.golpes_contato

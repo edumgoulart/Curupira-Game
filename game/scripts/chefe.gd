@@ -1,16 +1,33 @@
 class_name Chefe
 extends Node2D
 ## Base de todos os chefes: o que é igual em todos fica aqui, e cada chefe (Mula, Cuca...)
-## herda e só implementa a própria máquina de estados e os ataques.
+## herda e só implementa os próprios ataques.
 ##
 ## Regras do GDD que valem para todos: leva dano o tempo todo, a vida não aparece na tela,
-## todo ataque tem aviso visual antes do golpe.
+## todo ataque tem aviso visual antes do golpe, e a luta tem três fases.
 ##
-## Nós que a cena do chefe precisa ter: AnimatedSprite2D, Vida, Hurtbox (layer enemy),
-## Contato (Hitbox, layer enemy_hitbox).
+## A luta é uma máquina de estados simples (EstadoLuta) que roda em loop:
+##   ESPERANDO (pausa) -> sorteia um ataque da fase atual -> ATACANDO -> ESPERANDO ...
+## Cada ataque é uma rotina curta no script do chefe (aviso, ação, fim), escrita com
+## "await esperar(s)". Assim um ataque se lê de cima a baixo, na ordem em que acontece,
+## e os tempos vêm todos do .tres de dados. esperar() conta pelo relógio do chefe
+## (fator_tempo: a Bolha Abissal deixa tudo mais lento) e para sozinho se o chefe for derrotado.
+##
+## Nós que a cena do chefe precisa ter: AnimatedSprite2D (SpriteFrames do gerador de pixel
+## art, escala 4), Vida, Hurtbox (layer enemy), Contato (Hitbox, layer enemy_hitbox).
+## O desenho olha para a esquerda; virar(true) espelha para a direita.
 
 ## Emitido quando a vida chega a zero. A arena escuta para a vitória/salvar progresso.
 signal chefe_derrotado
+## Emitido quando a luta passa para a próxima fase (0 = fase 1).
+signal fase_mudou(fase: int)
+## Um passo da física, já multiplicado pelo relógio do chefe. Quem espera usa este sinal.
+signal _passo(delta: float)
+
+enum EstadoLuta { ESPERANDO, ATACANDO, DERROTADO }
+
+## Meia largura da arena (px): as paredes ficam em ±960 (arena centrada na câmera).
+const ARENA_MEIA_LARGURA: float = 960.0
 
 ## Cor do brilho durante os avisos (telegrafo visual). Só visual.
 const COR_AVISO: Color = Color(1.6, 0.9, 0.5)
@@ -26,6 +43,16 @@ const INTERVALO_VENENO: float = 1.0
 @export var alvo: Node2D
 
 var derrotado: bool = false
+var estado_luta: EstadoLuta = EstadoLuta.ESPERANDO
+## Fase atual da luta: 0, 1 ou 2.
+var fase: int = 0
+## Ataque em andamento (vazio entre ataques).
+var ataque_atual: StringName = &""
+var _ultimo_ataque: StringName = &""
+var _ataque_novo: StringName = &""
+var _sorteio := RandomNumberGenerator.new()
+# Multiplica a velocidade das animações (ex.: o salto do Boto dura o que o .tres mandar).
+var _ritmo_animacao: float = 1.0
 var _veneno_por_pulso: int = 0
 var _pulsos_veneno: int = 0
 var _timer_veneno: Timer
@@ -36,8 +63,9 @@ var _timer_lentidao: Timer
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var vida: Vida = $Vida
-@onready var hurtbox: Hurtbox = $Hurtbox
-@onready var contato: Hitbox = $Contato
+# Procura em qualquer nível: a Máquina guarda os dois dentro do Nucleo, que segue a lente.
+@onready var hurtbox: Hurtbox = find_child("Hurtbox") as Hurtbox
+@onready var contato: Hitbox = find_child("Contato") as Hitbox
 
 
 func _ready() -> void:
@@ -58,6 +86,133 @@ func _ready() -> void:
 	vida.zerou.connect(_ao_zerar_vida)
 	vida.configurar(dados.vida)
 	contato.dano = dados.golpes_contato
+	FolhaSprites.preparar(sprite)
+	_sorteio.randomize()
+	# Começa no próximo frame: o _ready do chefe (filho desta classe) ainda está rodando.
+	_lutar.call_deferred()
+
+
+func _physics_process(delta: float) -> void:
+	_passo.emit(delta * fator_tempo())
+
+
+func _process(_delta: float) -> void:
+	# A lentidão também deixa as animações mais lentas.
+	sprite.speed_scale = fator_tempo() * _ritmo_animacao
+
+
+## O laço da luta: pausa, sorteia um ataque da fase, executa, repete.
+func _lutar() -> void:
+	tocar(&"idle")
+	if not await esperar(dados.pausa_entre_ataques):
+		return
+	while not derrotado:
+		_atualizar_fase()
+		ataque_atual = _sortear_ataque()
+		estado_luta = EstadoLuta.ATACANDO
+		await _executar(ataque_atual)
+		if derrotado:
+			return
+		ataque_atual = &""
+		estado_luta = EstadoLuta.ESPERANDO
+		avisar(false)
+		tocar(&"idle")
+		if not await esperar(dados.pausa_entre_ataques):
+			return
+
+
+## Cada chefe implementa: um "match nome:" que chama a rotina do ataque com await.
+func _executar(_nome: StringName) -> void:
+	await esperar(0.5)
+
+
+func _atualizar_fase() -> void:
+	var nova: int = dados.fase_para(float(vida.atual) / float(maxi(vida.maximo, 1)))
+	if nova <= fase:
+		return
+	var antes: Array[StringName] = dados.ataques_da_fase(fase)
+	fase = nova
+	# O ataque que entrou nesta fase abre a fase, para o jogador ver a novidade.
+	_ataque_novo = &""
+	for nome in dados.ataques_da_fase(fase):
+		if nome not in antes:
+			_ataque_novo = nome
+			break
+	fase_mudou.emit(fase)
+
+
+## Sorteia um ataque da fase atual, sem repetir o último (quando há mais de um).
+func _sortear_ataque() -> StringName:
+	if _ataque_novo != &"":
+		_ultimo_ataque = _ataque_novo
+		_ataque_novo = &""
+		return _ultimo_ataque
+	var opcoes: Array[StringName] = dados.ataques_da_fase(fase).duplicate()
+	if opcoes.size() > 1:
+		opcoes.erase(_ultimo_ataque)
+	if opcoes.is_empty():
+		return &""
+	_ultimo_ataque = opcoes[_sorteio.randi_range(0, opcoes.size() - 1)]
+	return _ultimo_ataque
+
+
+## Espera "segundos" no relógio do chefe. Devolve false se o chefe foi derrotado no meio:
+## o ataque deve parar ("if not await esperar(x): return").
+func esperar(segundos: float) -> bool:
+	var falta: float = segundos
+	while falta > 0.0 and not is_zero_approx(falta):
+		falta -= await _passo
+		if derrotado:
+			return false
+	return not derrotado
+
+
+## Espera um passo da física e devolve o delta (já com a lentidão).
+func passo() -> float:
+	return await _passo
+
+
+## Toca a animação do começo e espera ela terminar (para animações sem loop).
+func tocar_e_esperar(nome: StringName) -> bool:
+	reiniciar(nome)
+	return await esperar(FolhaSprites.duracao(sprite, nome))
+
+
+## Toca a animação do primeiro quadro (ex.: o coice de cada bola de fogo).
+func reiniciar(nome: StringName) -> void:
+	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(nome):
+		return
+	sprite.play(nome)
+	sprite.set_frame_and_progress(0, 0.0)
+
+
+## Onde fica um ponto do desenho (boca, mão, lente) no quadro atual, no mundo.
+func ponto(nome: String) -> Vector2:
+	return FolhaSprites.ponto(sprite, nome, global_position)
+
+
+## O desenho olha para a esquerda; true vira para a direita (espelha o sprite e os pontos).
+func virar(para_direita: bool) -> void:
+	sprite.scale.x = -absf(sprite.scale.x) if para_direita else absf(sprite.scale.x)
+
+
+func olhando_para_direita() -> bool:
+	return sprite.scale.x < 0.0
+
+
+## -1 se o alvo está à esquerda do chefe, 1 se à direita.
+func lado_do_alvo() -> float:
+	return 1.0 if x_do_alvo() > global_position.x else -1.0
+
+
+## Anda na horizontal até x, na velocidade dada (px/s). false se foi derrotado no caminho.
+func andar_ate(x: float, velocidade: float) -> bool:
+	while not is_equal_approx(global_position.x, x):
+		var dt: float = await _passo
+		if derrotado:
+			return false
+		global_position.x = move_toward(global_position.x, x, velocidade * dt)
+	return true
 
 
 ## Chamado pela Hurtbox quando um ataque do Curupira acerta.
@@ -166,12 +321,18 @@ func x_do_alvo() -> float:
 	return alvo.global_position.x if alvo else global_position.x - 600.0
 
 
+## Posição do alvo; sem alvo, um ponto à esquerda do chefe.
+func pos_do_alvo() -> Vector2:
+	return alvo.global_position if alvo else global_position + Vector2.LEFT * 600.0
+
+
 ## Põe um ataque (projétil, poça...) na cena atual, e não no chefe: assim ele não anda junto.
 func lancar_na_cena(no: Node) -> void:
 	get_tree().current_scene.add_child(no)
 
 
 ## Toca a animação se ela existir no SpriteFrames (se não existir, não dá erro).
+## Se já é a que está tocando, continua de onde estava.
 func tocar(nome: StringName) -> void:
 	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(nome):
 		return
@@ -179,13 +340,15 @@ func tocar(nome: StringName) -> void:
 		sprite.play(nome)
 
 
-## Cada chefe sobrescreve para parar a própria máquina de estados.
+## Cada chefe sobrescreve para limpar o que é dele (ex.: voltar ao lugar).
 func _ao_ser_derrotado() -> void:
 	pass
 
 
 func _ao_zerar_vida() -> void:
 	derrotado = true
+	estado_luta = EstadoLuta.DERROTADO
+	_ritmo_animacao = 1.0
 	_pulsos_veneno = 0
 	_timer_veneno.stop()
 	_timer_lentidao.stop()
@@ -196,7 +359,6 @@ func _ao_zerar_vida() -> void:
 	# Some com projéteis, poças etc. que ainda estão na tela.
 	get_tree().call_group("ataques_chefe", "queue_free")
 	_ao_ser_derrotado()
+	reiniciar(&"derrota")
 	chefe_derrotado.emit()
 	print("%s derrotado(a)!" % dados.nome)
-	# Provisório até a tela de vitória: some aos poucos.
-	create_tween().tween_property(self, "modulate:a", 0.0, 1.0)

@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" path="res://assets/pixel/boto/efeitos/coracao_estoura_1.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/pixel/boto/efeitos/coracao_estoura_2.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/pixel/boto/efeitos/coracao_estoura_3.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/boto/efeitos/coracao_estoura_4.png" id="4"]
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="5"]
+
+[node name="CoracaoEstouraBoto" type="Sprite2D"]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("1")
+centered = false
+offset = Vector2(-9, -9)
+script = ExtResource("5")
+quadros = Array[Texture2D]([ExtResource("1"), ExtResource("2"), ExtResource("3"), ExtResource("4")])
+fps = 16.0
+loop = false
+apagar_ao_terminar = true

@@ -4,12 +4,17 @@ extends Hitbox
 ## Layer enemy_hitbox; mask player (acerta a hurtbox do Curupira) + world (some no chão/parede).
 ## Sem teto na arena: se sair da tela por cima, some pelo VisibleOnScreenNotifier2D.
 
+## true = o projétil gira para apontar para onde voa. Pixel art redonda (feitiço, nota)
+## fica false: girar um desenho de pixel quebra a grade.
+@export var girar: bool = true
+
 var velocidade: Vector2 = Vector2.ZERO
 
 
 func lancar(nova_velocidade: Vector2) -> void:
 	velocidade = nova_velocidade
-	rotation = velocidade.angle()
+	if girar:
+		rotation = velocidade.angle()
 
 
 func _ready() -> void:

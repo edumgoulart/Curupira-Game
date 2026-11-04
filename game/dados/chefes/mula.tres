@@ -1,8 +1,9 @@
 [gd_resource type="Resource" script_class="MulaData" format=3 uid="uid://dcifq07t13sbr"]
 
-[ext_resource type="Script" uid="uid://d2lnm0pfnkafb" path="res://scripts/mula_data.gd" id="1_dados"]
-[ext_resource type="PackedScene" uid="uid://dq5ys8hoiy2ft" path="res://scenes/bola_de_fogo_mula.tscn" id="2_bola"]
-[ext_resource type="PackedScene" uid="uid://bwrinv2p0og0s" path="res://scenes/meteoro.tscn" id="3_met"]
+[ext_resource type="Script" path="res://scripts/mula_data.gd" id="1_dados"]
+[ext_resource type="PackedScene" path="res://scenes/bola_de_fogo_mula.tscn" id="2_bola"]
+[ext_resource type="PackedScene" path="res://scenes/meteoro.tscn" id="3_met"]
+[ext_resource type="PackedScene" path="res://scenes/onda_fogo_mula.tscn" id="4_onda"]
 
 [resource]
 script = ExtResource("1_dados")
@@ -12,5 +13,9 @@ recompensa = "Bola de Fogo e Canhão Flamejante"
 vida = 1200
 pausa_entre_ataques = 1.2
 golpes_contato = 1
+ataques_fase_1 = Array[StringName]([&"bolas", &"pisoteio"])
+ataques_fase_2 = Array[StringName]([&"bolas", &"pisoteio", &"investida"])
+ataques_fase_3 = Array[StringName]([&"bolas", &"pisoteio", &"investida", &"meteoros"])
 cena_bola = ExtResource("2_bola")
+cena_onda = ExtResource("4_onda")
 cena_meteoro = ExtResource("3_met")

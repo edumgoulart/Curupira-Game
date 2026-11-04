@@ -1,164 +1,207 @@
 extends Chefe
-## Máquina de IA — chefe final. "Vida alta e dano alto, os maiores entre todos" (GDD).
-## Fica parada no lado direito da sala; sorteia entre dois ataques (nunca bombas duas vezes):
-##   - raio laser: uma linha fina sai do LED e acompanha o Curupira; no fim do aviso trava
-##     e o laser dispara nessa direção (aviso 0,8 s, 1 golpe);
-##   - bombas: três caem do teto (uma onde o Curupira está, duas ao lado); no chão piscam e
-##     mostram a área por 1,5 s e explodem (2 golpes). Depois a Máquina fica parada 1,2 s.
-## Estado único e leva dano o tempo todo (regras do GDD). Não concede ataque.
-## Vida, dano recebido, contato e derrota vêm da classe base Chefe (chefe.gd).
+## Máquina de IA (o Núcleo) — chefe final. Pendurada no trilho do teto por um braço; a origem
+## do node é o ponto do trilho. Três fases (vida em maquina.tres):
+##   fase 1: laser, bombas;   fase 2: + pistoes;   fase 3: + varredura.
+## Não concede ataque.
 ##
-## Ciclo da máquina de estados:
-##   ESPERANDO --sorteio--> AVISO_LASER -> LASER --------------------------> ESPERANDO
-##                     \--> BOMBAS (até as três explodirem) -> PARADA --(sem pausa extra)--> sorteio
+## Cada ataque, na ordem em que acontece:
+##   laser      — a lente abre e uma linha fina segue o Curupira; trava e dispara;
+##   bombas     — recolhe para o alto, os alçapões do teto abrem e caem N bombas
+##                (uma no Curupira, as outras ao lado); depois fica parada (janela);
+##   pistoes    — a lente olha o chão e as placas do piso saltam em ondas na direção do Curupira;
+##   varredura  — desce até a altura do Curupira: laser reto na altura da cabeça (abaixar),
+##                depois mira o chão e o ponto de impacto corre até a parede (pular).
+## A hurtbox e o contato ficam no "Nucleo", que acompanha a lente do desenho (ponto "lente")
+## a cada frame, porque o corpo desce e sobe dentro das próprias animações.
 ##
-## Animações usadas (criar no SpriteFrames do AnimatedSprite2D quando houver arte):
-##   idle, aviso_laser, laser, bombas, parada, derrota
-## Enquanto não há arte, o desenho provisório (retângulo com LED) fica em VisualProvisorio.
-
-enum Estado { ESPERANDO, AVISO_LASER, LASER, BOMBAS, PARADA, DERROTADA }
-enum Ataque { NENHUM, LASER, BOMBAS }
+## Animações usadas (maquina_frames.tres):
+##   idle, aviso_laser, mirando, laser, fim_laser, aviso_bombas, bombas, fim_bombas,
+##   aviso_pistoes, pistoes, descer, varredura, varredura_chao, subir, derrota
 
 ## Brilho de aviso da Máquina: vermelho. Só visual.
 const COR_AVISO_MAQUINA: Color = Color(1.8, 0.6, 0.6)
-## Altura de onde as bombas caem, acima do chão (px). Só visual (o topo da tela).
-const ALTURA_QUEDA_BOMBA: float = 1100.0
+## Distância do centro do corpo até a lente, no desenho olhando para a esquerda (px).
+const LENTE_AO_CENTRO: Vector2 = Vector2(62.0, 0.0)
+## Alçapão que abre no teto em cima de cada bomba. Só visual.
+const CENA_ALCAPAO: PackedScene = preload("res://scenes/alcapao_maquina.tscn")
+## O chão da arena, medido do trilho (px): a arte põe o teto em 14 e o chão em 220 (× 4).
+const ALTURA_DO_CHAO: float = 824.0
 
-var estado: Estado = Estado.ESPERANDO
-var _tempo: float = 0.0
-var _ultimo_ataque: Ataque = Ataque.NENHUM
-var _sorteio := RandomNumberGenerator.new()
-var _laser: LaserMaquina
-var _bombas_pendentes: int = 0
-
-## Os dados com o tipo da Máquina (o campo "dados" da base é do tipo genérico ChefeData).
 @onready var _d: MaquinaData = dados as MaquinaData
-## De onde sai o laser (o LED).
-@onready var led: Marker2D = $Led
-## Altura do chão (base da Máquina): onde as bombas caem.
-@onready var pe: Marker2D = $Pe
-## Desenho provisório (retângulo com LED). Fica dentro do sprite para herdar o brilho de aviso.
-@onready var visual_provisorio: Polygon2D = $AnimatedSprite2D/VisualProvisorio
-@onready var luz_led: Polygon2D = $AnimatedSprite2D/VisualProvisorio/Led
+## Hurtbox e contato do corpo (seguem a lente).
+@onready var nucleo: Node2D = $Nucleo
 
 
-func _ready() -> void:
-	super._ready()
-	_sorteio.randomize()
-	_entrar(Estado.ESPERANDO, _d.pausa_entre_ataques)
+func _process(delta: float) -> void:
+	super._process(delta)
+	nucleo.global_position = ponto("lente") + LENTE_AO_CENTRO * Vector2(signf(sprite.scale.x), 1.0)
 
 
-func _physics_process(delta: float) -> void:
-	delta *= fator_tempo()  # Bolha Abissal: o relógio do chefe anda mais devagar
-	if estado == Estado.DERROTADA:
-		return
-	if estado == Estado.BOMBAS:
-		return  # espera as bombas explodirem (sinal explodiu)
-	_tempo -= delta
-	if estado == Estado.AVISO_LASER and _laser:
+func _executar(nome: StringName) -> void:
+	match nome:
+		&"laser":
+			await _laser()
+		&"bombas":
+			await _bombas()
+		&"pistoes":
+			await _pistoes()
+		&"varredura":
+			await _varredura()
+
+
+## Onde a Máquina está pendurada fica fora da arena: o chão é medido a partir do trilho.
+func _chao() -> float:
+	return global_position.y + ALTURA_DO_CHAO
+
+
+func _novo_laser(golpes: int) -> LaserMaquina:
+	var laser: LaserMaquina = _d.cena_laser.instantiate()
+	laser.dano = golpes
+	laser.global_position = ponto("lente")
+	lancar_na_cena(laser)
+	return laser
+
+
+func _laser() -> void:
+	avisar(true, COR_AVISO_MAQUINA)
+	reiniciar(&"aviso_laser")
+	var laser := _novo_laser(_d.golpes_laser)
+	var tempo: float = 0.0
+	while tempo < _d.aviso_laser:
+		if sprite.animation == &"aviso_laser" and not sprite.is_playing():
+			tocar(&"mirando")
+		laser.global_position = ponto("lente")
 		# A linha acompanha o Curupira e trava no fim do aviso.
-		if _tempo > _d.travamento_laser:
-			_laser.mirar(alvo.global_position if alvo else led.global_position + Vector2.LEFT)
+		if tempo < _d.aviso_laser - _d.travamento_laser:
+			laser.mirar(pos_do_alvo())
 		else:
-			_laser.travar()
-	if _tempo > 0.0 and not is_zero_approx(_tempo):
+			laser.travar()
+		tempo += await passo()
+		if derrotado:
+			return
+	avisar(false)
+	tocar(&"laser")
+	laser.disparar()
+	if not await esperar(_d.duracao_laser):
 		return
-
-	match estado:
-		Estado.ESPERANDO:
-			_escolher_ataque()
-		Estado.AVISO_LASER:
-			_laser.disparar()
-			_entrar(Estado.LASER, _d.duracao_laser)
-		Estado.LASER:
-			_laser.queue_free()
-			_laser = null
-			_entrar(Estado.ESPERANDO, _d.pausa_entre_ataques)
-		Estado.PARADA:
-			# A parada já é a pausa depois das bombas: sorteia o próximo direto.
-			_escolher_ataque()
+	laser.queue_free()
+	await tocar_e_esperar(&"fim_laser")
 
 
-## Sorteia o próximo ataque; nunca bombas duas vezes seguidas.
-func _escolher_ataque() -> void:
-	var ataque: Ataque = Ataque.LASER
-	if _ultimo_ataque != Ataque.BOMBAS and _sorteio.randi_range(0, 1) == 1:
-		ataque = Ataque.BOMBAS
-	_ultimo_ataque = ataque
-	match ataque:
-		Ataque.LASER:
-			_laser = _d.cena_laser.instantiate()
-			_laser.dano = _d.golpes_laser
-			_laser.global_position = led.global_position
-			lancar_na_cena(_laser)
-			_laser.mirar(alvo.global_position if alvo else led.global_position + Vector2.LEFT)
-			_entrar(Estado.AVISO_LASER, _d.aviso_laser)
-		Ataque.BOMBAS:
-			_soltar_bombas()
-			_entrar(Estado.BOMBAS, 0.0)
-
-
-func _entrar(novo_estado: Estado, duracao: float) -> void:
-	estado = novo_estado
-	_tempo = duracao
-	avisar(estado == Estado.AVISO_LASER or estado == Estado.BOMBAS, COR_AVISO_MAQUINA)
-	# LED aceso forte enquanto ataca; apagado ("superaquecido") na parada. Só visual.
-	match estado:
-		Estado.AVISO_LASER, Estado.LASER, Estado.BOMBAS:
-			luz_led.modulate = Color(1.6, 1.6, 1.6)
-		Estado.PARADA:
-			luz_led.modulate = Color(0.35, 0.35, 0.35)
-		_:
-			luz_led.modulate = Color.WHITE
-	_atualizar_animacao()
-
-
-## Uma bomba onde o Curupira está e as outras ao lado, alternando (para 3: 0, -d, +d).
-func _soltar_bombas() -> void:
+func _bombas() -> void:
+	avisar(true, COR_AVISO_MAQUINA)
+	if not await tocar_e_esperar(&"aviso_bombas"):
+		return
+	avisar(false)
+	tocar(&"bombas")
+	# Uma bomba onde o Curupira está e as outras ao lado, alternando (para 3: 0, -d, +d).
 	var centro: float = x_do_alvo()
-	_bombas_pendentes = _d.quantidade_bombas
+	var pendentes: Array[int] = [_d.quantidade_bombas]
 	for i in _d.quantidade_bombas:
-		var passo: int = (i + 1) / 2
+		var passo_lado: int = (i + 1) / 2
 		var lado: float = -1.0 if i % 2 == 1 else 1.0
-		var x: float = clampf(centro + lado * passo * _d.distancia_bombas, -900.0, 900.0)
+		var x: float = clampf(centro + lado * passo_lado * _d.distancia_bombas, -ARENA_MEIA_LARGURA + 60.0, ARENA_MEIA_LARGURA - 60.0)
+		var alcapao: Node2D = CENA_ALCAPAO.instantiate()
+		alcapao.global_position = Vector2(x, global_position.y)
+		lancar_na_cena(alcapao)
+		get_tree().create_timer(2.0, false).timeout.connect(alcapao.queue_free)
 		var bomba: BombaMaquina = _d.cena_bomba.instantiate()
 		bomba.configurar(_d)
-		bomba.global_position = Vector2(x, pe.global_position.y)
-		bomba.get_node("Corpo").position.y = -ALTURA_QUEDA_BOMBA
-		bomba.explodiu.connect(_ao_explodir_bomba)
+		bomba.global_position = Vector2(x, _chao())
+		bomba.get_node("Corpo").position.y = global_position.y - _chao()
+		bomba.explodiu.connect(func() -> void: pendentes[0] -= 1)
 		lancar_na_cena(bomba)
+	while pendentes[0] > 0:
+		await passo()
+		if derrotado:
+			return
+	if not await tocar_e_esperar(&"fim_bombas"):
+		return
+	# Parada depois das bombas: é a janela para atacar.
+	tocar(&"idle")
+	await esperar(maxf(_d.parada_apos_bombas - FolhaSprites.duracao(sprite, &"fim_bombas"), 0.0))
 
 
-func _ao_explodir_bomba() -> void:
-	_bombas_pendentes -= 1
-	if _bombas_pendentes <= 0 and estado == Estado.BOMBAS:
-		_entrar(Estado.PARADA, _d.parada_apos_bombas)
+func _pistoes() -> void:
+	avisar(true, COR_AVISO_MAQUINA)
+	reiniciar(&"aviso_pistoes")
+	if not await esperar(_d.aviso_pistoes):
+		return
+	avisar(false)
+	tocar(&"pistoes")
+	var lado: float = lado_do_alvo()
+	var inicio: float = global_position.x
+	var fim: float = lado * ARENA_MEIA_LARGURA
+	var velocidade: float = _d.velocidade_onda_pistoes
+	var duracao_total: float = 0.0
+	for onda in _d.ondas_pistoes:
+		# Placas lado a lado, saindo de baixo da Máquina até a parede do lado do Curupira.
+		var x: float = inicio
+		while (fim - x) * lado > 0.0:
+			var placa: PlacaMaquina = _d.cena_placa.instantiate()
+			var atraso: float = absf(x - inicio) / velocidade
+			placa.configurar(atraso, _d.aviso_placa, _d.golpes_placa)
+			placa.global_position = Vector2(x, _chao())
+			lancar_na_cena(placa)
+			duracao_total = maxf(duracao_total, atraso)
+			x += lado * _d.largura_placa
+		if not await esperar(_d.intervalo_ondas_pistoes):
+			return
+		velocidade *= _d.aceleracao_onda_pistoes
+	await esperar(maxf(duracao_total - _d.intervalo_ondas_pistoes, 0.0) + _d.aviso_placa)
 
 
-## Sem arte ainda: o retângulo provisório é o que pisca e muda de cor.
+func _varredura() -> void:
+	avisar(true, COR_AVISO_MAQUINA)
+	if not await tocar_e_esperar(&"descer"):
+		return
+	tocar(&"varredura")
+	var lado: float = lado_do_alvo()
+	# 1ª passada: reta, na altura da lente (a cabeça do Curupira em pé).
+	var laser := _novo_laser(_d.golpes_varredura)
+	laser.rotation = 0.0 if lado > 0.0 else PI
+	laser.travar()
+	if not await esperar(_d.aviso_varredura):
+		return
+	avisar(false)
+	laser.disparar()
+	if not await esperar(_d.duracao_varredura_alta):
+		return
+	laser.queue_free()
+	# 2ª passada: mira o chão perto dela e o ponto de impacto corre até a parede.
+	avisar(true, COR_AVISO_MAQUINA)
+	tocar(&"varredura_chao")
+	laser = _novo_laser(_d.golpes_varredura)
+	var x0: float = global_position.x + lado * _d.inicio_varredura_chao
+	var x1: float = lado * ARENA_MEIA_LARGURA
+	_apontar_no_chao(laser, x0)
+	laser.travar()
+	if not await esperar(_d.aviso_varredura):
+		return
+	avisar(false)
+	laser.disparar()
+	var tempo: float = 0.0
+	while tempo < _d.duracao_varredura_chao:
+		_apontar_no_chao(laser, lerpf(x0, x1, tempo / _d.duracao_varredura_chao))
+		tempo += await passo()
+		if derrotado:
+			return
+	laser.queue_free()
+	await tocar_e_esperar(&"subir")
+
+
+## Laser da lente até o ponto (x, chão), cortado no chão.
+func _apontar_no_chao(laser: LaserMaquina, x: float) -> void:
+	laser.global_position = ponto("lente")
+	var alvo_chao := Vector2(x, _chao())
+	laser.apontar(alvo_chao)
+	laser.definir_comprimento(laser.global_position.distance_to(alvo_chao))
+
+
+## Sem arte nova não há mais desenho provisório: quem pisca é o sprite.
 func _visual_colorido() -> CanvasItem:
-	return visual_provisorio
+	return sprite
 
 
-func _ao_ser_derrotado() -> void:
-	estado = Estado.DERROTADA
-	if _laser:
-		_laser = null  # já é apagado junto com os outros ataques (grupo ataques_chefe)
-	luz_led.modulate = Color(0.2, 0.2, 0.2)
-	_atualizar_animacao()
-
-
-func _atualizar_animacao() -> void:
-	match estado:
-		Estado.ESPERANDO:
-			tocar(&"idle")
-		Estado.AVISO_LASER:
-			tocar(&"aviso_laser")
-		Estado.LASER:
-			tocar(&"laser")
-		Estado.BOMBAS:
-			tocar(&"bombas")
-		Estado.PARADA:
-			tocar(&"parada")
-		Estado.DERROTADA:
-			tocar(&"derrota")
+func ponto_de_mira() -> Vector2:
+	return nucleo.global_position

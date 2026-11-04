@@ -1,20 +1,35 @@
 extends CharacterBody2D
-## Curupira — movimento lateral com gravidade, game feel, dash, ataques e vida.
+## Curupira — movimento lateral com gravidade, game feel, dash, mira em 8 direções, agachar,
+## ataques e vida.
 ##
-## Animações usadas (criar no SpriteFrames do AnimatedSprite2D com estes nomes exatos):
-##   idle   — parado no chão
-##   correr — andando no chão
-##   pular  — subindo no ar
-##   cair   — descendo no ar
-##   dash   — durante o dash (0,2 s)
-##   especial — parado disparando um especial contínuo (Canhão Flamejante, 1,5 s)
-##   derrota — ao levar o último golpe (sem loop)
-##   atacar — mão subindo e soltando o ataque (sem loop); recomeça a cada tiro
+## Mira (GDD): cima e baixo mudam a direção do tiro.
+##   de pé: frente, diagonal para cima (cima + frente) e cima; andando: frente ou diagonal;
+##   baixo no chão agacha (atira para a frente, rente ao chão, e fica com hitbox baixa);
+##   travar a mira (aim_lock) segura no lugar e libera a diagonal para baixo;
+##   no ar: cima, diagonal para cima, frente, diagonal para baixo e baixo.
+## O tiro sai da mão desenhada no quadro atual (ponto "mao" do curupira.json).
+##
+## Animações usadas (curupira_frames.tres, gerado pelo gerador de pixel art):
+##   idle, correr, pular, cair, pouso, dash, freio, especial, dano, derrota,
+##   atirar, atirar_diag_cima, atirar_cima, atirar_diag_baixo,
+##   correr_atirar, correr_atirar_diag_cima,
+##   ar_atirar_cima, ar_atirar_diag_cima, ar_atirar_lado, ar_atirar_diag_baixo, ar_atirar_baixo,
+##   abaixar, agachado, agachado_atirar, levantar
 ## Se uma animação ainda não existir, toca a idle no lugar (não dá erro).
 ## O dash tem efeito próprio (fantasmas, folhas, vento, corpo esticado) no node EfeitoDash.
-## Sem "especial", o especial contínuo usa a "atacar" (o feixe sai da mão).
 
-enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, DASH, ESPECIAL, DERROTADO }
+enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, AGACHADO, DASH, ESPECIAL, DERROTADO }
+
+## Ângulos da mira (graus de tela; o lado vem de olhando_para).
+const MIRA_CIMA: float = -90.0
+const MIRA_DIAG_CIMA: float = -45.0
+const MIRA_FRENTE: float = 0.0
+const MIRA_DIAG_BAIXO: float = 45.0
+const MIRA_BAIXO: float = 90.0
+## Altura da cápsula agachado, em fração da de pé (GDD: ~40%). Só a forma; o desenho é da folha.
+const ALTURA_AGACHADO: float = 0.5
+## Quanto tempo a pose de dano fica na tela depois de um golpe (s). Só visual.
+const DURACAO_POSE_DANO: float = 0.2
 
 ## Emitido no último golpe. A arena escuta para mostrar a tela de derrota.
 signal derrotado
@@ -31,6 +46,8 @@ const DURACAO_POSE_ATAQUE: float = 0.3
 var estado: Estado = Estado.PARADO
 ## 1 = direita, -1 = esquerda. Define o lado para onde o Curupira atira e dá o dash.
 var olhando_para: int = 1
+## Mira atual em graus (MIRA_*).
+var mira: float = MIRA_FRENTE
 
 # Contadores regressivos (s). Enquanto > 0, a janela está aberta.
 var _tempo_coyote: float = 0.0
@@ -40,6 +57,12 @@ var _tempo_recarga_dash: float = 0.0
 var _tempo_invencivel: float = 0.0
 var _tempo_especial: float = 0.0
 var _tempo_ataque: float = 0.0
+var _tempo_pouso: float = 0.0
+var _tempo_dano: float = 0.0
+var _estava_no_ar: bool = false
+# Formas de pé e agachado (corpo e hurtbox), trocadas ao agachar.
+var _formas_de_pe: Array = []
+var _formas_agachado: Array = []
 # No ar só pode um dash por pulo; volta a valer ao tocar o chão.
 var _dash_aereo_disponivel: bool = true
 # Lentidão ativa: quem está deixando lento (ex.: poça da Cuca) -> fator de velocidade.
@@ -51,6 +74,8 @@ var _lentidoes: Dictionary = {}
 @onready var hurtbox: Hurtbox = $Hurtbox
 @onready var carga: CargaEspecial = $CargaEspecial
 @onready var efeito_dash: EfeitoDash = $EfeitoDash
+@onready var forma_corpo: CollisionShape2D = $CollisionShape2D
+@onready var forma_hurtbox: CollisionShape2D = $Hurtbox/CollisionShape2D
 
 
 func _ready() -> void:
@@ -73,6 +98,11 @@ func _ready() -> void:
 	# Ataque saiu (básico ou especial) -> Atirador avisa -> animação de ataque.
 	atirador.disparou.connect(_ao_disparar)
 
+	# Pixel art: âncora nos pés, filtro Nearest; o Atirador vai para a mão a cada frame.
+	FolhaSprites.preparar(sprite)
+	atirador.seguindo_mao = true
+	_preparar_formas_agachado()
+
 
 func _physics_process(delta: float) -> void:
 	_atualizar_janelas(delta)
@@ -89,14 +119,19 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_atualizar_estado()
+	mira = _calcular_mira()
+	# Segurar o botão atira sem parar; a cadência fica com o Atirador.
+	# A pose de tiro entra antes da animação, para o tiro sair da mão já esticada.
+	var pode_atirar: bool = _pode_atirar()
+	var atirando: bool = pode_atirar and Input.is_action_pressed("attack_basic")
+	if atirando:
+		_tempo_ataque = maxf(_tempo_ataque, DURACAO_POSE_ATAQUE)
 	_atualizar_animacao()
+	_por_atirador_na_mao()
 	_atualizar_invencibilidade(delta)
 
-	# Segurar o botão atira sem parar; a cadência fica com o Atirador.
-	var pode_atirar: bool = _pode_atirar()
-	if pode_atirar and Input.is_action_pressed("attack_basic"):
-		atirador.tentar_atirar(olhando_para, fator_lentidao())
-		_tempo_ataque = maxf(_tempo_ataque, DURACAO_POSE_ATAQUE)
+	if atirando:
+		atirador.tentar_atirar(olhando_para, fator_lentidao(), mira)
 	# Especial: só com a barra cheia; disparar zera a barra.
 	if pode_atirar and Input.is_action_just_pressed("attack_special") and carga.esta_cheia():
 		atirador.atirar_especial(olhando_para)
@@ -138,6 +173,7 @@ func take_damage(amount: int, _from: Node) -> void:
 	vida.perder(amount)
 	if vida.esta_viva():
 		_tempo_invencivel = dados_vida.invencibilidade_apos_golpe
+		_tempo_dano = DURACAO_POSE_DANO
 
 
 ## Enquanto true, o Curupira não leva golpe: no dash, logo depois de um golpe e derrotado.
@@ -173,15 +209,66 @@ func _pode_atirar() -> bool:
 	return estado != Estado.DASH and estado != Estado.ESPECIAL and estado != Estado.DERROTADO
 
 
-## Chamado pelo Atirador a cada ataque que sai. O projétil já nasce na mão (posição do
-## Atirador = mão estendida do frame "mao_atacando"); aqui só entra a animação.
+## Chamado pelo Atirador a cada ataque que sai. O projétil já nasce na mão; aqui só a pose.
+## Recomeça a pose de tiro do primeiro quadro (o coice da mão), exceto correndo e no ar,
+## onde as pernas não podem pular de quadro.
 func _ao_disparar() -> void:
 	_tempo_ataque = maxf(_tempo_ataque, DURACAO_POSE_ATAQUE)
-	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(&"atacar"):
-		return
-	# Recomeça do primeiro frame a cada tiro, mesmo com a pose do tiro anterior ainda na tela.
-	sprite.play(&"atacar")
-	sprite.set_frame_and_progress(0, 0.0)
+	if estado == Estado.PARADO or estado == Estado.AGACHADO:
+		sprite.set_frame_and_progress(0, 0.0)
+
+
+## Põe o Atirador no ponto "mao" do quadro atual (com escala e lado do sprite).
+func _por_atirador_na_mao() -> void:
+	var mao: Variant = FolhaSprites.ponto_arte(sprite, "mao")
+	if mao == null:
+		# Animação sem mão desenhada (ex.: idle): usa a pose de tiro equivalente.
+		mao = Vector2(12.0, -36.0) if estado != Estado.AGACHADO else Vector2(16.0, -6.0)
+	atirador.global_position = sprite.to_global(mao)
+
+
+## Direção do tiro conforme cima/baixo, o lado e se está no chão (regras no topo do script).
+func _calcular_mira() -> float:
+	var vertical: float = signf(Input.get_axis("aim_up", "crouch"))
+	var frente: bool = Input.get_axis("move_left", "move_right") != 0.0
+	if estado == Estado.AGACHADO:
+		return MIRA_FRENTE
+	if vertical < 0.0:
+		return MIRA_DIAG_CIMA if frente else MIRA_CIMA
+	if vertical > 0.0:
+		if not is_on_floor():
+			return MIRA_DIAG_BAIXO if frente else MIRA_BAIXO
+		if _mira_travada():
+			return MIRA_DIAG_BAIXO
+	return MIRA_FRENTE
+
+
+## Segurando aim_lock no chão: fica parado e mira em qualquer direção do chão.
+func _mira_travada() -> bool:
+	return is_on_floor() and Input.is_action_pressed("aim_lock")
+
+
+## Formas agachado: a mesma cápsula, mais baixa, com a base no mesmo lugar (os pés).
+func _preparar_formas_agachado() -> void:
+	for forma in [forma_corpo, forma_hurtbox]:
+		var de_pe := forma.shape as CapsuleShape2D
+		_formas_de_pe.append([de_pe, forma.position])
+		if de_pe == null:
+			_formas_agachado.append([forma.shape, forma.position])
+			continue
+		var baixa := de_pe.duplicate() as CapsuleShape2D
+		baixa.height = maxf(de_pe.height * ALTURA_AGACHADO, baixa.radius * 2.0)
+		var base: float = forma.position.y + de_pe.height / 2.0
+		_formas_agachado.append([baixa, Vector2(forma.position.x, base - baixa.height / 2.0)])
+
+
+func _usar_formas(agachado: bool) -> void:
+	var lista: Array = _formas_agachado if agachado else _formas_de_pe
+	var formas: Array = [forma_corpo, forma_hurtbox]
+	for i in formas.size():
+		if formas[i].shape != lista[i][0]:
+			formas[i].set_deferred("shape", lista[i][0])
+			formas[i].set_deferred("position", lista[i][1])
 
 
 ## Disparando especial contínuo: não anda, não pula, não dá dash, não vira.
@@ -226,6 +313,8 @@ func _atualizar_janelas(delta: float) -> void:
 
 	_tempo_recarga_dash -= delta
 	_tempo_ataque -= delta
+	_tempo_pouso -= delta
+	_tempo_dano -= delta
 
 
 func _aplicar_gravidade(delta: float) -> void:
@@ -237,10 +326,13 @@ func _mover_horizontal() -> void:
 	# get_axis já anula esquerda + direita juntas. signf deixa o analógico com
 	# velocidade fixa (sem "andar devagar" com o analógico meio inclinado).
 	var direcao: float = signf(Input.get_axis("move_left", "move_right"))
-	velocity.x = direcao * dados.velocidade * fator_lentidao()
+	# Agachado ou com a mira travada não anda, mas ainda vira para mirar do outro lado.
+	var parado_no_lugar: bool = is_on_floor() and (_mira_travada() or Input.get_axis("aim_up", "crouch") > 0.0)
+	velocity.x = 0.0 if parado_no_lugar else direcao * dados.velocidade * fator_lentidao()
 	if direcao != 0.0:
 		olhando_para = int(direcao)
-		sprite.flip_h = olhando_para < 0
+		# Vira pela escala (e não flip_h), para a âncora dos pés e os pontos da folha virarem juntos.
+		sprite.scale.x = absf(sprite.scale.x) * olhando_para
 
 
 ## O pulo sai quando as duas janelas estão abertas ao mesmo tempo:
@@ -304,33 +396,84 @@ func _processar_dash(delta: float) -> void:
 ## o derrotado não sai.
 func _atualizar_estado() -> void:
 	if estado == Estado.DASH or estado == Estado.ESPECIAL or estado == Estado.DERROTADO:
+		_usar_formas(false)
 		return
 	if is_on_floor():
-		estado = Estado.CORRENDO if velocity.x != 0.0 else Estado.PARADO
+		if _estava_no_ar:
+			_tempo_pouso = FolhaSprites.duracao(sprite, &"pouso")
+		var agachar: bool = Input.get_axis("aim_up", "crouch") > 0.0 and not Input.is_action_pressed("aim_lock")
+		if agachar:
+			estado = Estado.AGACHADO
+		else:
+			estado = Estado.CORRENDO if velocity.x != 0.0 else Estado.PARADO
 	else:
 		estado = Estado.PULANDO if velocity.y < 0.0 else Estado.CAINDO
+	_estava_no_ar = not is_on_floor()
+	_usar_formas(estado == Estado.AGACHADO)
 
 
 func _atualizar_animacao() -> void:
-	# Pose de ataque por cima de parado/correndo/pulando/caindo (onde dá para atirar).
-	if _tempo_ataque > 0.0 and _pode_atirar():
-		_tocar(&"atacar")
+	if _tempo_dano > 0.0 and estado != Estado.DERROTADO and estado != Estado.DASH:
+		_tocar(&"dano")
 		return
+	var atacando: bool = _tempo_ataque > 0.0 and _pode_atirar()
 	match estado:
 		Estado.PARADO:
-			_tocar(&"idle")
+			if atacando or _mira_travada():
+				_tocar(_animacao_de_tiro_de_pe(), &"atirar")
+			elif _tempo_pouso > 0.0:
+				_tocar(&"pouso")
+			else:
+				_tocar(&"idle")
 		Estado.CORRENDO:
-			_tocar(&"correr")
-		Estado.PULANDO:
-			_tocar(&"pular")
-		Estado.CAINDO:
-			_tocar(&"cair")
+			if atacando:
+				_tocar(&"correr_atirar_diag_cima" if mira == MIRA_DIAG_CIMA else &"correr_atirar", &"correr")
+			else:
+				_tocar(&"correr")
+		Estado.PULANDO, Estado.CAINDO:
+			if atacando:
+				_tocar(_animacao_de_tiro_no_ar(), &"pular")
+			else:
+				_tocar(&"pular" if estado == Estado.PULANDO else &"cair")
+		Estado.AGACHADO:
+			if atacando:
+				_tocar(&"agachado_atirar", &"agachado")
+			elif sprite.animation == &"abaixar" and sprite.is_playing():
+				pass  # termina de descer
+			elif sprite.animation != &"agachado" and sprite.animation != &"abaixar" and sprite.animation != &"agachado_atirar":
+				_tocar(&"abaixar", &"agachado")
+			else:
+				_tocar(&"agachado")
 		Estado.DASH:
 			_tocar(&"dash")
 		Estado.ESPECIAL:
-			_tocar(&"especial", &"atacar")
+			_tocar(&"especial", &"atirar")
 		Estado.DERROTADO:
 			_tocar(&"derrota")
+
+
+func _animacao_de_tiro_de_pe() -> StringName:
+	match mira:
+		MIRA_CIMA:
+			return &"atirar_cima"
+		MIRA_DIAG_CIMA:
+			return &"atirar_diag_cima"
+		MIRA_DIAG_BAIXO:
+			return &"atirar_diag_baixo"
+	return &"atirar"
+
+
+func _animacao_de_tiro_no_ar() -> StringName:
+	match mira:
+		MIRA_CIMA:
+			return &"ar_atirar_cima"
+		MIRA_DIAG_CIMA:
+			return &"ar_atirar_diag_cima"
+		MIRA_DIAG_BAIXO:
+			return &"ar_atirar_diag_baixo"
+		MIRA_BAIXO:
+			return &"ar_atirar_baixo"
+	return &"ar_atirar_lado"
 
 
 ## Se a animação ainda não existir no SpriteFrames, toca a reserva (idle por padrão):

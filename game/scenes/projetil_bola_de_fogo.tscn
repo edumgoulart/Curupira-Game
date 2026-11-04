@@ -3,10 +3,10 @@
 [ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
 [ext_resource type="PackedScene" uid="uid://qlej0ru4rb3i" path="res://scenes/explosao.tscn" id="2_expl"]
 [ext_resource type="Script" uid="uid://bku4kjgoguonj" path="res://scripts/animacao_quadros.gd" id="3_anim"]
-[ext_resource type="Texture2D" uid="uid://grmul6fqqoss" path="res://assets/efeitos/bola_fogo_1.png" id="4_q1"]
-[ext_resource type="Texture2D" uid="uid://ipshq213mrv1" path="res://assets/efeitos/bola_fogo_2.png" id="5_q2"]
-[ext_resource type="Texture2D" uid="uid://tyms2spomxyj" path="res://assets/efeitos/bola_fogo_3.png" id="6_q3"]
-[ext_resource type="Texture2D" uid="uid://b50cfwdrp6605" path="res://assets/efeitos/bola_fogo_4.png" id="7_q4"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/bola_fogo_1.png" id="4_q1"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/bola_fogo_2.png" id="5_q2"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/bola_fogo_3.png" id="6_q3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/bola_fogo_4.png" id="7_q4"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_bola"]
 radius = 20.0
@@ -21,12 +21,15 @@ cena_impacto = ExtResource("2_expl")
 shape = SubResource("CircleShape2D_bola")
 
 [node name="Fogo" type="Sprite2D" parent="."]
-scale = Vector2(0.35, 0.35)
+texture_filter = 1
+scale = Vector2(4, 4)
 texture = ExtResource("4_q1")
-offset = Vector2(-136, -31)
+centered = false
+offset = Vector2(-17, -8)
+flip_h = true
 script = ExtResource("3_anim")
 quadros = Array[Texture2D]([ExtResource("4_q1"), ExtResource("5_q2"), ExtResource("6_q3"), ExtResource("7_q4")])
-fps = 16.0
+fps = 12.0
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
 rect = Rect2(-40, -24, 66, 48)

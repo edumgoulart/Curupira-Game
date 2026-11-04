@@ -149,7 +149,8 @@ func _animar_corpo_inicio() -> void:
 		return
 	if _tween_corpo:
 		_tween_corpo.kill()
-	sprite.scale = _escala_base * esticar
+	# O lado vem do sinal da escala (o Curupira vira pela escala): mantém o sinal ao esticar.
+	sprite.scale = Vector2(absf(_escala_base.x) * esticar.x * _direcao, _escala_base.y * esticar.y)
 	sprite.rotation = deg_to_rad(inclinacao) * _direcao
 	sprite.modulate = Color(brilho_clarao, brilho_clarao, brilho_clarao)
 	_tween_corpo = create_tween()
@@ -164,7 +165,7 @@ func _animar_corpo_fim() -> void:
 		_tween_corpo.kill()
 	sprite.modulate = Color.WHITE
 	_tween_corpo = create_tween().set_parallel()
-	_tween_corpo.tween_property(sprite, "scale", _escala_base, duracao_volta) \
+	_tween_corpo.tween_property(sprite, "scale", Vector2(absf(_escala_base.x) * _direcao, _escala_base.y), duracao_volta) \
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_tween_corpo.tween_property(sprite, "rotation", 0.0, duracao_volta) \
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
