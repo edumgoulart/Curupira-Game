@@ -47,6 +47,24 @@ position = Vector2(959, 3)
 rotation = 4.712389
 shape = SubResource("WorldBoundaryShape2D_parede")
 
+[node name="LimiteAreiaEsquerdo" type="StaticBody2D" parent="."]
+position = Vector2(-616, 0)
+collision_layer = 32
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LimiteAreiaEsquerdo"]
+rotation = 1.5707964
+shape = SubResource("WorldBoundaryShape2D_parede")
+
+[node name="LimiteAreiaDireito" type="StaticBody2D" parent="."]
+position = Vector2(520, 0)
+collision_layer = 32
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LimiteAreiaDireito"]
+rotation = 4.712389
+shape = SubResource("WorldBoundaryShape2D_parede")
+
 [node name="LadoEsquerdo" type="Marker2D" parent="."]
 position = Vector2(-856, 364)
 

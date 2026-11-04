@@ -239,12 +239,13 @@ Nomes configurados no `project.godot`.
 | # | Layer | Quem está nela | Mask (o que enxerga) |
 |---|---|---|---|
 | 1 | `world` | Chão, paredes | — |
-| 2 | `player` | Corpo e Hurtbox do Curupira | `world` (corpo); Hurtbox mask 0 |
+| 2 | `player` | Corpo e Hurtbox do Curupira | `world` e `limite_arena` (corpo, máscara 33); Hurtbox mask 0 |
 | 3 | `player_hitbox` | Projéteis e feixe do Curupira | `enemy`, `world` (máscara 9) |
 | 4 | `enemy` | Hurtbox do chefe; corações do Boto (podem ser estourados) | — |
 | 5 | `enemy_hitbox` | Projéteis, ondas, poças, bombas, placas, laser, jato do chefe | `player` |
+| 6 | `limite_arena` | Paredes que só seguram o corpo do Curupira (beiras da areia do Boto) | — |
 
-Quem causa dano só enxerga quem recebe pelas masks, nunca por `if` no código. As ondas de fogo da Mula têm mask só `player` (2) para não baterem no chão em que correm. Projéteis do chefe também ficam no grupo `ataques_chefe`, usado para limpá-los quando o chefe morre.
+Quem causa dano só enxerga quem recebe pelas masks, nunca por `if` no código. As paredes da areia do Boto ficam na `limite_arena`, e não na `world`, para os tiros do Curupira passarem por elas até o Boto na água. As ondas de fogo da Mula têm mask só `player` (2) para não baterem no chão em que correm. Projéteis do chefe também ficam no grupo `ataques_chefe`, usado para limpá-los quando o chefe morre.
 
 ### 7.2 Hitbox e Hurtbox **[Implementado]**
 
@@ -406,6 +407,7 @@ LevelN (Node2D)                   # texture_filter = Nearest (pixel art)
 ├── Fundo (Node2D, FundoArena)    # monta Fundo (z −10) e Frente (z 5) a partir de assets/pixel/arenas/<chefe>/
 ├── Camera2D                      # fixa na origem; filha da arena, nunca do Curupira
 ├── Floor, LeftWall, RightWall    # StaticBody2D com WorldBoundaryShape2D, layer world
+├── LimiteAreiaEsquerdo/Direito   # só no Boto: paredes nas beiras da areia, layer limite_arena
 ├── Curupira                      # instância
 ├── <Chefe>                       # instância, com alvo = Curupira
 ├── HUD                           # instância, com curupira
@@ -421,9 +423,11 @@ LevelN (Node2D)                   # texture_filter = Nearest (pixel art)
 | Mula | (488, 340) |
 | Cuca | (528, 340) |
 | Boto (linha d'água em 364) | (800, 364); marcadores `LadoEsquerdo` (−856, 364) e `LadoDireito` (800, 364) |
+| Beiras da areia do Boto (paredes `LimiteAreia*`) | x = −616 e x = 520 (colunas 86 e 370 da arte, `AREIA_BOTO` no gerador) |
 | Máquina (ponto de fixação no teto) | (648, −484) |
 
-- **[Divergente]** O `Fundo`/`SalaBranca`/`TileMapLayer` antigos saíram. `FundoArena` lê `fundo_1.png...` e `frente_1.png...` da pasta e anima a 4 fps; trocar a arte é só exportar de novo a pasta.
+- **[Divergente]** O `Fundo`/`SalaBranca`/`TileMapLayer` antigos saíram. `FundoArena` lê `fundo_1.png...` e `frente_1.png...` da pasta e anima no `fps` do `arena.json` (o `fps` exportado no node só vale se o json não tiver); trocar a arte é só exportar de novo a pasta.
+- **Arte das arenas** (`arenas_px.js`): fundo em planos (céu, mata ao longe, árvores do meio, troncos das bordas, chão). Quanto mais longe, mais perto da cor do céu e com menos contraste, com neblina pontilhada entre os planos. O meio da arena fica escuro e liso para o Curupira e o chefe se destacarem. O fogo do fundo da Mula é pequeno, sem contorno e numa rampa apagada (`RAMPA_FOGO_LONGE`), atrás da fumaça, para não competir com o fogo dela. A floresta da Cuca é azulada de noite, para a Cuca verde e roxa saltar. O laço tem 2 s: tudo que mexe no fundo repete a cada 2 s (`volta(t)`).
 - A frente do Boto (água) fica por cima dos personagens.
 - **[Assumido]** Extrair uma `arena_base.tscn` só se as quatro começarem a divergir; hoje a duplicação é de poucos nós.
 
@@ -447,7 +451,7 @@ A arte é pixel art em 480×270, ampliada 4× para 1920×1080. Ela é desenhada 
 - `pontos` são por quadro e relativos à âncora, em pixels da arte: `mao` (Curupira), `boca` e `frente` (Mula), `boca` e `garra` (Cuca), `bico` e `nadadeira` (Boto), `lente` (Máquina).
 - `<personagem>_frames.tres`: `SpriteFrames` gerado da folha, com os mesmos nomes de animação do JSON.
 - `<personagem>/efeitos/<efeito>_<n>.png`: projéteis e efeitos em quadros soltos, descritos em `efeitos/efeitos.json` (fps, loop, tamanho, centro).
-- `arenas/<chefe>/fundo_<n>.png` e `frente_<n>.png`: 8 quadros de 480×270. `arenas/menu/` é a floresta do fundo dos menus.
+- `arenas/<chefe>/fundo_<n>.png` e `frente_<n>.png`: 16 quadros de 480×270, num laço de 2 s (8 fps, no `arena.json`). `arenas/menu/` é a floresta do fundo dos menus (8 quadros a 4 fps).
 - `ui/fonte_pixel.fnt` + `.png`: fonte BMFont (11 linhas: acento, maiúscula de 7 e descendente), com o contorno escuro já desenhado. `ui/titulo.png` e `ui/botao_<estado>.png` (normal, foco, hover, apertado, desabilitado, painel) já vêm ampliados 4×, para o `StyleBoxTexture` usar no tamanho da tela.
 
 ### 10.3 Importação e filtro

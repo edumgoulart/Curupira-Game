@@ -8,7 +8,8 @@ extends Node2D
 
 ## Pasta da arena (ex.: res://assets/pixel/arenas/mula).
 @export_dir var pasta: String = ""
-## Quadros por segundo do fogo, da água e das luzes do fundo.
+## Quadros por segundo do fogo, da água e das luzes do fundo. O `fps` do `arena.json` da
+## pasta, quando existe, manda mais que este (o gerador sabe quantos quadros tem o laço).
 @export var fps: float = 4.0
 ## z_index da frente (os personagens ficam no 0).
 @export var z_frente: int = 5
@@ -16,6 +17,7 @@ extends Node2D
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_ler_fps()
 	_montar("fundo", -10)
 	_montar("frente", z_frente)
 
@@ -36,3 +38,12 @@ func _montar(prefixo: String, z: int) -> void:
 	camada.scale = Vector2.ONE * FolhaSprites.ESCALA
 	camada.z_index = z
 	add_child(camada)
+
+
+func _ler_fps() -> void:
+	var caminho: String = pasta + "/arena.json"
+	if not FileAccess.file_exists(caminho):
+		return
+	var dados: Variant = JSON.parse_string(FileAccess.get_file_as_string(caminho))
+	if dados is Dictionary and dados.has("fps"):
+		fps = float(dados["fps"])

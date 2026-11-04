@@ -64,6 +64,7 @@ Controle é a forma principal de jogar; teclado também precisa funcionar 100%.
 | 3 | `player_hitbox` | projéteis e ataques do Curupira |
 | 4 | `enemy` | corpo/hurtbox dos chefes |
 | 5 | `enemy_hitbox` | projéteis e ataques dos chefes |
+| 6 | `limite_arena` | paredes que só seguram o Curupira (beiras da areia do Boto) |
 
 Hitbox do jogador só detecta hurtbox de inimigo e vice-versa — **resolver com layers/masks, não com `if` no código**.
 

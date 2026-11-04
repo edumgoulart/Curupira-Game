@@ -13,6 +13,11 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   - Na segunda rodada mudaram também os ataques ganhos (feitiço, bolhas, poção, canhão e os
     respingos), o menu e as outras telas (tema, fonte, fundo), as caixas de dano dos chefes e
     a hurtbox do Curupira.
+  - Na terceira rodada, a pedido do Eduardo: a Cuca foi redesenhada (cabeça redonda, olhão
+    com cílios, cabeleira cacheada, vestido de bruxa; a célula da folha agora é 140×130), os
+    fundos de Mula, Cuca e Boto foram refeitos (16 quadros num laço de 2 s) e a areia do Boto
+    ficou mais estreita, com paredes nas beiras (`LimiteAreia*` no `level3`, layer 6
+    `limite_arena`; o corpo do Curupira agora tem máscara 33).
   - Os `*_frames.tres` são gerados por script (`art/pixel/gerar_spriteframes.gd`). É exceção
     à regra do `CLAUDE.md` (SpriteFrames é do Arthur): mudar o desenho no gerador e gerar
     de novo, em vez de editar à mão.
@@ -28,6 +33,9 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   headless (`game/testes/teste_lutas.gd`), que não acusa erro de script. Rodar `level1..4`
   e observar:
   - a âncora: os pés no chão (y = 340) e o Boto na linha d'água;
+  - no Boto: o Curupira para nas beiras da areia, os tiros passam até o Boto na água e o
+    salto do Boto ainda cai na água do outro lado;
+  - a Cuca nova: o feitiço saindo da garra, a poção da mão e as notas da boca;
   - os tiros saindo da mão do Curupira nas 8 direções, dos dois lados, agachado e no ar;
   - os tiros dos chefes saindo do lugar certo: bola da boca da Mula, feitiço da garra da Cuca, jato do bico do Boto, laser da lente da Máquina;
   - a fase 2 (com 2/3 da vida) e a fase 3 (com 1/3) trazendo o ataque novo logo em seguida;

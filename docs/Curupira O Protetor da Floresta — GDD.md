@@ -183,13 +183,13 @@ Este é o cenário da fase da Mula sem Cabeça.
 
 ### Cenário: península do Boto
 
-A arena é uma península de areia com água dos dois lados. O Boto cor-de-rosa alterna entre os dois lados, pulando de um para o outro. No design inicial, a água é azul de um lado e barrenta do outro.
+A arena é uma península de areia com água dos dois lados. O Boto cor-de-rosa alterna entre os dois lados, pulando de um para o outro. No design inicial, a água é azul de um lado e barrenta do outro. O Curupira fica só na areia: as beiras dela seguram ele, e o Boto fica na água, do lado de fora.
 
 &#91;image: Design inicial da arena do Boto cor-de-rosa: península de areia entre água azul e água barrenta\]
 
 ### Cenário: floresta da Cuca
 
-A arena fica na floresta, com o caldeirão de feitiços da Cuca ao fundo.
+A arena fica na floresta, de noite e com neblina, com o caldeirão de feitiços da Cuca ao fundo, ao pé de uma árvore oca.
 
 &#91;image: Design inicial da arena da Cuca: clareira na floresta com um caldeirão verde ao pé de uma árvore\]
 

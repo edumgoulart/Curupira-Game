@@ -268,9 +268,9 @@ function exportarMaquina() {
 }
 function exportarArenas() {
   for (const id of Object.keys(ARENAS_PX)) {
-    const quadros = Array.from({ length: 8 }, (_, k) => ARENAS_PX[id].quadro(k * 0.25));
+    const quadros = Array.from({ length: QUADROS_ARENA }, (_, k) => ARENAS_PX[id].quadro(k * LACO_ARENA / QUADROS_ARENA));
     saida.arenas[id] = {
-      fps: 4, fundo: quadros.map(q => png(q.cam.paraTela())),
+      fps: QUADROS_ARENA / LACO_ARENA, fundo: quadros.map(q => png(q.cam.paraTela())),
       frente: quadros[0].frente ? quadros.map(q => png(q.frente.paraTela())) : null,
       chao_y: CHAO_PX, curupira_x: ARENAS_PX[id].x
     };
