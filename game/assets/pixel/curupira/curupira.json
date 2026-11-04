@@ -1,0 +1,441 @@
+{
+ "imagem": "curupira.png",
+ "celula": [52, 68],
+ "ancora": [24, 64],
+ "escala_no_jogo": 4,
+ "animacoes": [
+  {
+   "nome": "idle",
+   "linha": 0,
+   "quadros": 12,
+   "fps": 7.5,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [2, -12],
+     [2, -12],
+     [2, -12],
+     [1, -12],
+     [2, -12],
+     [2, -12],
+     [2, -12],
+     [2, -12],
+     [2, -12],
+     [2, -12],
+     [2, -12],
+     [2, -12]
+    ]
+   }
+  },
+  {
+   "nome": "correr",
+   "linha": 1,
+   "quadros": 6,
+   "fps": 12.5,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [-3, -16],
+     [1, -13],
+     [8, -16],
+     [10, -20],
+     [8, -16],
+     [1, -14]
+    ]
+   }
+  },
+  {
+   "nome": "pular",
+   "linha": 2,
+   "quadros": 6,
+   "fps": 12,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [1, -12],
+     [-4, -11],
+     [-1, -12],
+     [6, -16],
+     [6, -16],
+     [6, -16]
+    ]
+   },
+   "nota": "impulso e subida; para no último quadro"
+  },
+  {
+   "nome": "cair",
+   "linha": 3,
+   "quadros": 5,
+   "fps": 10,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [7, -17],
+     [8, -17],
+     [8, -17],
+     [8, -17],
+     [8, -17]
+    ]
+   },
+   "nota": "queda; para no último quadro"
+  },
+  {
+   "nome": "pouso",
+   "linha": 4,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [9, -14],
+     [9, -14],
+     [8, -14],
+     [4, -12]
+    ]
+   }
+  },
+  {
+   "nome": "dash",
+   "linha": 5,
+   "quadros": 4,
+   "fps": 20,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [4, -16],
+     [-3, -15],
+     [-3, -15],
+     [-3, -15]
+    ]
+   },
+   "nota": "0,2 s, como no GDD"
+  },
+  {
+   "nome": "freio",
+   "linha": 6,
+   "quadros": 4,
+   "fps": 16,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [-2, -15],
+     [12, -19],
+     [12, -19],
+     [12, -19]
+    ]
+   }
+  },
+  {
+   "nome": "atirar",
+   "linha": 7,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [10, -22],
+     [16, -18],
+     [10, -22],
+     [16, -18]
+    ]
+   },
+   "nota": "para a frente"
+  },
+  {
+   "nome": "atirar_diag_cima",
+   "linha": 8,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [6, -30],
+     [13, -32],
+     [6, -30],
+     [13, -32]
+    ]
+   }
+  },
+  {
+   "nome": "atirar_cima",
+   "linha": 9,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [-2, -33],
+     [1, -40],
+     [-2, -33],
+     [1, -40]
+    ]
+   }
+  },
+  {
+   "nome": "atirar_diag_baixo",
+   "linha": 10,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [6, -14],
+     [9, -7],
+     [6, -14],
+     [9, -7]
+    ]
+   },
+   "nota": "no chão, só com a mira travada"
+  },
+  {
+   "nome": "correr_atirar",
+   "linha": 11,
+   "quadros": 6,
+   "fps": 12.5,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [13, -22],
+     [19, -17],
+     [19, -18],
+     [19, -19],
+     [19, -17],
+     [13, -21]
+    ]
+   }
+  },
+  {
+   "nome": "correr_atirar_diag_cima",
+   "linha": 12,
+   "quadros": 6,
+   "fps": 12.5,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [10, -30],
+     [17, -31],
+     [17, -32],
+     [16, -32],
+     [17, -31],
+     [10, -29]
+    ]
+   }
+  },
+  {
+   "nome": "ar_atirar_cima",
+   "linha": 13,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [-1, -35],
+     [2, -41],
+     [-1, -35],
+     [2, -41]
+    ]
+   }
+  },
+  {
+   "nome": "ar_atirar_diag_cima",
+   "linha": 14,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [7, -31],
+     [14, -33],
+     [7, -31],
+     [14, -33]
+    ]
+   }
+  },
+  {
+   "nome": "ar_atirar_lado",
+   "linha": 15,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [11, -23],
+     [17, -20],
+     [11, -23],
+     [17, -20]
+    ]
+   }
+  },
+  {
+   "nome": "ar_atirar_diag_baixo",
+   "linha": 16,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [7, -15],
+     [9, -8],
+     [7, -15],
+     [9, -8]
+    ]
+   }
+  },
+  {
+   "nome": "ar_atirar_baixo",
+   "linha": 17,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [-1, -12],
+     [-4, -6],
+     [-1, -12],
+     [-4, -6]
+    ]
+   },
+   "nota": "para baixo só existe no ar"
+  },
+  {
+   "nome": "abaixar",
+   "linha": 18,
+   "quadros": 5,
+   "fps": 18,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [2, -12],
+     [4, -9],
+     [7, -3],
+     [9, -1],
+     [9, -1]
+    ]
+   }
+  },
+  {
+   "nome": "agachado",
+   "linha": 19,
+   "quadros": 8,
+   "fps": 5.1,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [9, -1],
+     [9, -1],
+     [9, -1],
+     [9, -1],
+     [9, -1],
+     [9, -1],
+     [9, -1],
+     [9, -1]
+    ]
+   }
+  },
+  {
+   "nome": "agachado_atirar",
+   "linha": 20,
+   "quadros": 4,
+   "fps": 10,
+   "loop": true,
+   "pontos": {
+    "mao": [
+     [18, -6],
+     [18, -6],
+     [18, -6],
+     [18, -6]
+    ]
+   }
+  },
+  {
+   "nome": "levantar",
+   "linha": 21,
+   "quadros": 4,
+   "fps": 16,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [8, -2],
+     [6, -5],
+     [4, -9],
+     [2, -12]
+    ]
+   }
+  },
+  {
+   "nome": "especial",
+   "linha": 22,
+   "quadros": 16,
+   "fps": 10,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [2, -12],
+     [1, -12],
+     [-1, -12],
+     [-3, -12],
+     [-6, -12],
+     [-8, -12],
+     [-9, -12],
+     [17, -16],
+     [23, -17],
+     [23, -17],
+     [22, -17],
+     [22, -17],
+     [22, -17],
+     [17, -16],
+     [10, -14],
+     [4, -13]
+    ]
+   },
+   "nota": "o cabelo pega fogo e apaga; a onça sai no quadro 7"
+  },
+  {
+   "nome": "dano",
+   "linha": 23,
+   "quadros": 2,
+   "fps": 12,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [9, -28],
+     [10, -31]
+    ]
+   },
+   "nota": "o código pisca o sprite durante a invencibilidade"
+  },
+  {
+   "nome": "derrota",
+   "linha": 24,
+   "quadros": 22,
+   "fps": 8.5,
+   "loop": false,
+   "pontos": {
+    "mao": [
+     [1, -12],
+     [10, -31],
+     [10, -31],
+     [7, -26],
+     [2, -18],
+     [-3, -9],
+     [-6, -2],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1],
+     [-7, -1]
+    ]
+   }
+  }
+ ]
+}

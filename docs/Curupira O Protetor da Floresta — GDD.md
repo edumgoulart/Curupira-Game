@@ -13,10 +13,10 @@ O design está em definição e a implementação ainda não começou.
 
 O trabalho é dividido de forma igualitária; a tabela indica só o foco de cada um.
 
-- **Definido:** história, elenco de chefes, ataques e números de combate, direção de arte, controles, telas, público e plataforma. Há designs iniciais do Curupira, dos três seres folclóricos e de três arenas.
-- **Em definição:** design da máquina e da arena dela, tamanho dos sprites e lista de áudio.
+- **Definido:** história, elenco de chefes, direção de arte em pixel art, controles, telas, público e plataforma. Há sprites em pixel art do Curupira, dos quatro chefes e das quatro arenas, já exportados para o Godot.
+- **Em definição:** números dos ataques novos dos chefes, regra de troca de fase, botão de travar a mira e lista de áudio.
 - **Implementação:** não iniciada. A estrutura de cenas e o movimento do Curupira estão planejados em Documentação técnica.
-- **Bloqueios:** decisões listadas em Questões em aberto. As marcações (Q5) e (Q14) ao longo do documento apontam para essa lista.
+- **Bloqueios:** decisões listadas em Questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do documento apontam para essa lista.
 
 ## Declaração de conceito
 
@@ -26,7 +26,7 @@ Curupira: O Protetor da Floresta é um jogo 2D de combates contra chefes em aren
 
 Boss-rush de plataforma 2D em visão lateral. O jogo é composto somente por lutas contra chefes, cada uma em uma arena de tela única, sem rolagem de câmera e sem trechos de fase entre os chefes.
 
-As referências de design são Cuphead e Mega Man. Do primeiro vêm o foco em lutas de chefe e o estilo visual; do segundo, o ataque concedido por cada chefe derrotado.
+As referências de design são Cuphead e Mega Man. Do primeiro vêm o foco em lutas de chefe, as fases dentro de cada luta e a mira em oito direções; do segundo, o ataque concedido por cada chefe derrotado. O estilo visual é pixel art.
 
 ## Público-alvo
 
@@ -71,29 +71,48 @@ O jogo tem dois momentos-chave:
 
 ## Arte, som e música
 
-O estilo visual é animação 2D tradicional dos anos 1930 reinterpretada através do folclore e das paisagens brasileiras, com cenários pintados à mão, formas caricaturais, textura analógica e composição teatral. A arte é desenho digital, sob responsabilidade principal do Eduardo, e as animações são feitas em sprite sheet.
+O estilo visual é pixel art: personagens caricaturais de membros "de mangueira" (*rubber hose*), folclore e paisagens brasileiras, desenhados pixel por pixel numa resolução baixa e ampliados por um número inteiro. As animações são feitas em folha de sprites (sprite sheet). A arte é responsabilidade principal do Eduardo.
 
 ### Direção de arte
 
-- **Traço.** Estética 2D desenhada à mão, inspirada nas animações norte-americanas das décadas de 1930 e 1940, com forte influência do estilo *rubber hose*. Os contornos são orgânicos e irregulares e as formas são levemente caricaturais. O acabamento evita um aspecto digital excessivamente limpo.
-- **Pintura.** Simula aquarela, guache e tinta sobre papel, com textura granulada, pequenas imperfeições e variações de cor.
-- **Profundidade.** Os ambientes usam várias camadas de vegetação. Elementos próximos à câmera são maiores e mais escuros; o fundo usa silhuetas, fumaça e redução de contraste para criar perspectiva atmosférica.
-- **Paleta.** Quente, terrosa e relativamente dessaturada: marrons, verdes escuros, ocres e cinzas. Elementos importantes usam cores altamente saturadas, como os vermelhos, laranjas e amarelos do fogo.
-- **Composição das arenas.** Segue a lógica de um palco teatral 2D. A área frontal, relativamente limpa, é a arena jogável. Os elementos complexos e narrativos ficam no fundo e nas laterais, para manter legíveis os personagens, os inimigos e os projéteis.
+- **Grade única.** Tudo é desenhado numa resolução base de **480×270** e ampliado **4×** para a tela de 1920×1080. Curupira, chefes, projéteis, efeitos e cenários usam o mesmo tamanho de pixel: um chefe maior tem mais pixels, não pixels maiores. Não há rotação livre nem redimensionamento de sprite, porque isso quebra a grade; poses giradas (como a folha na diagonal) têm desenho próprio.
+- **Tamanhos.** O Curupira tem cerca de 61 px de altura (245 px na tela). Os chefes têm entre 80 e 110 px (320 a 440 px na tela). A Máquina pendurada no teto chega a 210 px com o braço.
+- **Cor.** Cada material tem uma rampa de 4 a 7 tons. A sombra puxa para o roxo e a luz para o amarelo. A luz vem de cima e da frente do personagem.
+- **Contorno.** Contorno de 1 px, na cor mais escura de cada material (pele, fogo, folha, pelo), não um preto único. Sem meio-tom, sem transparência parcial e sem degradê liso: sombras, fantasmas do dash e brilhos são feitos com cor chapada ou pontilhado.
+- **Expressão.** Olhos grandes e bocas desenhadas pixel a pixel. O Curupira tem 12 expressões (oba, feliz, rindo, bravo, furioso, determinado, convencido, surpreso, assustado, dor, triste e tonto).
+- **Curupira.** Cabelo vermelho comum, em mechas que mexem com o corpo e deitam com o vento. O cabelo só pega fogo durante o especial e apaga depois.
+- **Cenários.** Faixas de cor no céu, camadas de vegetação cada vez mais escuras e frias, sem contorno preto e com menos contraste que os personagens. A área da frente fica limpa para a luta; o que é complexo fica no fundo e nas laterais, como num palco.
+- **Paleta.** Quente e terrosa nos cenários de floresta, com o fogo, a magia e a água bem saturados para os ataques se destacarem. A sala da Máquina é branca e fria, e o vermelho do laser é a cor mais forte dela.
 
-As ferramentas de arte são o Krita e o ChatGPT. Não decidido (Q5): tamanho dos sprites e quadros por animação.
+As animações saem de um gerador escrito em código, guardado em `art/pixel/gerador/`: cada personagem é montado a partir de peças desenhadas pixel a pixel (cabeça, olhos, bocas, mãos, pés) e de um esqueleto de poses. O mesmo gerador exporta as folhas para `game/assets/pixel/`.
+
+### Quadros por animação
+
+- **Chefes.** 12 quadros por segundo. Cada ataque é dividido em três animações: aviso, ação e fim. Assim o tempo do aviso pode ser ajustado no Godot sem refazer arte.
+- **Curupira.** 10 a 20 quadros por segundo, conforme o movimento: idle tem 12 quadros, corrida 6, tiro 4 por ciclo e especial 16.
+- **Projéteis e efeitos.** De 1 a 8 quadros cada, como arquivos PNG separados.
+- **Cenários.** 8 quadros a 4 por segundo para o fogo, a água e as luzes do fundo.
 
 ### Animações, som e lista de assets
 
-As animações previstas para o Curupira são parado, correr, pular, dash e ataque. Os designs iniciais do Curupira e dos três seres folclóricos estão em Objetos do jogo, e os das três arenas estão em Mundo do jogo. Faltam o design da máquina e o da arena dela.
+As animações do Curupira são:
+
+- **Movimento:** idle, correr, pular, cair, pouso, dash e freio.
+- **Tiro de pé:** atirar para cima, na diagonal para cima, para a frente e na diagonal para baixo.
+- **Tiro correndo:** para a frente e na diagonal para cima.
+- **Tiro no ar:** em cinco direções, de cima até baixo.
+- **Agachado:** abaixar, ficar agachado, atirar agachado e levantar.
+- **Outras:** especial, dano e derrota.
+
+As animações de cada chefe estão em Objetos do jogo.
 
 A música de fundo é simples e de estilo brasileiro, natural e sem exageros. Música e efeitos sonoros vêm de bibliotecas gratuitas. Não decidido (Q14): quais bibliotecas, faixas e efeitos serão usados.
 
-Lista de assets: ainda não existe. Ela será uma planilha separada com todos os assets de arte e som, ligada a esta seção.
+Lista de assets: as folhas de sprites, os efeitos e os cenários estão em `game/assets/pixel/`. Cada personagem tem um arquivo `.json` com o tamanho da célula, a âncora, o fps de cada animação e os pontos de onde saem os tiros. A planilha com os assets de som ainda não existe.
 
 ## Plataforma-alvo
 
-O jogo é para PC e é projetado para controle (gamepad), que é a forma recomendada de jogar. O teclado também funciona. A plataforma inicial é Linux, e o projeto precisa poder ser exportado para Windows com facilidade. O jogo roda em tela cheia, com resolução base de 1920×1080.
+O jogo é para PC e é projetado para controle (gamepad), que é a forma recomendada de jogar. O teclado também funciona. A plataforma inicial é Linux, e o projeto precisa poder ser exportado para Windows com facilidade. O jogo roda em tela cheia em 1920×1080. A arte é desenhada em 480×270 e ampliada 4×; as coordenadas do jogo continuam em pixels de 1920×1080, então os números de movimento e de combate deste documento não mudam.
 
 Os requisitos mínimos serão definidos depois que o jogo estiver concluído.
 
@@ -101,7 +120,7 @@ Os requisitos mínimos serão definidos depois que o jogo estiver concluído.
 
 | Jogo | Lançamento | Semelhança |
 | --- | --- | --- |
-| Cuphead (Studio MDHR) | 2017 | Lutas contra chefes como núcleo do jogo; estilo visual de referência |
+| Cuphead (Studio MDHR) | 2017 | Lutas contra chefes como núcleo do jogo, com fases e mira em oito direções |
 | Mega Man (Capcom) | 1987 | O jogador escolhe a ordem dos chefes, e cada chefe derrotado concede seu ataque |
 
 O que diferencia Curupira: o elenco e o cenário vêm do folclore brasileiro, o tema é a defesa da floresta, e não há fases de percurso entre os chefes.
@@ -176,11 +195,11 @@ A arena fica na floresta, com o caldeirão de feitiços da Cuca ao fundo.
 
 ### Cenário: sala da máquina
 
-A arena é uma sala branca dentro da central da empresa. O design desse cenário ainda não foi feito.
+A arena é uma câmara de testes branca dentro da central da empresa, em estilo de laboratório: parede de painéis brancos com juntas cinza e faixas de luz, a metade de baixo em metal escuro, um trilho no teto com três alçapões, piso de placas claras com faixas de perigo amarelas e pretas nas pontas e uma placa "CÂMARA 04". Uma janela de observação mostra lá fora a floresta derrubada, com tocos e fumaça. A Máquina fica pendurada no trilho do teto.
 
 ### Estrutura das arenas
 
-As arenas têm só chão e paredes, sem plataformas, obstáculos ou perigos próprios. Elas são abertas em cima: não há teto físico, e o limite superior da tela cumpre esse papel visualmente. A câmera é fixa no centro da arena e não segue o Curupira.
+As arenas têm só chão e paredes, sem plataformas, obstáculos ou perigos próprios. Elas são abertas em cima: não há teto físico, e o limite superior da tela cumpre esse papel visualmente. O teto da sala da Máquina é só desenho; os alçapões e as placas do piso que se levantam são ataques dela, não perigos da arena. A câmera é fixa no centro da arena e não segue o Curupira.
 
 A arena inteira cabe na resolução base de 1920×1080.
 
@@ -194,11 +213,14 @@ O jogo é controlado por gamepad, com teclado como alternativa. As ações usam 
 
 | Ação | Controle (layout Xbox) | Teclado | Ação no Input Map |
 | --- | --- | --- | --- |
-| Andar | Direcional | WASD | `move_left`, `move_right` |
+| Andar | Direcional | A e D | `move_left`, `move_right` |
+| Mirar para cima | Direcional para cima | W | A definir (proposta: `aim_up`) |
+| Abaixar e mirar para baixo | Direcional para baixo | S | A definir (proposta: `crouch`) |
+| Travar a mira | RB (proposta, Q15) | Shift (proposta, Q15) | A definir (proposta: `aim_lock`) |
 | Pular | A | Espaço | `jump` |
-| Ataque básico | X | J | A definir |
-| Especial | Y | K | A definir |
-| Dash | B | L | A definir |
+| Ataque básico | X | J | `attack_basic` |
+| Especial | Y | K | `attack_special` |
+| Dash | B | L | `dash` |
 
 ### Telas
 
@@ -218,7 +240,7 @@ O jogo tem nove tipos de tela:
 
 A vida do Curupira e a carga do especial ficam no canto inferior esquerdo da tela. A vida do chefe não aparece: o jogo a contabiliza, mas não a mostra ao jogador, como em Cuphead.
 
-Durante a luta, W e S no teclado e cima e baixo no direcional não têm função.
+Durante a luta, cima e baixo servem para mirar e baixo também agacha. As regras estão em Ataque básico e especial.
 
 ## Sistemas e funcionalidades (MVP)
 
@@ -255,7 +277,13 @@ O Curupira começa o jogo com um ataque básico, o Tiro de Folha, e um especial,
 
 Todos os ataques básicos são projéteis. Eles diferem em tipo de tiro, dano e velocidade de ataque, mas causam dano por segundo parecido: o tiro rápido é seguro, o tiro lento e forte exige prever o chefe, e o teleguiado causa menos dano porque não erra.
 
-O Curupira atira na horizontal, para o lado em que está olhando. Segurar o botão de ataque atira sem parar.
+O Curupira atira em oito direções, com o projétil saindo da mão. Segurar o botão de ataque atira sem parar.
+
+- **De pé, parado ou andando:** para a frente, para a frente com cima na diagonal para cima e só cima reto para cima. Andando, ele atira para a frente ou na diagonal para cima.
+- **Agachado:** baixo no chão agacha. Agachado, o Curupira fica com cerca de 40% da altura, não anda e atira para a frente, rente ao chão. Agachar serve para desviar de ataques altos, como o jato do Boto e a primeira varredura da Máquina.
+- **Mira travada:** segurando o botão de travar a mira, ele fica parado no lugar e pode mirar em qualquer direção do chão, inclusive a diagonal para baixo. O botão ainda não foi escolhido (Q15).
+- **No ar:** atira em cinco direções, de cima até baixo: cima, diagonal para cima, frente, diagonal para baixo e baixo. Para baixo reto só existe no ar.
+- **Direção:** a frente é o lado para onde ele está olhando, e as diagonais são a 45°.
 
 A barra do especial tem 100 pontos. Cada acerto soma pontos conforme o ataque básico equipado, de modo que a barra enche em 20 a 25 s de acertos com qualquer um deles. Os valores de cada ataque estão em Objetos do jogo.
 
@@ -286,6 +314,8 @@ O jogo tem um personagem jogável e quatro chefes.
 
 &#91;image: Design inicial do Curupira: cabelo vermelho em forma de chamas e saia de folhas\]
 
+Na versão em pixel art, a cabeça é mais redonda e o cabelo é vermelho comum, sem fogo; ele só pega fogo durante o especial. O sprite tem cerca de 61 px de altura.
+
 | Atributo | Valor |
 | --- | --- |
 | Vida | 4 golpes |
@@ -294,7 +324,7 @@ O jogo tem um personagem jogável e quatro chefes.
 | Gravidade | 2800 px/s² |
 | Dash | 300 px em 0,2 s, recarga de 0,8 s |
 | Invencibilidade após golpe | 1,5 s |
-| Forma de colisão | Cápsula |
+| Forma de colisão | Cápsula (em pé) e cápsula baixa, com cerca de 40% da altura (agachado) |
 
 A cápsula evita que o personagem prenda em quinas do cenário.
 
@@ -324,7 +354,15 @@ Especiais:
 
 ### Chefes
 
-Cada um dos três seres folclóricos concede um ataque básico e um especial ao ser derrotado. A máquina controlada por IA é o chefe final, liberada depois dos três, e não concede ataque. Cada chefe tem um estado único: nenhuma luta muda de fase no meio.
+Cada um dos três seres folclóricos concede um ataque básico e um especial ao ser derrotado. A máquina controlada por IA é o chefe final, liberada depois dos três, e não concede ataque.
+
+Cada luta tem três fases. Cada chefe tem quatro ataques:
+
+- **Fase 1:** dois ataques.
+- **Fase 2:** entra um terceiro ataque, mais difícil, misturado aos dois primeiros.
+- **Fase 3:** entra o quarto, o mais difícil, e os quatro se alternam.
+
+A ideia, como no Cuphead, é variar o ritmo e brincar com o jogador em vez de repetir dois ataques a luta inteira. Ainda não está decidido quando cada fase começa (Q16); a proposta é trocar quando o chefe perde um terço e dois terços da vida.
 
 Três regras valem para todos os chefes:
 
@@ -341,20 +379,41 @@ Três regras valem para todos os chefes:
 
 A duração-alvo supõe que o jogador acerta o chefe em 60% do tempo. Uma partida sem derrotas soma cerca de 7 min 30 s.
 
-Ataques de cada chefe:
+Ataques de cada chefe. Os avisos e golpes que já existiam continuam valendo; os dos ataques novos estão marcados como "a definir" (Q16).
 
-| Chefe | Ataque | Aviso | Golpes |
-| --- | --- | --- | --- |
-| Mula sem Cabeça | Três bolas de fogo em sequência | 0,5 s | 1 cada |
-| Mula sem Cabeça | Meteoro, que ela atira para cima com seus poderes. Uma sombra no chão marca a queda. Depois dele, a Mula fica parada por 1,5 s | 1 s | 2 |
-| Cuca | Feitiço | 0,5 s | 1 |
-| Cuca | Poção que deixa uma poça de veneno ou de lentidão por 5 s. No máximo duas poças na arena | 0,6 s | Ver Efeitos de estado |
-| Boto cor-de-rosa | Troca de lado a cada 6 s, pulando e soltando três bolhas lentas | Sem aviso | 1 cada |
-| Boto cor-de-rosa | Jato de água, parado em um dos lados. Depois dele, o Boto fica parado por 1,2 s | 0,7 s | 1 |
-| Máquina controlada por IA | Raio laser. Uma linha fina mostra o trajeto antes do disparo | 0,8 s | 1 |
-| Máquina controlada por IA | Bombas, que explodem 1,5 s depois de cair | 1,5 s | 2 |
+| Chefe | Fase | Ataque | Aviso | Golpes | Como desviar |
+| --- | --- | --- | --- | --- | --- |
+| Mula sem Cabeça | 1 | Rajada rasteira: abaixa o peito até o chão e cospe três bolas de fogo em sequência, rente ao chão | 0,5 s | 1 cada | Pular |
+| Mula sem Cabeça | 1 | Pisoteio: empina, segura no alto e bate as patas da frente; uma onda de fogo corre pelo chão | A definir | A definir | Pular |
+| Mula sem Cabeça | 2 | Investida: raspa o casco duas vezes, atravessa a arena e bate na parede. Fica tonta depois | A definir | A definir | Dash |
+| Mula sem Cabeça | 3 | Chuva de meteoros: lança três meteoros para cima; uma sombra no chão marca a queda de cada um. Depois fica parada por 1,5 s | 1 s cada | 2 cada | Sair das sombras |
+| Cuca | 1 | Feitiço em leque: três feitiços grandes e bem separados, o do meio mirado no Curupira | 0,5 s | 1 cada | Passar entre eles |
+| Cuca | 1 | Poção que deixa uma poça de veneno ou de lentidão por 5 s. No máximo duas poças na arena | 0,6 s | Ver Efeitos de estado | Sair da poça |
+| Cuca | 2 | Bote de jacaré: abre a boca, se joga de barriga e desliza pela arena abocanhando | A definir | A definir | Pular |
+| Cuca | 3 | Canção de ninar: duas fileiras de notas em onda, com uma brecha entre elas que sobe e desce | A definir | A definir | Passar na brecha |
+| Boto cor-de-rosa | 1 | Jato de água reto, saindo da boca, na altura do peito do Curupira, até a outra margem. Depois o Boto fica parado por 1,2 s | 0,7 s | 1 | Abaixar |
+| Boto cor-de-rosa | 1 | Beijos de bolha: quatro corações lentos e ondulando, que estouram com um tiro | A definir | A definir | Atirar neles |
+| Boto cor-de-rosa | 2 | Chapéu bumerangue: o chapéu vai baixo até o outro lado e volta alto | A definir | A definir | Pular na ida e abaixar na volta |
+| Boto cor-de-rosa | 3 | Salto: troca de lado pulando por cima da areia, girando e soltando três bolhas lentas | Sem aviso | 1 cada | Correr para baixo dele |
+| Máquina controlada por IA | 1 | Raio laser. Uma linha fina mostra o trajeto antes do disparo | 0,8 s | 1 | Sair da linha |
+| Máquina controlada por IA | 1 | Bombas, que caem dos alçapões do teto e explodem 1,5 s depois de cair. Depois a Máquina fica parada por 1,2 s | 1,5 s | 2 | Sair da área |
+| Máquina controlada por IA | 2 | Piso traiçoeiro: as placas do chão saltam em sequência, em duas ondas vindo na direção do Curupira | A definir | A definir | Pular as placas |
+| Máquina controlada por IA | 3 | Varredura: desce até a altura do Curupira e varre a arena com o laser, primeiro reto na altura da cabeça e depois mirando o chão | A definir | A definir | Abaixar e depois pular |
 
-Os três seres folclóricos lutam sob controle mental, por chips colocados pela máquina. Nos designs iniciais abaixo, o chip controlador aparece implantado no corpo de cada um. O design da máquina ainda não foi feito.
+Animações dos chefes no Godot (nomes no `SpriteFrames`):
+
+| Chefe | Animações |
+| --- | --- |
+| Mula sem Cabeça | `idle`, `aviso_bolas`, `bolas`, `fim_bolas`, `aviso_pisoteio`, `pisoteio_alto`, `pisoteio`, `aviso_investida`, `galope`, `batida`, `tonta`, `trote`, `aviso_meteoros`, `meteoros`, `cansada`, `derrota` |
+| Cuca | `idle`, `aviso_feitico`, `feitico`, `fim_feitico`, `aviso_pocao`, `pocao`, `fim_pocao`, `aviso_bote`, `bote`, `levantar`, `andar`, `aviso_ninar`, `ninar`, `fim_ninar`, `derrota` |
+| Boto cor-de-rosa | `idle`, `aviso_jato`, `jato`, `fim_jato`, `aviso_beijos`, `beijos`, `fim_beijos`, `aviso_chapeu`, `arremesso`, `sem_chapeu`, `pega_chapeu`, `mergulho`, `salto`, `emergir`, `derrota` |
+| Máquina controlada por IA | `idle`, `aviso_laser`, `mirando`, `laser`, `fim_laser`, `aviso_bombas`, `bombas`, `fim_bombas`, `aviso_pistoes`, `pistoes`, `descer`, `varredura`, `varredura_chao`, `subir`, `derrota` |
+
+Os projéteis e efeitos de cada chefe (bola de fogo, onda de fogo, meteoro, feitiço, poção, poça, nota, jato, coração, chapéu, laser, bomba, alçapão, placa, explosões) são animações separadas, em `game/assets/pixel/<chefe>/efeitos/`. Quantidade, espaçamento, velocidade e tempo de cada ataque ficam no `.tres` de dados do chefe, no Godot.
+
+Os três seres folclóricos lutam sob controle mental, por chips colocados pela máquina. Nos designs iniciais abaixo, o chip controlador aparece implantado no corpo de cada um, e o olho do chefe fica vermelho enquanto o chip está ligado. Na derrota, o chip salta do corpo e o olho volta à cor normal.
+
+A máquina controlada por IA, o Núcleo, é uma casca branca de painéis pendurada no trilho do teto por um braço mecânico. Ela tem uma lente vermelha no lugar do olho, abas que abrem quando ela carrega um ataque e cabos soltos embaixo. Na derrota, a casca racha, a lente apaga e nasce um broto da rachadura.
 
 &#91;image: Design inicial da Mula sem Cabeça: corpo de mula com chamas saindo do pescoço no lugar da cabeça e chip no flanco\]
 
@@ -376,7 +435,7 @@ O jogo é somente em português.
 | --- | --- |
 | Motor | Godot 4.x |
 | Linguagem | GDScript |
-| Arte | Krita e ChatGPT |
+| Arte | Gerador de pixel art em código (`art/pixel/gerador/`) e Krita para retoques |
 | Música e efeitos | Bibliotecas gratuitas |
 | Controle de versão | Git pelo Godot Git Plugin, com repositório no GitHub |
 | Fluxo de branches | GitHub Flow |
@@ -439,10 +498,11 @@ Ideias fora do MVP, ainda não adotadas:
 
 ## Questões em aberto
 
-Há 2 questões em aberto. As marcações (Q5) e (Q14) ao longo do documento apontam para esta lista.
+Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do documento apontam para esta lista.
 
-- [ ] **Q5. Produção da arte.** Tamanho dos sprites e quadros por animação; design da máquina e da arena dela.
 - [ ] **Q14. Áudio.** Bibliotecas, faixas e efeitos usados, com a fonte e a licença de cada um.
+- [ ] **Q15. Travar a mira.** Qual botão trava a mira (proposta: RB no controle e Shift no teclado) e o nome da ação no Input Map.
+- [ ] **Q16. Fases e ataques novos.** Em que ponto da vida cada fase começa (proposta: a cada terço) e o aviso, a duração, a velocidade e os golpes dos ataques marcados como "a definir".
 
 ### Resolvidas
 
@@ -453,10 +513,12 @@ Há 2 questões em aberto. As marcações (Q5) e (Q14) ao longo do documento apo
 | O que cada chefe concede? | Cada ser folclórico concede um ataque básico e um especial. A máquina não concede nada | Objetos do jogo |
 | Como funciona a troca de ataques? | Escolha antes de cada fase, sem troca durante | Sistemas e funcionalidades |
 | Os ataques básicos são projéteis? | Sim, todos. Variam em tipo de tiro, dano e velocidade de ataque | Sistemas e funcionalidades |
-| Para onde o Curupira atira? | Na direção para onde está olhando | Sistemas e funcionalidades |
+| Para onde o Curupira atira? | Em oito direções: para cima, nas diagonais e para a frente; para baixo só no ar. Também atira agachado | Sistemas e funcionalidades |
 | O dash dá invencibilidade? | Sim | Sistemas e funcionalidades |
 | O que acontece no quarto golpe e como é o salvamento? | O jogador perde a fase. O progresso é salvo a cada chefe derrotado e permanece depois de fechar o jogo | Sistemas e funcionalidades |
-| Os chefes mudam de fase durante a luta? | Não. Cada chefe tem um estado único | Objetos do jogo |
+| Os chefes mudam de fase durante a luta? | Sim. Três fases, com quatro ataques por chefe | Objetos do jogo |
+| Tamanho dos sprites e quadros por animação (Q5)? | Pixel art em 480×270 ampliada 4×. Curupira com ~61 px, chefes entre 80 e 110 px, chefes a 12 quadros por segundo | Arte, som e música |
+| Qual é o design da máquina e da arena dela? | O Núcleo pendurado no teto, numa câmara de testes branca | Objetos do jogo e Mundo do jogo |
 | As arenas têm plataformas ou perigos próprios? | Não. Só chão e paredes | Mundo do jogo |
 | A vida do chefe aparece na tela? | Não. Só a vida do Curupira e a carga do especial, no canto inferior esquerdo | Interface do usuário |
 | Como a história é contada? | Em cenas estáticas no início do jogo | Objetivos e progressão |

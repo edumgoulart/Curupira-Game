@@ -5,6 +5,14 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 
 ## Para o Arthur conferir no editor
 
+- **Pixel art pronta para ligar nas cenas** (`game/assets/pixel/`, guia em `docs/tdd.md` seção 4).
+  - Nenhuma cena foi mexida.
+  - Os `*_frames.tres` foram gerados por script a pedido do Eduardo. É exceção à regra do `CLAUDE.md` (SpriteFrames é do Arthur).
+  - Em cada cena, trocar o `sprite_frames` do `AnimatedSprite2D` pelo `<nome>_frames.tres`.
+  - No mesmo node, usar `scale = (4, 4)`, `texture_filter = Nearest` e o `offset` da tabela do TDD.
+  - Ajustar as `CollisionShape2D` aos sprites novos. O Curupira agachado precisa de uma cápsula baixa, com ~40% da altura.
+  - Os nomes de animação mudaram: os chefes agora têm `aviso_*`, `*` e `fim_*` por ataque, e o Curupira tem `atirar_*`, `ar_atirar_*` e `agachado*`. A lista está no GDD e nos `.json`.
+
 - **Animações criadas pelo Claude no SpriteFrames.** São exceção à regra do `CLAUDE.md`
   (SpriteFrames é do Arthur) e foram feitas a pedido do Eduardo. Conferir no editor:
   - `correr` (Curupira): 8 quadros `curupira_corrida_01..08.png`, 15 fps, loop. O FPS é
@@ -21,11 +29,11 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 
 ## Decisões em aberto
 
-- **Atirar correndo.** A pose `atacar` tem prioridade sobre `correr`
-  (`game/scripts/curupira.gd:316`). Correndo e atirando, o Curupira desliza pelo chão na pose
-  parada de ataque. Opções:
-  - frames de "correr atirando";
-  - mostrar `correr` enquanto anda e `atacar` só parado ou no ar.
+- **Mira em 8 direções, agachar e fases (GDD novo).** Arte pronta, código ainda não.
+  - **Input Map:** faltam as ações de mirar para cima, abaixar e travar a mira. O botão de travar a mira está na Q15 do GDD.
+  - **Curupira:** `curupira.gd` e `atirador.gd` ainda atiram só para o lado. Hoje ele "desliza na pose parada de ataque" quando corre atirando. A arte nova resolve isso com a animação `correr_atirar`, que só falta ligar.
+  - **Chefes:** os scripts ainda têm os 2 ataques antigos e estado único. Os 4 ataques por fase e quando cada fase começa dependem da Q16 do GDD.
+  - **Regras desatualizadas:** o resumo de regras do `CLAUDE.md` e do `AGENTS.md` ainda diz "estado único", "atira para onde está olhando" e que W/S não fazem nada. A dupla decide quando atualizar.
 - **Pulo × tamanho.** Com o Curupira maior (~245 px de altura), o pulo do GDD (~215 px)
   ficou mais baixo que ele, e desviar dos ataques ficou mais difícil. Mudar `velocidade_pulo`
   é valor de combate, então tem que sair do GDD.
@@ -54,8 +62,7 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   Para não precisar disso, exportar todos os frames de um personagem na mesma tela e escala
   da idle dele (Curupira e Mula: 1254×1254).
 - **Frame 03 da corrida.** O pé desce ~4 px abaixo do chão. Veio assim no desenho.
-- **GDD, Q5.** Tamanho dos sprites e quadros por animação continuam em aberto no GDD.
-  Registrar lá o que foi adotado.
+- **Arte antiga.** Os três itens acima (cor da pele, tela e escala, frame 03) são da arte de 1254×1254. Deixam de valer quando a pixel art entrar nas cenas.
 
 ## Repositório
 

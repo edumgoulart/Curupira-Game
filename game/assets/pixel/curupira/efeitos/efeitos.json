@@ -1,0 +1,55 @@
+{
+ "folha_cima": {
+  "nome": "folha_cima",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [6, 13],
+  "centro": [3, 6],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_diag_cima": {
+  "nome": "folha_diag_cima",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [15, 15],
+  "centro": [7, 7],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_lado": {
+  "nome": "folha_lado",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [13, 6],
+  "centro": [6, 3],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_diag_baixo": {
+  "nome": "folha_diag_baixo",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [15, 15],
+  "centro": [7, 7],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_baixo": {
+  "nome": "folha_baixo",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [6, 13],
+  "centro": [3, 6],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "onca": {
+  "nome": "onca",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [21, 18],
+  "centro": [10, 10],
+  "quadros": 2
+ }
+}

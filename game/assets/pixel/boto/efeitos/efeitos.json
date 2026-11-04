@@ -1,0 +1,70 @@
+{
+ "jato_meio": {
+  "nome": "jato_meio",
+  "fps": 16,
+  "loop": true,
+  "tamanho": [18, 7],
+  "centro": [9, 3],
+  "nota": "emendar lado a lado (18 px); rolar os quadros dá o movimento",
+  "quadros": 4
+ },
+ "jato_ponta": {
+  "nome": "jato_ponta",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [16, 20],
+  "centro": [11, 15],
+  "quadros": 4
+ },
+ "bola_agua": {
+  "nome": "bola_agua",
+  "fps": 8,
+  "loop": false,
+  "tamanho": [12, 12],
+  "centro": [6, 6],
+  "nota": "aviso no bico; cresce durante o aviso",
+  "quadros": 6
+ },
+ "gota": {
+  "nome": "gota",
+  "fps": 1,
+  "loop": false,
+  "tamanho": [3, 4],
+  "centro": [1, 2],
+  "quadros": 1
+ },
+ "coracao": {
+  "nome": "coracao",
+  "fps": 6,
+  "loop": true,
+  "tamanho": [9, 9],
+  "centro": [4, 4],
+  "quadros": 2
+ },
+ "coracao_estoura": {
+  "nome": "coracao_estoura",
+  "fps": 16,
+  "loop": false,
+  "tamanho": [18, 18],
+  "centro": [9, 9],
+  "quadros": 4
+ },
+ "chapeu": {
+  "nome": "chapeu",
+  "fps": 16,
+  "loop": true,
+  "tamanho": [24, 24],
+  "centro": [12, 12],
+  "nota": "girando no voo",
+  "quadros": 8
+ },
+ "respingo": {
+  "nome": "respingo",
+  "fps": 15,
+  "loop": false,
+  "tamanho": [45, 29],
+  "centro": [20, 6],
+  "nota": "na linha da água",
+  "quadros": 6
+ }
+}

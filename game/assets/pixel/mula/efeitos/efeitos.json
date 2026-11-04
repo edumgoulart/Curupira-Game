@@ -1,0 +1,72 @@
+{
+ "bola_fogo": {
+  "nome": "bola_fogo",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [23, 16],
+  "centro": [5, 8],
+  "nota": "anda para a esquerda; espelhar para a direita",
+  "quadros": 4
+ },
+ "onda_fogo": {
+  "nome": "onda_fogo",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [32, 25],
+  "centro": [16, 19],
+  "nota": "base no chão (centro = ponto de apoio)",
+  "quadros": 4
+ },
+ "rocha": {
+  "nome": "rocha",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [12, 12],
+  "centro": [6, 6],
+  "nota": "subindo",
+  "quadros": 8
+ },
+ "rocha_caindo": {
+  "nome": "rocha_caindo",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [18, 26],
+  "centro": [9, 20],
+  "quadros": 4
+ },
+ "sombra_meteoro": {
+  "nome": "sombra_meteoro",
+  "fps": 8,
+  "loop": false,
+  "tamanho": [26, 8],
+  "centro": [13, 4],
+  "nota": "aviso no chão; tocar durante o tempo de queda",
+  "quadros": 8
+ },
+ "explosao": {
+  "nome": "explosao",
+  "fps": 24,
+  "loop": false,
+  "tamanho": [38, 34],
+  "centro": [19, 16],
+  "quadros": 8
+ },
+ "fogo_chao": {
+  "nome": "fogo_chao",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [20, 17],
+  "centro": [10, 11],
+  "nota": "base no chão",
+  "quadros": 4
+ },
+ "poeira": {
+  "nome": "poeira",
+  "fps": 15,
+  "loop": false,
+  "tamanho": [19, 8],
+  "centro": [10, 7],
+  "nota": "base no chão",
+  "quadros": 6
+ }
+}
