@@ -459,25 +459,30 @@ function desenharRocha(cam, cx, cy, t, emBrasa, caindo = false) {
 
 /* =====================================================================
    CUCA
-   Jacaré de pé, corcunda de bruxa, juba loira em cachos, cinto de poções e o olho vermelho do chip.
+   Jacaré de pé, esguia, juba loira em cachos e chapéu de bruxa. O chip tomou conta: está cravado na gola
+   do sobretudo, com veias de circuito, uma luz vermelha na faixa de metal do chapéu e o olho vermelho.
    ===================================================================== */
 const PCU = {
   verdeO: '#122818', verdeD: '#24502C', verdeS: '#3A7838', verde: '#58A042', verdeL: '#9ACC5A', barriga: '#EEDCA0', barrigaS: '#C8AC6C',
   cab: '#F6C434', cabS: '#D08A1C', cabL: '#FFEA8E', cabO: '#5A320A', dente: '#FFF8EC', boca: '#4A0E1E', lingua: '#E0575A',
-  olho: '#FFF8EC', iris: '#E0241B', irisCalma: '#E8A010', cinto: '#5A2E18', cintoL: '#E0B040', garra: '#F2E8D0',
-  vestO: '#1C0C26', vestD: '#341A4A', vestS: '#4E2868', vest: '#6A3A88', vestL: '#9264AE', renda: '#EADCC6', rendaS: '#B8A48E', remendo: '#8A6A3A', rubor: '#D9786A',
+  olho: '#FFF8EC', iris: '#E0241B', irisCalma: '#E8A010', cinto: '#1A0C1E', cintoL: '#E0B040', garra: '#F2E8D0', rubor: '#D9786A',
+  // vestido e sobretudo cor de ameixa, forro vermelho
+  vestO: '#140818', vestD: '#2A1230', vestS: '#3E1A46', vest: '#54265E', vestL: '#764282', forro: '#A81A28', forroS: '#6A0E1A', botao: '#C8B060',
+  chapeu: '#3A2250', chapeuS: '#24143A', chapeuL: '#5A3A78', chapeuO: '#1C0C26',
+  metal: '#8A949A', metalS: '#545E66', metalL: '#C8D2D8', metalO: '#141A20',
+  veia: '#FF3A2A', veiaD: '#9A1A14', brilho: '#FF8A6A', chipK: '#1A2420', chipk: '#2E3A36', pino: '#8A9490',
   magia: '#5BD94A', magiaL: '#C8FF9A', magiaD: '#1F7A2A', magiaO: '#0E3A14', roxo: '#8E44AD', roxoL: '#C07BDB', roxoD: '#4E1E66',
   vidro: '#D8EEF2', vidroO: '#2A3A44', rolha: '#8A5A2E', nota: '#2A1E3A', notaL: '#B48CFF', azul: '#3B82C4'
 };
-const CUCA = { quadril: pt(0, -24), ombroP: pt(-6, -56), ombroL: pt(3, -58), pes: [pt(-9, 0), pt(8, 0)] };
+const CUCA = { quadril: pt(0, -24), ombroP: pt(-5, -59), ombroL: pt(5, -60), pes: [pt(-6, 0), pt(3, 0)] };
 function cucaBase(t) {
   const r = Math.sin(t * 2.2);
-  // esfrega as garras na frente do peito, como vilã de desenho
-  const esf = Math.sin(t * 9);
+  // garra da frente erguida, dedos mexendo; a outra na cintura
+  const g = Math.sin(t * 3);
   return {
-    X: 372, x: 0, y: 0, inc: 6 + r, cab: r * 1.5, mand: 3, sx: 1, olho: 'bravo', iris: PCU.iris,
-    pes: CUCA.pes.map(p => ({ ...p })), maos: [pt(-22 + esf * 2, -46 + Math.abs(esf)), pt(-17 - esf * 2, -48)], rabo: Math.sin(t * 2) * 3,
-    chip: true, lingua: false, sorriso: false, deitada: 0, treme: 0, corpoY: r * 0.7, cabelo: Math.sin(t * 2.2 - 0.8)
+    X: 372, x: 0, y: 0, inc: 3 + r, cab: r * 1.5, mand: 0, sx: 1, olho: 'normal', iris: PCU.iris,
+    pes: CUCA.pes.map(p => ({ ...p })), maos: [pt(-18 + g, -57 + Math.cos(t * 3) * 1.2), pt(8, -43)], rabo: Math.sin(t * 2) * 3,
+    chip: true, lingua: false, sorriso: false, deitada: 0, treme: 0, corpoY: r * 0.6, cabelo: Math.sin(t * 2.2 - 0.8)
   };
 }
 // cacho: bola com sombra embaixo/atrás e brilho em cima/frente (luz de cima e da esquerda da tela)
@@ -491,6 +496,11 @@ function cachoPx(cam, cx, cy, r) {
   // risquinho do cacho enrolando
   cam.set(cx + r * 0.25, cy + r * 0.1, PCU.cabS); cam.set(cx + r * 0.25 - 1, cy + r * 0.1 + 1, PCU.cabS);
 }
+// carimbo que vira junto quando a Cuca olha para o outro lado (cx = coluna do eixo)
+function carimboSx(cam, linhas, ox, oy, mapa, sx, cx) {
+  const w = Math.max(...linhas.map(l => l.length));
+  cam.carimbo(linhas, sx > 0 ? ox : 2 * cx - ox - w + 1, oy, mapa, sx < 0);
+}
 function cucaPx(cam, R, t, sombraCor) {
   const sx = R.sx, X = R.X + R.x, Y = CHAO_PX + R.y;
   const L = p => pt(X + sx * p.x, Y + p.y);
@@ -498,155 +508,190 @@ function cucaPx(cam, R, t, sombraCor) {
   const giro = -R.inc - 80 * R.deitada;
   // tronco inclina a partir do quadril; deitada = de barriga no chão (bote)
   const T = p => { const q = soma(CUCA.quadril, rot(sub(p, CUCA.quadril), giro)); return pt(q.x, q.y + R.corpoY + 15 * R.deitada); };
-  const piv = pt(-2, -68), Hc = T(piv);
+  const LT = p => L(T(p)), LTs = ps => ps.map(([x, y]) => LT(pt(x, y)));
+  // saia e sobretudo: quando a Cuca afunda (derrota), a barra amontoa no chão em vez de passar dele
+  const LTc = ps => ps.map(([x, y]) => { const q = LT(pt(x, y)); return pt(q.x, Math.min(q.y, CHAO_PX)); });
+  const piv = pt(-1, -66), Hc = T(piv);
   const H = p => soma(Hc, rot(sub(p, piv), -R.inc * 0.4 - R.cab + 6 * R.deitada));
-  const ang = -sx * (R.inc + 80 * R.deitada);
-  if (sombraCor) aviso(() => elipse(cam, X + sx * 4, CHAO_PX + 1, 26 + 14 * R.deitada, 2.2, sombraCor));
-  // rabo grosso que afina, com a crista de escamas no dorso
-  let parte = nova();
-  const r0 = T(pt(8, -22)), rp = pt(42 + R.rabo, -3 + Math.abs(R.rabo) * 0.3);
-  const ptsR = curvaQ(L(r0), L(pt(32, -14 + R.rabo * 0.5)), Lc(rp), 14);
-  ptsR.forEach((p, i) => parte.disco(p.x, p.y, 6 * (1 - i / 16) + 0.7, PCU.verde));
-  sombraB(parte, PCU.verde, PCU.verdeS, PCU.verdeL, 2);
-  ptsR.forEach((p, i) => { if (i % 2 === 0 && i > 1 && i < 13) { const h = 6 * (1 - i / 16) + 0.7; parte.set(p.x, p.y - h - 0.5, PCU.verdeS); parte.set(p.x, p.y - h - 1.5, PCU.verdeS); } });
-  cam.colar(parte.contornar(PCU.verdeO));
-  // braço: manga do vestido com babado rasgado, antebraço verde e três garras
-  const braco = (o, m, escuro) => {
-    const p = nova(), a = L(T(o)), b = L(m), pts = curvaMembro(a, b, 26, -sx, 0.8);
-    const meio = Math.round(pts.length * 0.5), punho = pts[meio];
-    p.traco(pts.slice(meio), 4.6, escuro ? PCU.verdeS : PCU.verde);
-    sombraB(p, escuro ? PCU.verdeS : PCU.verde, escuro ? PCU.verdeD : PCU.verdeS, escuro ? PCU.verde : PCU.verdeL, 1);
-    const dir = unit(sub(b, punho));
-    for (const da of [-40, 0, 40]) { const v = rot(dir, da); for (let k = 2; k <= 4; k++) p.set(b.x + v.x * k, b.y + v.y * k, k < 4 ? PCU.garra : PCU.barrigaS); }
-    p.disco(b.x, b.y, 2.6, escuro ? PCU.verdeS : PCU.verde);
-    cam.colar(p.contornar(PCU.verdeO));
-    const m2 = nova(), vc = escuro ? [PCU.vestS, PCU.vestD, PCU.vest] : [PCU.vest, PCU.vestS, PCU.vestL];
-    m2.traco(pts.slice(0, meio + 1), 6.4, vc[0]);
-    // boca da manga alargando, com pontas
-    m2.disco(punho.x, punho.y, 4.2, vc[0]);
-    for (const da of [-70, 70]) { const v = rot(dir, da); m2.traco([punho, pt(punho.x + v.x * 5 + dir.x * 2, punho.y + v.y * 5 + dir.y * 2)], 2, vc[0]); }
-    sombraB(m2, vc[0], vc[1], vc[2], 1);
-    cam.colar(m2.contornar(PCU.vestO));
-  };
-  const perna = (q, pe, escuro) => {
-    const p = nova(), a = L(T(q)), b = Lc(pe), base = escuro ? PCU.verdeS : PCU.verde;
-    p.traco(curvaMembro(a, soma(b, pt(0, -2)), 24, sx, 0.8), 7, base);
-    elipse(p, b.x - sx * 3, b.y - 1.5, 6, 2.6, base);
-    sombraB(p, base, escuro ? PCU.verdeD : PCU.verdeS, escuro ? PCU.verde : PCU.verdeL, 1);
-    for (const dx of [-9, -6, -3]) { p.set(b.x + sx * dx, b.y - 1, PCU.garra); p.set(b.x + sx * (dx - 1), b.y - 1, PCU.garra); }
-    cam.colar(p.contornar(PCU.verdeO));
+  const LH = p => L(H(p)), LHs = ps => ps.map(([x, y]) => LH(pt(x, y)));
+  const bal = R.cabelo || 0;
+  if (sombraCor) aviso(() => elipse(cam, X + sx * 4, CHAO_PX + 1, 24 + 16 * R.deitada, 2.2, sombraCor));
+  // pinta um pixel de um ponto do tronco (para listras e pregas que acompanham a inclinação)
+  const marca = (c, x, y, cor, so) => { const p = LT(pt(x, y)); if (p.y > CHAO_PX) return; const g = c.get(Math.floor(p.x), Math.floor(p.y)); if (!so || (so === true ? g : g === so)) c.set(p.x, p.y, cor); };
+  let c;
+  // rabo fino com crista, saindo de trás da saia
+  c = nova();
+  const ptsR = curvaQ(LT(pt(6, -16)), L(pt(24, -12 + R.rabo * 0.5)), Lc(pt(31 + R.rabo, -2 + Math.abs(R.rabo) * 0.3)), 14);
+  ptsR.forEach((p, i) => c.disco(p.x, p.y, 3.4 * (1 - i / 15) + 0.6, PCU.verde));
+  sombraB(c, PCU.verde, PCU.verdeS, PCU.verdeL, 1);
+  c.contornar(PCU.verdeO);
+  ptsR.forEach((p, i) => { if (i % 2 && i > 1 && i < 11) c.set(p.x, p.y - 3.4 * (1 - i / 15) - 1.2, PCU.verdeO); });
+  cam.colar(c);
+  // cachos de trás
+  c = nova();
+  [[9, -64, 4.2], [11, -57, 3.8], [8, -52, 3.4], [13, -50, 3]].forEach(([x, y, r], k) => { const p = LT(pt(x + bal * (0.4 + k * 0.3), y + Math.abs(bal) * 0.3)); cachoPx(c, p.x, p.y, r); });
+  cam.colar(c.contornar(PCU.cabO));
+  // braço: manga justa de ameixa, antebraço verde e três garras
+  const braco = (o, m, la) => {
+    const a = LT(o), b = L(m), pts = curvaMembro(a, b, 20, la ? sx : -sx, 0.9);
+    const n = pts.length, k = Math.round(n * 0.72), pele = la ? PCU.verdeS : PCU.verde;
+    const mp = nova(), dir = unit(sub(b, pts[n - 3]));
+    mp.traco(pts.slice(k - 2), 2.6, pele);
+    mp.disco(b.x, b.y, 2.1, pele);
+    for (const da of [-45, 0, 45]) { const v = rot(dir, da); for (let j = 1; j <= 3; j++) mp.set(b.x + v.x * (1.5 + j), b.y + v.y * (1.5 + j), j < 3 ? pele : PCU.garra); }
+    cam.colar(mp.contornar(PCU.verdeO));
+    const cv = la ? [PCU.vestS, PCU.vestD, PCU.vest] : [PCU.vest, PCU.vestS, PCU.vestL];
+    const mg = nova();
+    mg.traco(pts.slice(0, k + 1), 3.4, cv[0]);
+    mg.disco(a.x, a.y, 2.6, cv[0]);
+    sombraB(mg, cv[0], cv[1], cv[2], 1);
+    cam.colar(mg.contornar(PCU.vestO));
   };
   braco(CUCA.ombroL, R.maos[1], true);
-  perna(pt(6, -24), R.pes[1], true);
-  // cabelo de trás: cachos descendo pelas costas, balançando um pouco atrasados
-  const cachos = nova(), bal = R.cabelo || 0;
-  [[13, -62, 4.6], [11, -54, 4.2], [15, -50, 3.6], [9, -47, 3.4]].forEach(([x, y, r], k) => { const c = L(T(pt(x + bal * (0.5 + k * 0.3), y + Math.abs(bal) * 0.4))); cachoPx(cachos, c.x, c.y, r); });
-  cam.colar(cachos.contornar(PCU.cabO));
-  perna(pt(-6, -24), R.pes[0], false);
-  // vestido: corpete corcunda, saia rodada com a barra rasgada, dobras e remendo
-  parte = nova();
-  const elT = (c, rx, ry, cor = PCU.vest) => { const p = L(T(c)); elipse(parte, p.x, p.y, rx, ry, cor, ang); };
-  elT(pt(1, -46), 11, 14); elT(pt(6, -55), 9, 8); elT(pt(0, -30), 14, 10);
-  const barra = [];
-  for (let x = -19; x <= 19; x++) barra.push(pt(x, -15 + ((x + 19) % 6 < 3 ? (x + 19) % 6 : 6 - (x + 19) % 6) * 1.2));
-  poli(parte, [pt(-12, -36), pt(13, -36), ...barra.reverse()].map(p => L(T(p))), PCU.vest);
-  sombraB(parte, PCU.vest, PCU.vestS, PCU.vestL, 2);
-  for (const x0 of [-9, -1, 8]) for (let y = -28; y <= -17; y++) { const p = L(T(pt(x0 + (y + 28) * 0.12 * Math.sign(x0 || 1), y))); if (parte.get(p.x, p.y) === PCU.vest) parte.set(p.x, p.y, PCU.vestS); }
-  const rm = L(T(pt(-9, -26)));
-  for (let j = 0; j < 5; j++) for (let i = 0; i < 5; i++) if (parte.get(rm.x + i, rm.y + j)) parte.set(rm.x + i, rm.y + j, (i + j) % 4 === 0 ? PCU.vestO : PCU.remendo);
-  cam.colar(parte.contornar(PCU.vestO));
-  // cinto com fivela e duas poções
-  parte = nova();
-  const c0 = L(T(pt(-14, -35))), c1 = L(T(pt(14, -36)));
-  for (let u = 0; u <= 1; u += 0.03) { const p = lerp(c0, c1, u); parte.set(p.x, p.y, PCU.cinto); parte.set(p.x, p.y + 1, PCU.cinto); }
-  const fv = lerp(c0, c1, 0.3);
-  parte.carimbo(['ooo', 'o.o', 'ooo'], Math.round(fv.x) - 1, Math.round(fv.y) - 1, { o: PCU.cintoL });
-  cam.colar(parte.contornar(PCU.vestO));
-  if (!R.semPocao) { frascoPx(cam, L(T(pt(7, -31))), PCU.magia, t); frascoPx(cam, L(T(pt(0, -30))), PCU.azul, t + 1); }
-  if (R.chip) { const c = L(T(pt(-1, -47))); chipPx(cam, c.x, c.y, t); }
-  // pescoço e gola de renda
-  parte = nova();
-  { const p = L(T(pt(-3, -62))); elipse(parte, p.x, p.y, 6, 5, PCU.verde, ang); }
-  sombraB(parte, PCU.verde, PCU.verdeS, null, 1);
-  cam.colar(parte.contornar(PCU.verdeO));
-  parte = nova();
-  for (let k = 0; k <= 6; k++) { const p = L(T(pt(-9 + k * 3, -59 - k * 0.4))); parte.disco(p.x, p.y, 2.4, PCU.renda); }
-  sombraB(parte, PCU.renda, PCU.rendaS, null, 1);
-  cam.colar(parte.contornar(PCU.vestO));
-  // cabeça: crânio redondo, focinho curto e arredondado, mandíbula clara que abre
-  parte = nova();
-  const hc = L(H(pt(2, -77)));
-  elipse(parte, hc.x, hc.y, 13, 11, PCU.verde);
-  poli(parte, [pt(-3, -88), pt(-12, -85), pt(-20, -81), pt(-25, -78.5), pt(-28, -75), pt(-28, -70), pt(-3, -68)].map(p => L(H(p))), PCU.verde);
-  const ponta = L(H(pt(-24.5, -74)));
-  parte.disco(ponta.x, ponta.y, 4.8, PCU.verde);
-  // calombo do olho
-  const oc = L(H(pt(-8, -86)));
-  parte.disco(oc.x, oc.y, 6.5, PCU.verde);
-  sombraB(parte, PCU.verde, PCU.verdeS, PCU.verdeL, 1);
-  // narina e pintinhas de escama
-  const na = L(H(pt(-26, -78)));
-  parte.set(na.x, na.y, PCU.verdeD); parte.set(na.x + sx, na.y, PCU.verdeD);
-  for (const [x, y] of [[-16, -78], [-11, -80], [-19, -75], [-13, -75], [4, -80]]) { const p = L(H(pt(x, y))); parte.set(p.x, p.y, PCU.verdeS); }
-  // boca aberta: fundo vinho e língua
-  const dob = pt(-3, -69);
-  const Mn = p => H(soma(dob, rot(sub(p, dob), R.mand * -1)));
-  if (R.mand > 4) poli(parte, [...[pt(-4, -69), pt(-27, -70)].map(H), ...[pt(-25, -64), pt(-4, -63)].map(Mn)].map(p => L(p)), PCU.boca);
-  if (R.lingua || R.mand > 9) { const l0 = L(Mn(pt(-12, -65))); parte.disco(l0.x, l0.y, 2.6, PCU.lingua); parte.disco(l0.x - sx * 3, l0.y + 1, 1.8, PCU.lingua); }
-  // dentinhos de cima: só dois caninos aparecem com a boca fechada
-  if (R.mand > 4) for (let x = -25; x <= -7; x += 3) { const p = L(H(pt(x, -69))); parte.set(p.x, p.y, PCU.dente); parte.set(p.x, p.y + 1, PCU.dente); }
-  else for (const x of [-21, -11]) { const p = L(H(pt(x, -69))); parte.set(p.x, p.y, PCU.dente); parte.set(p.x, p.y + 1, PCU.dente); parte.set(p.x + sx, p.y, PCU.dente); }
-  cam.colar(parte.contornar(PCU.verdeO));
-  // mandíbula: verde por fora, papo creme por baixo
-  parte = nova();
-  poli(parte, [pt(-3, -69), pt(-26, -69.5), pt(-27, -67), pt(-23, -64), pt(-4, -63)].map(p => L(Mn(p))), PCU.verde);
-  for (let x = -22; x <= -2; x++) { const p = L(Mn(pt(x, -64.2))); if (parte.get(p.x, p.y)) parte.set(p.x, p.y, PCU.barriga); const q = L(Mn(pt(x, -65.2))); if (parte.get(q.x, q.y) && x > -20) parte.set(q.x, q.y, PCU.barriga); }
-  sombraB(parte, PCU.verde, PCU.verdeS, null, 1);
-  if (R.mand > 4) for (let x = -23; x <= -8; x += 3) { const p = L(Mn(pt(x, -69))); parte.set(p.x, p.y - 1, PCU.dente); }
-  cam.colar(parte.contornar(PCU.verdeO));
-  // risco do sorriso subindo no fim da boca (de boca fechada a Cuca sorri de lado)
-  if (R.mand <= 4 || R.sorriso) { const a = L(H(pt(-3, -69))); cam.set(a.x, a.y, PCU.verdeO); cam.set(a.x + sx, a.y - 1, PCU.verdeO); cam.set(a.x + 2 * sx, a.y - 2, PCU.verdeO); }
-  // bochecha corada
-  { const p = L(H(pt(-6, -73))); cam.set(p.x, p.y, PCU.rubor); cam.set(p.x + sx, p.y, PCU.rubor); cam.set(p.x + 2 * sx, p.y, PCU.rubor); cam.set(p.x + sx, p.y + 1, PCU.rubor); }
-  olhoJacarePx(cam, oc.x - sx * 0.5, oc.y, R.olho, R.iris, t, sx);
-  // cabeleira loira: cachos fofos no alto da cabeça e caindo atrás da nuca
-  const frente = nova();
-  // primeiro o volume (bolas grandes), depois os cachos da borda por cima
-  [[11, -82, 9], [14, -72, 7], [5, -88, 7]].forEach(([x, y, r]) => { const c = L(H(pt(x + bal * 0.3, y))); cachoPx(frente, c.x, c.y, r); });
-  [[20, -82, 5], [20, -73, 5], [17, -65, 4.6], [17, -90, 5], [10, -95, 5.4], [3, -96, 5], [-4, -95, 4.4], [12, -64, 4]].forEach(([x, y, r], k) => {
-    const c = L(H(pt(x + bal * (0.3 + 0.1 * k), y))); cachoPx(frente, c.x, c.y, r);
+  // pés descalços de jacaré, garras de fora
+  c = nova();
+  R.pes.forEach((pe, i) => {
+    const b = Lc(pe), cor = i ? PCU.verdeS : PCU.verde;
+    poli(c, [[4, -6], [4, -1], [-5, -1], [-5, -3], [-1, -6]].map(([x, y]) => pt(b.x + sx * x, b.y + y)), cor);
+    sombraB(c, cor, i ? PCU.verdeD : PCU.verdeS, null, 1);
   });
-  // franja: um cacho caindo na testa, atrás do olho
-  { const c = L(H(pt(-10, -96))); cachoPx(frente, c.x, c.y, 3.4); }
-  cam.colar(frente.contornar(PCU.cabO));
+  c.contornar(PCU.verdeO);
+  R.pes.forEach(pe => { const b = Lc(pe); for (const dx of [-6, -4]) c.set(b.x + sx * dx, b.y - 1, PCU.garra); });
+  cam.colar(c);
+  // saia longa com a barra rasgada
+  c = nova();
+  const barra = [];
+  for (let x = -20, k = 0; x <= 18; k++) {
+    const w = 2 + Math.floor(hash(7 + k) * 3), fundo = hash(13 + k) < 0.3 ? 3 + Math.floor(hash(k + 1) * 3) : 1 + Math.floor(hash(k * 3 + 1) * 2);
+    barra.push([x, -5], [x + w / 2, -5 + fundo], [x + w, -5]); x += w;
+  }
+  poli(c, LTc([[-7, -42], [-12, -26], ...barra, [13, -24], [8, -42]]), PCU.vest);
+  sombraB(c, PCU.vest, PCU.vestS, PCU.vestL, 2);
+  for (const [x0, k] of [[-8, -0.28], [-1, -0.05], [6, 0.18]]) for (let y = -34; y <= -6; y++) marca(c, x0 + (y + 34) * k, y, PCU.vestS, PCU.vest);
+  cam.colar(c.contornar(PCU.vestO));
+  // sobretudo aberto: painel de trás comprido e aba da frente, forro vermelho nas beiras
+  c = nova();
+  poli(c, LTc([[-4, -62], [8, -63], [11, -52], [15, -30], [19, -4], [6, -4], [3, -26], [1, -42]]), PCU.vestD);
+  poli(c, LTc([[-8, -60], [-5, -62], [-4, -42], [-8, -26], [-14, -4], [-18, -4], [-13, -26], [-9, -42]]), PCU.vestD);
+  sombraB(c, PCU.vestD, PCU.vestO, PCU.vestS, 1);
+  for (let y = -40; y <= -6; y++) { marca(c, 3 + (y + 42) * 0.08, y, PCU.forro, true); marca(c, -9 - (y + 42) * 0.24, y, PCU.forro, true); }
+  cam.colar(c.contornar(PCU.vestO));
+  // corpete
+  c = nova();
+  poli(c, LTs([[-7, -42], [-7.5, -48], [-9.5, -53], [-9, -57], [-6, -61], [5, -62], [8, -58], [8, -50], [8, -42]]), PCU.vest);
+  { const p = LT(pt(-6.5, -54)); c.disco(p.x, p.y, 3.4, PCU.vest); }
+  sombraB(c, PCU.vest, PCU.vestS, PCU.vestL, 1);
+  cam.colar(c.contornar(PCU.vestO));
+  // lapela da frente com os botões
+  c = nova();
+  poli(c, LTs([[-9, -60], [-6, -62], [-5, -50], [-8, -43]]), PCU.vestD);
+  sombraB(c, PCU.vestD, PCU.vestO, PCU.vestS, 1);
+  cam.colar(c.contornar(PCU.vestO));
+  for (const y of [-56, -50]) marca(cam, -7, y, PCU.botao);
+  // cinto escuro e a poção pendurada
+  c = nova();
+  for (let x = -8; x <= 8; x++) { marca(c, x, -43, PCU.cinto); marca(c, x, -42, PCU.cinto); }
+  cam.colar(c);
+  if (!R.semPocao) frascoPx(cam, LT(pt(6, -39)), PCU.roxo, t);
+  // gola alta e dura, atrás da cabeça
+  c = nova();
+  poli(c, LTs([[-6, -61], [-8, -67], [-4, -66], [2, -74], [6, -75], [12, -71], [10, -62]]), PCU.vestD);
+  sombraB(c, PCU.vestD, PCU.vestO, PCU.vestS, 1);
+  for (let k = 0; k < 6; k++) marca(c, 4 + k, -73 + k * 1.6, PCU.forro, PCU.vestD);
+  cam.colar(c.contornar(PCU.vestO));
+  // pescoço
+  c = nova();
+  c.traco([LT(pt(0, -60)), LH(pt(-1, -66))], 5.4, PCU.verde);
+  sombraB(c, PCU.verde, PCU.verdeS, null, 1);
+  cam.colar(c.contornar(PCU.verdeO));
+  // cabeça: crânio redondo e focinho fino. Fechada, a boca é um traço; aberta, o focinho racha
+  // e a mandíbula gira na dobra, sem peça separada (mesma cor, um contorno só)
+  c = nova();
+  const hc = LH(pt(2, -74));
+  elipse(c, hc.x, hc.y, 8.5, 7.5, PCU.verde);
+  const dobra = pt(-4, -68), aberta = R.mand > 3;
+  const Mn = p => H(soma(dobra, rot(sub(p, dobra), -R.mand)));
+  const linhaBoca = x => -69 + (x > -7 ? -(x + 7) * 0.6 : 0);
+  poli(c, LHs([[-3, -80], [-9, -77], [-15, -74.5], [-19, -72.6], [-21.5, -70.8], [-21.5, -69], [-7, -69], [-2, -72], [4, -67]]), PCU.verde);
+  if (aberta) {
+    poli(c, [LH(pt(-21, -69)), LH(pt(-5, -69)), L(Mn(pt(-5, -69))), L(Mn(pt(-21, -69)))], PCU.boca);
+    if (R.lingua || R.mand > 9) { const l0 = L(Mn(pt(-12, -68))); c.disco(l0.x, l0.y - 1, 2.2, PCU.lingua); }
+  }
+  poli(c, [[-21.5, -69], [-7, -69], [-3, -68.5], [-3, -66.2], [-11, -66.8], [-19, -67.6], [-21.5, -68.4]].map(([x, y]) => L(Mn(pt(x, y)))), PCU.verde);
+  const ol = LH(pt(-4, -79));
+  c.disco(ol.x, ol.y, 6, PCU.verde);
+  sombraB(c, PCU.verde, PCU.verdeS, PCU.verdeL, 1);
+  for (const [x, y] of [[-11, -74.5], [-15, -73], [-8, -72], [7, -77], [5, -72]]) { const p = LH(pt(x, y)); c.set(p.x, p.y, PCU.verdeS); }
+  { const p = LH(pt(-20, -72)); c.set(p.x, p.y, PCU.verdeD); }
+  if (aberta) {
+    // dentes nas duas beiradas
+    for (let x = -19; x <= -7; x += 3) { const p = LH(pt(x, -69)); c.set(p.x, p.y, PCU.dente); const q = L(Mn(pt(x + 1, -69))); c.set(q.x, q.y - 1, PCU.dente); }
+    for (let x = -6; x <= -2; x++) { const p = LH(pt(x, linhaBoca(x))); c.set(p.x, p.y, PCU.verdeO); }
+  } else {
+    for (let x = -21; x <= -2; x++) { const p = LH(pt(x, linhaBoca(x))); c.set(p.x, p.y, x > -7 ? PCU.verdeO : PCU.verdeD); }
+    const p = LH(pt(-9, -68)); c.set(p.x, p.y, PCU.dente);
+  }
+  { const p = LH(pt(-3, -71)); c.set(p.x, p.y, PCU.rubor); c.set(p.x + sx, p.y, PCU.rubor); }
+  cam.colar(c.contornar(PCU.verdeO));
+  // cachos da frente e o chapéu
+  c = nova();
+  [[9, -78, 5], [11, -71, 4.2], [4, -85, 3.4], [8, -86, 3.6], [13, -82, 3.8]].forEach(([x, y, r], k) => { const p = LH(pt(x + bal * (0.2 + 0.1 * k), y)); cachoPx(c, p.x, p.y, r); });
+  cam.colar(c.contornar(PCU.cabO));
+  chapeuCucaPx(cam, LH, sx, t, bal, R.chip);
+  olhoCucaPx(cam, ol.x, ol.y + 0.5, R.olho, R.iris, t, sx);
   braco(CUCA.ombroP, R.maos[0], false);
-  return { mao: R.maos.map(m => L(m)), boca: L(H(pt(-27, -67))), cabeca: hc, corpo: L(T(pt(-1, -47))) };
+  // chip cravado na gola, com as veias de circuito correndo pela roupa
+  const chip = LT(pt(-2, -57));
+  if (R.chip) {
+    for (const passos of [[[0, 4], [-3, 0], [0, 3]], [[4, 0], [0, 6]], [[-3, 0], [0, -2]]]) {
+      let q = pt(Math.round(chip.x), Math.round(chip.y));
+      passos.forEach(([dx, dy], i) => { const n = Math.max(Math.abs(dx), Math.abs(dy)); for (let s = 1; s <= n; s++) cam.set(q.x + sx * Math.sign(dx) * s, q.y + Math.sign(dy) * s, (i + s) % 4 === 0 ? PCU.veia : PCU.veiaD); q = pt(q.x + sx * dx, q.y + dy); });
+      cam.carimbo(['ee', 'ec'], q.x, q.y, { e: PCU.veiaD, c: PCU.veia });
+    }
+    chipCravadoPx(cam, chip.x, chip.y, t);
+  }
+  return { mao: R.maos.map(m => L(m)), boca: LH(pt(-22, -69)), cabeca: hc, corpo: chip };
 }
-// olhão de jacaré no calombo: esclera grande, íris com pupila de fenda, pálpebra pesada e cílios
-function olhoJacarePx(cam, cx, cy, tipo, iris, t, sx) {
-  const b = nova();
-  const cilios = () => { for (const [dx, dy] of [[2, -4], [3, -5], [4, -3], [5, -4], [4, -1], [6, -2]]) b.set(cx + sx * dx, cy + dy, PCU.verdeO); };
-  if (tipo === 'feliz' || tipo === 'piscando') {
-    // olho fechado: arco para cima (feliz) ou linha reta (piscando)
-    elipse(b, cx, cy, 3.8, 4.2, PCU.verde);
-    for (let k = -3; k <= 3; k++) b.set(cx + k, cy + (tipo === 'feliz' ? (Math.abs(k) < 2 ? -1 : 0) : 1), PCU.verdeO);
-    cilios(); cam.colar(b.contornar(PCU.verdeO)); return;
+// chip escuro com a luz vermelha piscando e um brilho em volta
+function chipCravadoPx(cam, cx, cy, t, ligado = true) {
+  const x = Math.round(cx), y = Math.round(cy), b = nova(), luz = ligado && Math.floor(t * 4) % 2 ? PCU.veia : PCU.veiaD;
+  b.carimbo(['.y.y.y.', 'yKKKKKy', '.KkkkK.', 'yKkRRKy', '.KkRRK.', 'yKKKKKy', '.y.y.y.'], x - 3, y - 3, { y: PCU.pino, K: PCU.chipK, k: PCU.chipk, R: luz });
+  cam.colar(b.contornar('#0A0E0C'));
+  if (ligado) for (const [dx, dy] of [[-4, 1], [4, -1], [1, -4], [-1, 4]]) cam.set(x + dx, y + dy, PCU.brilho);
+}
+// chapéu de bruxa com a ponta caindo para trás e a faixa de metal com a luz do chip
+function chapeuCucaPx(cam, LH, sx, t, bal, ligado = true) {
+  const base = pt(7, -88), inc = -14 - bal * 2, r = rad(inc);
+  const Q = (x, y) => LH(pt(base.x + x * Math.cos(r) - y * Math.sin(r), base.y + x * Math.sin(r) + y * Math.cos(r)));
+  const c = nova();
+  poli(c, [Q(-8, 0), Q(-5, -8), Q(-1, -15), Q(5, -20), Q(11, -19), Q(7, -16), Q(5, -12), Q(7, 0)], PCU.chapeu);
+  sombraB(c, PCU.chapeu, PCU.chapeuS, PCU.chapeuL, 1);
+  for (let x = -7; x <= 7; x += 0.5) for (const y of [-2, -3, -4]) { const p = Q(x, y); if (c.get(Math.floor(p.x), Math.floor(p.y))) c.set(p.x, p.y, y === -4 ? PCU.metalL : y === -2 ? PCU.metalS : PCU.metal); }
+  for (const x of [-5, 5]) { const p = Q(x, -3); c.set(p.x, p.y, PCU.metalO); }
+  cam.colar(c.contornar(PCU.chapeuO));
+  const a = nova(), aba = [];
+  for (let k = 0; k < 28; k++) { const u = k / 28 * TAU; aba.push(Q(Math.cos(u) * 15, 0.5 + Math.sin(u) * 2.4)); }
+  poli(a, aba, PCU.chapeu);
+  sombraB(a, PCU.chapeu, PCU.chapeuS, PCU.chapeuL, 1);
+  cam.colar(a.contornar(PCU.chapeuO));
+  const p = Q(-1, -3);
+  cam.carimbo(['oRo', 'RLR', 'oRo'], Math.round(p.x) - 1, Math.round(p.y) - 1, { o: PCU.metalO, R: ligado && Math.floor(t * 4) % 2 ? PCU.veia : PCU.veiaD, L: ligado ? PCU.brilho : PCU.veiaD });
+}
+// olhão amendoado com cílios para trás; a pálpebra é da cor da pele (sem maquiagem)
+function olhoCucaPx(cam, cx, cy, tipo, iris, t, sx) {
+  const X0 = Math.round(cx), x = X0 - 4, y = Math.round(cy) - 3;
+  const b = nova(), M = { o: PCU.verdeO, W: PCU.olho, I: iris, P: PCU.verdeO, s: PCU.verdeS, B: PM.branco, g: PCU.verde };
+  const S = (linhas, ox, oy) => carimboSx(b, linhas, ox, oy, M, sx, X0);
+  if (tipo === 'feliz') S(['.........', '..ooooo..', '.o.....o.', 'o.......o'], x, y);
+  else if (tipo === 'piscando') S(['.........', '.........', 'ooooooooo', '.o.o.o.o.'], x, y);
+  else {
+    S(['..sssss..', '.ooooooo.', 'oIIIWWWWo', 'IIBPIWWWo', 'IIIPIWWWo', 'oIIIWWWWo', '.oWWWWWo.', '..ooooo..'], x, y - 2);
+    if (tipo === 'bravo') S(['ooooo....', 'ggoo.....'], x, y - 1);
+    if (tipo === 'cansado') S(['ooooooooo', 'ggggggggg'], x, y);
+    if (tipo === 'tonto') { for (let i = 0; i < 4; i++) b.set(X0 - 2 + i, y + 1 + (i % 2), PCU.verdeO); b.set(X0, y + 3, PCU.verdeO); }
   }
-  elipse(b, cx, cy, 3.8, 4.2, PCU.olho);
-  if (tipo === 'tonto') { for (let i = 0; i < 12; i++) { const a = i * 0.7 + t * 7, r = i / 12 * 3; b.set(cx + Math.cos(a) * r, cy + Math.sin(a) * r, PCU.verdeO); } cilios(); cam.colar(b.contornar(PCU.verdeO)); return; }
-  const ix = cx - sx * 0.8, iy = cy + 0.6;
-  b.disco(ix, iy, 2.6, iris);
-  b.set(ix, iy - 1, PCU.verdeO); b.set(ix, iy, PCU.verdeO); b.set(ix, iy + 1, PCU.verdeO);
-  b.set(cx + sx * 1.2, cy - 1.6, PM.branco); b.set(cx + sx * 1.2, cy - 0.6, PM.branco);
-  // pálpebra: brava = inclinada para o focinho; cansada = meio fechada
-  const cobre = tipo === 'bravo' ? 1.6 : tipo === 'cansado' ? 3 : 0.6;
-  for (let x = -4; x <= 4; x++) {
-    const lim = cy - 4.4 + cobre + (tipo === 'bravo' ? -sx * x * 0.4 : 0);
-    for (let y = Math.floor(cy - 5); y <= lim; y++) if (b.get(Math.floor(cx + x), y)) b.set(cx + x, y, PCU.verde);
-    if (b.get(Math.floor(cx + x), Math.floor(lim) + 1)) b.set(cx + x, lim + 1, PCU.verdeO);
-  }
-  cilios();
-  cam.colar(b.contornar(PCU.verdeO));
+  S(['......o.o', '.....o.o.', '....oo.o.', '.....o...'], x + 2, y - 5);
+  cam.colar(b);
 }
 const FRASCO_PX = ['.r.', 'vvv', 'vLv', 'cCc', '.c.'];
 function frascoPx(cam, c, cor, t, grande = false) {
@@ -681,7 +726,7 @@ function pocaPx(cam, x, larg, t, cores = [PCU.roxoD, PCU.roxo, PCU.roxoL]) {
 
 const CUCA_ESTADOS = {
   idle: {
-    dur: 2.4, nome: 'Esfregando as garras',
+    dur: 2.4, nome: 'Garra erguida',
     quadro(s, t) {
       const R = cucaBase(t), u = s % 2.4;
       // pisca no meio e solta uma risadinha no fim: cabeça para trás, ombros sacudindo
