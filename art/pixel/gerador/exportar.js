@@ -278,7 +278,7 @@ function exportarArenas() {
 }
 
 try {
-  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu();
+  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu(); exportarHud();
   document.getElementById('saida').textContent = JSON.stringify(saida);
   document.title = 'pronto';
 } catch (e) { document.getElementById('saida').textContent = 'ERRO ' + e.stack; }

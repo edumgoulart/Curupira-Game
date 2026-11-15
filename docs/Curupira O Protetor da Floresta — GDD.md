@@ -238,7 +238,7 @@ O jogo tem nove tipos de tela:
 
 ### Elementos na tela durante a luta
 
-A vida do Curupira e a carga do especial ficam no canto inferior esquerdo da tela. A vida do chefe não aparece: o jogo a contabiliza, mas não a mostra ao jogador, como em Cuphead.
+A vida do Curupira e a carga do especial ficam no canto inferior esquerdo da tela: um retrato do Curupira, um coração por golpe que ele aguenta e uma barra de cipó com a cabeça da onça, que acende quando o especial está cheio. A vida do chefe aparece numa barra no alto da tela, com o nome dele e marcas onde a luta muda de fase (decisão do Eduardo; antes ela ficava escondida, como em Cuphead).
 
 Durante a luta, cima e baixo servem para mirar e baixo também agacha. As regras estão em Ataque básico e especial.
 
@@ -520,7 +520,7 @@ Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do docum
 | Tamanho dos sprites e quadros por animação (Q5)? | Pixel art em 480×270 ampliada 4×. Curupira com ~61 px, chefes entre 80 e 110 px, chefes a 12 quadros por segundo | Arte, som e música |
 | Qual é o design da máquina e da arena dela? | O Núcleo pendurado no teto, numa câmara de testes branca | Objetos do jogo e Mundo do jogo |
 | As arenas têm plataformas ou perigos próprios? | Não. Só chão e paredes | Mundo do jogo |
-| A vida do chefe aparece na tela? | Não. Só a vida do Curupira e a carga do especial, no canto inferior esquerdo | Interface do usuário |
+| A vida do chefe aparece na tela? | Sim, numa barra no alto da tela com o nome do chefe (mudou a pedido do Eduardo; antes era escondida, estilo Cuphead) | Interface do usuário |
 | Como a história é contada? | Em cenas estáticas no início do jogo | Objetivos e progressão |
 | Qual é a duração do jogo? | Não é fixa. Cada luta termina quando o chefe ou o jogador é derrotado | Experiência do jogador |
 

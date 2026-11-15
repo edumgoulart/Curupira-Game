@@ -314,7 +314,7 @@ Poças da Cuca (`PocaCuca`, `Area2D`, layer `enemy_hitbox`, mask `player`) **[Im
 3. Os ataques mais fortes terminam com o chefe parado, cansado ou tonto (janela de ataque).
 4. **[Divergente]** A luta tem **três fases**, trocadas pela vida que sobra (GDD, seção dos chefes; números em Q16). A v0.2 e o `CLAUDE.md` ainda falam em "estado único".
 
-A vida do chefe **não aparece** na tela; o retorno é um pisca branco a cada acerto.
+A vida do chefe aparece numa barra no alto da tela (`hud_chefe.gd`, 11.1), e cada acerto ainda faz o chefe piscar de branco.
 
 ### 8.2 Dados **[Implementado]**
 
@@ -410,7 +410,7 @@ LevelN (Node2D)                   # texture_filter = Nearest (pixel art)
 ├── LimiteAreiaEsquerdo/Direito   # só no Boto: paredes nas beiras da areia, layer limite_arena
 ├── Curupira                      # instância
 ├── <Chefe>                       # instância, com alvo = Curupira
-├── HUD                           # instância, com curupira
+├── HUD                           # instância, com curupira e chefe
 ├── MenuPausa, TelaDerrota, TelaVitoria
 ```
 
@@ -509,7 +509,11 @@ Cenas de ataque dos chefes:
 ## 11. Interface
 
 ### 11.1 HUD **[Implementado]**
-Canto inferior esquerdo: vida do Curupira (4) e barra do especial (`hud_vida.gd`, `hud_especial.gd`, via sinais). Sem barra de vida do chefe. Arte antiga (não pixel).
+Pixel art do gerador (`art/pixel/gerador/hud_px.js` → `assets/pixel/ui/hud_*.png`, já ampliada 4×). O `hud.gd` só liga sinais; cada parte desenha a si mesma em `_draw()`, em passos de 4 px (1 pixel da arte).
+- **Canto inferior esquerdo** (`hud_vida.gd`): retrato do Curupira num aro de madeira e um coração por golpe. O retrato muda de cara: dor logo depois de um golpe, fúria (cabelo em chamas) com o especial cheio, assustado com 1 golpe e normal no resto. O coração perdido treme e pisca; o último pula como um batimento.
+- **Especial** (`hud_especial.gd`): moldura de cipó que enche de verde; cheia, vira brasa e a cabeça da onça acende.
+- **Chefe** (`hud_chefe.gd`): nome (`dados.nome`) e barra de metal com o chip na ponta, no alto da tela. Enche do zero na entrada, deixa um rastro claro a cada golpe, tem entalhes em `vida_fase_2` e `vida_fase_3`, e o LED do chip apaga quando o chefe é libertado. Cada `levelN` aponta o campo `chefe` do HUD para o chefe da arena.
+- O vão de cada moldura (onde entra o enchimento) está em `HUD_PX` no gerador e na constante `VAO` dos scripts: mudar nos dois.
 
 ### 11.2 Telas
 
@@ -617,7 +621,7 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 10. ~~Cuca, Boto, Máquina (lógica)~~
 11. ~~Pixel art: personagens, efeitos, arenas; 3 fases × 4 ataques; mira em 8 direções; agachar~~
 12. **Agora**: teste manual de cada luta e balanceamento dos valores provisórios.
-13. **Restante**: HUD em pixel, áudio, Opções, abertura, conteúdo dos créditos, cheats de debug, `CREDITS.md`, `main_scene` = menu, export Linux/Windows.
+13. **Restante**: áudio, Opções, abertura, conteúdo dos créditos, cheats de debug, `CREDITS.md`, `main_scene` = menu, export Linux/Windows.
 
 ## 17. Pendências
 
@@ -628,7 +632,7 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 | Limiares das fases (0,667 / 0,333) | Ritmo da luta | Fechar no GDD (Q16) |
 | Trava de mira sem botão no controle | Controle | Escolher o botão (GDD Q15) |
 | Coração do Boto carrega o especial | Pode ser exploit | Decidir; se não, tirar a hurtbox do coração do sinal de acerto |
-| HUD e folhas do dash com a arte antiga | Mistura de estilos | Gerar no `art/pixel/gerador` |
+| Folhas do dash com a arte antiga | Mistura de estilos | Gerar no `art/pixel/gerador` |
 | `CLAUDE.md` diz "chefes com estado único" | Instrução desatualizada | Atualizar o resumo de regras do `CLAUDE.md` |
 | Opções (volume, tela cheia) | Requisito do GDD | 2 sliders + toggle; salvar no `GameState` (14.2) |
 | Áudio (barramentos, faixas, SFX) | Requisito do GDD | Criar buses; lista de assets (Q14) |

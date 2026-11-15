@@ -3,7 +3,7 @@ extends Node2D
 ## Base de todos os chefes: o que é igual em todos fica aqui, e cada chefe (Mula, Cuca...)
 ## herda e só implementa os próprios ataques.
 ##
-## Regras do GDD que valem para todos: leva dano o tempo todo, a vida não aparece na tela,
+## Regras do GDD que valem para todos: leva dano o tempo todo, a vida aparece no HUD (hud_chefe.gd),
 ## todo ataque tem aviso visual antes do golpe, e a luta tem três fases.
 ##
 ## A luta é uma máquina de estados simples (EstadoLuta) que roda em loop:

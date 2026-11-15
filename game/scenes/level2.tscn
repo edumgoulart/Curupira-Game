@@ -54,8 +54,9 @@ position = Vector2(-540, 244)
 position = Vector2(528, 340)
 alvo = NodePath("../Curupira")
 
-[node name="HUD" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("4_hud")]
+[node name="HUD" parent="." node_paths=PackedStringArray("curupira", "chefe") instance=ExtResource("4_hud")]
 curupira = NodePath("../Curupira")
+chefe = NodePath("../Cuca")
 
 [node name="MenuPausa" parent="." instance=ExtResource("5_pausa")]
 

@@ -42,6 +42,10 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   - a Cuca nova: o feitiço saindo da garra erguida, a poção da mão, as notas da boca, o
     bote deitada e, na derrota, o chip saltando do peito e a luz do chapéu apagando;
   - os tiros saindo da mão do Curupira nas 8 direções, dos dois lados, agachado e no ar;
+  - o HUD novo: a barra do chefe enchendo na entrada, o rastro claro a cada golpe, os
+    entalhes das fases, o nome do chefe cabendo na tela (o do Boto é o mais longo); o
+    coração tremendo ao levar golpe, o retrato mudando de cara e a onça acendendo com o
+    especial cheio;
   - os tiros dos chefes saindo do lugar certo: bola da boca da Mula, feitiço da garra da Cuca, jato do bico do Boto, laser da lente da Máquina;
   - a fase 2 (com 2/3 da vida) e a fase 3 (com 1/3) trazendo o ataque novo logo em seguida;
   - os ataques ganhos: com `LIBERAR_TUDO_PARA_TESTE` (`game_state.gd`) todos já aparecem
@@ -57,8 +61,9 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 - **Coração do Boto carrega o especial.** Estourar um coração com tiro conta como acerto,
   porque a hurtbox dele está na layer `enemy`. Decidir se é desejado.
 - **Regras desatualizadas.** O resumo de regras do `CLAUDE.md` e do `AGENTS.md` ainda diz
-  "estado único", "atira para onde está olhando" e que W/S não fazem nada. O GDD e o TDD já
-  estão atualizados. A dupla decide quando atualizar.
+  "estado único", "atira para onde está olhando", que W/S não fazem nada e que a vida do
+  chefe não aparece (agora há barra, a pedido do Eduardo). O GDD e o TDD já estão
+  atualizados. A dupla decide quando atualizar.
 - **Pulo × tamanho.** O Curupira tem ~204 px de altura e o pulo do GDD, ~215 px. Testar se
   dá para pular por cima dos ataques rasteiros; mudar `velocidade_pulo` é valor de combate e
   tem que sair do GDD.
@@ -73,7 +78,6 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 - **Bola de Fogo do jogador.** Usa a bola da Mula, que só tem o desenho de lado: na
   diagonal e para cima ela voa de lado. Desenhar no gerador, com uma imagem por direção,
   como a folha.
-- **HUD** ainda é desenhado por código (círculos e barra lisos), fora do estilo pixel.
 - **Arte antiga.** Foi para `art/antiga/` e saiu do jogo. Só as folhas do dash
   (`game/assets/efeitos/folha.png`) continuam em uso, e por isso o filtro padrão do projeto
   ainda é `Linear`.
