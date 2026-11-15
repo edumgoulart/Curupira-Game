@@ -155,7 +155,38 @@ const ORELHA = [
   '..S.'
 ];
 const MAPA_PELE = { S: PM.pele, d: PM.peleS, D: PM.peleD, L: PM.peleL, e: PM.peleD, r: PM.pintura };
+const TRONCO = [
+  '..SSSSSS..',
+  '.dSSSSSSS.',
+  'ddSSSSSSSL',
+  'ddSSrSSSSL',
+  'ddSSSrSrSS',
+  'ddSSSSSrSS',
+  'ddSSSSSSSS',
+  '.dSSSSSSSS',
+  '.dSSSSSSSL',
+  '.ddSSSSSS.',
+  '..ddSSSS..'
+];
+const SAIA = [
+  [
+    '.GG.GG.GG.GG.',
+    'GGlGGlGGlGGlG',
+    'gGGgGGgGGgGGl',
+    '.gG.gG.gG.gG.',
+    '..g..g..g..g.'
+  ],
+  [
+    '.GG.GG.GG.GG.',
+    'GGlGGlGGlGGlG',
+    'gGGgGGgGGgGGl',
+    'gG.gG.gG.gG..',
+    'g..g..g..g...'
+  ]
+];
 const MAPA_SAIA = { G: PM.verdeM, g: PM.verde, l: PM.verdeL };
+const PE = ['.SSSS.', 'SSSSSL', 'dddddd'];
+const PE_PONTA = ['SSS..', 'SSSS.', '.dSSS', '..ddd'];
 const PUNHO = ['.SS.', 'SSSL', 'dSSS', '.dd.'];
 const PALMA = ['S.S.', 'SSSS', 'SSSL', 'dSSS', '.dd.'];
 
@@ -323,90 +354,13 @@ function rostoPixel(cam, hx, hy, ex, t, piscando, olharExtra) {
   }
 }
 
-/* ---------- corpo: pernas retas, pé virado para trás, tronco de costas retas, saia de folhas ----------
-   O desenho escolhido nos rascunhos (art/pixel/rascunhos/curupira_rascunho.js, "moleque da mata"). */
-const CORPO = { peito: 4.6, costas: 4.2, coxa: 8.8, canela: 8.3, wCoxa: 5, wCanela: 4 };
-const ESTIRA = 2.5;
-const pintaSe = (c, x, y, cor, base) => { x = Math.floor(x); y = Math.floor(y); if (c.get(x, y) && (!base || c.get(x, y) === base)) c.set(x, y, cor); };
-// joelho por cinemática inversa
-function joelhoPx(a, b, L1, L2) {
-  const d = Math.min(Math.hypot(b.x - a.x, b.y - a.y), L1 + L2 - 0.01) || 0.01, u = unit(sub(b, a));
-  const ang = Math.acos(clamp((L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), -1, 1)) * 180 / Math.PI;
-  const k1 = soma(a, mul(rot(u, ang), L1)), k2 = soma(a, mul(rot(u, -ang), L1));
-  // o joelho fica do lado esquerdo de quem anda do quadril para o pé: para a frente com a perna em pé,
-  // para cima com o corpo agachado (nunca atravessa o chão)
-  const lado = rot(u, -90), s = k => (k.x - a.x) * lado.x + (k.y - a.y) * lado.y;
-  return s(k1) >= s(k2) ? k1 : k2;
-}
-// pé virado para trás: calcanhar redondo na frente (+x), dedos apontando para trás (-x).
-// ang > 0 é a ponta do pé descendo (pé no ar), como no rig.
-function pePx(c, k, ang, cores) {
-  const g = k.y + 2.6, R = (x, y) => soma(k, rot(pt(x, y - 2.6), -ang));
-  poli(c, [R(-1.6, -4.6), R(1.4, -4.6), R(2.6, -3.6), R(3.2, -1.8), R(2.6, 0), R(-5.6, 0), R(-5.8, -2.2), R(-3.6, -3.2)], cores.S);
-  for (const [dx, dy, rr] of [[-5.6, -1.6, 1.3], [-6.4, -0.9, 1.1], [-4.4, -2.4, 1.2]]) { const p = R(dx, dy); c.disco(p.x, p.y, rr, cores.S); }
-  return R;
-}
-function dedosPx(c, R, cores) {
-  for (const [x, y, cor] of [[-4.5, -2.5, cores.d], [-5.5, -1.5, cores.d], [-7.5, -0.5, PM.peleLL], [-6.5, -1.5, PM.peleLL], [-5.5, -2.5, PM.peleLL],
-    [2.5, -2.5, cores.L], [2.5, -1.5, cores.L], [-0.5, -3.5, cores.d]]) { const p = R(x, y); pintaSe(c, p.x, p.y, cor); }
-}
-function pernaPx(cam, quadril, peRig, ang, cores) {
-  const c = new Camada(QW, QH), k = soma(peRig, pt(0, -1.2));
-  // perna reta: perto da altura normal, coxa e canela somam só um pouco mais que a distância e o
-  // joelho quase não dobra; quando o pé chega perto do quadril (agachado, pulo), dobra de verdade
-  const L = CORPO.coxa + CORPO.canela, d = Math.hypot(k.x - quadril.x, k.y - quadril.y), r = d / L;
-  const kL = r >= 0.85 ? Math.min(1, r * 1.015) : r <= 0.6 ? 1 : mix(1, 0.86, (r - 0.6) / 0.25);
-  const joelho = joelhoPx(quadril, k, CORPO.coxa * kL, CORPO.canela * kL);
-  c.traco([quadril, joelho], CORPO.wCoxa, cores.S);
-  c.traco([joelho, k], CORPO.wCanela, cores.S);
-  const R = pePx(c, k, ang, cores);
-  c.sombrear(cores.S, cores.d, cores.L);
-  dedosPx(c, R, cores);
-  cam.colar(c.contornar(PM.peleO));
-}
-function troncoPx(c, T, H, pescoco) {
-  const p = CORPO.peito, k = CORPO.costas;
-  // a linha das costas desce reta: sem barriga para a frente nem bunda para trás
-  poli(c, [T(-k + 0.4, 1.5), T(-k, -3), T(-k - 0.2, -H * 0.6), T(-k + 0.6, -H + 1.2), T(-k + 2, -H), T(1.5, -H), T(p - 1, -H + 1),
-    T(p, -H * 0.72), T(p - 0.4, -H * 0.45), T(p - 1, -H * 0.2), T(p - 0.6, 1.5)], PM.pele);
-  c.traco(pescoco, 3.6, PM.pele);
-  c.sombrear(PM.pele, PM.peleS, PM.peleL);
-  for (let x = 0.2; x <= p - 1.2; x += 0.5) { const m = T(x, -H * 0.55 - (x - p) * 0.12); pintaSe(c, m.x, m.y, PM.peleS, PM.pele); }
-  const u = T(p - 1.6, -H * 0.22); pintaSe(c, u.x, u.y, PM.peleS);
-}
-// seis folhas finas penduradas na corda, compridas e curtas alternadas; o vento (saia) puxa as pontas para trás
-function saiaPx(cam, T, t, saia, agita) {
-  const n = 6, comp = 5.6, puxa = saia / 10, tras = new Camada(QW, QH), frente = new Camada(QW, QH);
-  const Tc = (x, y) => { const q = T(x, y); return pt(q.x, Math.min(q.y, OY)); };
-  for (const i of [0, 2, 4, 1, 3, 5]) {
-    const u = i / (n - 1), x = mix(-CORPO.costas - 0.6, CORPO.peito + 0.4, u);
-    const len = comp * (i % 2 ? 0.62 : 1.08) * (0.9 + 0.2 * hash(i * 3.1 + 7));
-    const abre = (u - 0.45) * 4.6 - puxa + Math.sin(t * 7 * agita + i * 1.7) * 0.5 * agita;
-    const c = u < 0.3 ? tras : frente, cor = u < 0.3 ? (i % 2 ? PM.verde : PM.verdeD) : (i % 2 ? PM.verdeM : PM.verde);
-    poli(c, [Tc(x - 1, -1.6), Tc(x + 1, -1.6), Tc(x + 1.7 + abre * 0.5, len * 0.45), Tc(x + abre, len + 1.8), Tc(x - 1.7 + abre * 0.5, len * 0.45)], cor);
-    if (c === frente) for (let s = 0; s < len * 0.8; s += 0.7) { const q = Tc(x + abre * s / len * 0.8, s); if (frente.get(Math.floor(q.x), Math.floor(q.y)) === cor) frente.set(q.x, q.y, PM.verdeL); }
-  }
-  cam.colar(tras.contornar(PM.verdeO)); cam.colar(frente.contornar(PM.verdeO));
-  for (let x = -CORPO.costas - 0.5; x <= CORPO.peito + 0.5; x += 0.5) { const q = T(x, -2); cam.set(q.x, q.y, Math.floor(x * 2) % 3 ? PM.corda : PM.cordaL); }
-  const no = T(CORPO.peito - 0.2, -1.4); cam.set(no.x, no.y, PM.cordaL); cam.set(no.x, no.y + 1, PM.corda);
-}
-// braçadeira de corda no braço da frente, um pouco acima do cotovelo
-function bracadeiraPx(c, pts) {
-  const m = pts[4], n = unit(rot(sub(pts[5], pts[3]), 90));
-  for (let s = -2; s <= 2; s++) { pintaSe(c, m.x + n.x * s, m.y + n.y * s, PM.corda); pintaSe(c, m.x + n.x * s + 0.4, m.y + n.y * s + 1, PM.cordaL); }
-}
-
 /* ---------- corpo inteiro ----------
    Devolve a camada do quadro (pés na linha OY), a mão da frente e as pontas do fogo, em pixels. */
 const QW = 84, QH = 92, OX = 40, OY = 86;
 function curupiraPixel(pose, t, piscando = false, virados = false, exForcada = '') {
   const v = E5, cam = new Camada(QW, QH);
+  const P = l => ({ x: OX + l.x * SM, y: OY + l.y * SM });
   const q0 = pose.quadril, inc = pose.inclina || 0;
-  // pernas mais compridas que as do rig: tudo do quadril para cima sobe ESTIRA px, os pés ficam.
-  // Diminui quando o quadril desce (agachado, deitado), para o corpo não flutuar acima do chão.
-  const estira = ESTIRA * clamp(-q0.y / 51, 0, 1);
-  const P = l => ({ x: OX + l.x * SM, y: OY + l.y * SM - estira });
-  const Pe = l => ({ x: OX + l.x * SM, y: OY + l.y * SM });
   const W = d => soma(q0, rot(d, inc));
   // agachado (comprime = 1): o tronco encolhe e a cabeça desce junto, como borracha
   const comp = pose.comprime || 0, Tc = v.tronco * (1 - 0.4 * comp);
@@ -417,7 +371,7 @@ function curupiraPixel(pose, t, piscando = false, virados = false, exForcada = '
   const ex = exDe(exForcada || pose.ex);
   const rampaTras = { S: PM.peleS, d: PM.peleD, D: PM.peleD, L: PM.pele, e: PM.peleD };
 
-  // membro de mangueira em pixels (braços): mesma curva do rig, traço grosso, sombra embaixo
+  // membro de mangueira em pixels: mesma curva do rig, traço grosso, sombra embaixo
   const membroPx = (a, b, L, lado, w, cores) => {
     const parte = new Camada(QW, QH);
     const d = Math.hypot(b.x - a.x, b.y - a.y) || 0.01, h = Math.sqrt(Math.max(0, 3 * d * (L - d) / 8));
@@ -426,12 +380,17 @@ function curupiraPixel(pose, t, piscando = false, virados = false, exForcada = '
     for (let k = 0; k <= 12; k++) { const u = k / 12; pts.push(P(pt((1 - u) ** 2 * a.x + 2 * u * (1 - u) * c.x + u * u * b.x, (1 - u) ** 2 * a.y + 2 * u * (1 - u) * c.y + u * u * b.y))); }
     parte.traco(pts, w, cores.S);
     parte.sombrear(cores.S, cores.d, cores.L);
-    parte.pts = pts;
     return parte;
   };
   const mao = (parte, c, forma, cores) => {
     const linhas = forma === 'palma' ? PALMA : PUNHO, p = P(c);
     parte.carimbo(linhas, Math.round(p.x - 2), Math.round(p.y - linhas.length / 2), cores);
+  };
+  const pePx = (parte, pe, cores) => {
+    const p = P(pe.p), ponta = Math.abs(pe.ang) > 28;
+    const linhas = ponta ? PE_PONTA : PE;
+    const esp = virados;
+    parte.carimbo(linhas, Math.round(p.x - (esp ? 4 : 2)), Math.round(p.y - linhas.length + 2), cores, esp);
   };
   const corTras = { S: PM.peleS, d: PM.peleD, L: PM.pele }, corFrente = { S: PM.pele, d: PM.peleS, L: PM.peleL };
 
@@ -439,20 +398,34 @@ function curupiraPixel(pose, t, piscando = false, virados = false, exForcada = '
   let parte = membroPx(o.longe, maoL, bl[0], cot[0], 2.6, corTras);
   mao(parte, maoL, formas[0], rampaTras);
   cam.colar(parte.contornar(PM.peleO));
-  // 2. perna de trás e 3. perna da frente (retas, com o pé virado para trás)
-  pernaPx(cam, P(W(pt(-3, 0))), Pe(peL.p), peL.ang, corTras);
-  pernaPx(cam, P(W(pt(3, 0))), Pe(peP.p), peP.ang, corFrente);
-  // 4. tronco de costas retas e pescoço (até a nuca, atrás do queixo)
+  // 2. perna de trás e 3. perna da frente
+  parte = membroPx(W(pt(-3, 0)), peL.p, v.perna, -1, 3.2, corTras);
+  pePx(parte, peL, rampaTras);
+  cam.colar(parte.contornar(PM.peleO));
+  parte = membroPx(W(pt(3, 0)), peP.p, v.perna, -1, 3.2, corFrente);
+  pePx(parte, peP, MAPA_PELE);
+  cam.colar(parte.contornar(PM.peleO));
+  // 4. tronco: inclina deslocando linhas inteiras (nada de rotação livre)
+  parte = new Camada(QW, QH);
+  const q = P(q0), s = Math.sin(inc * Math.PI / 180);
+  const nl = Math.round(TRONCO.length - 4 * comp);
+  const linhasT = Array.from({ length: nl }, (_, i) => TRONCO[Math.floor(i * TRONCO.length / nl)]);
+  linhasT.forEach((linha, i) => {
+    const r = nl - 1 - i, dx = Math.round(r * s);
+    parte.carimbo([linha], Math.round(q.x - 5 + dx), Math.round(q.y - nl + 1 + i), MAPA_PELE);
+  });
+  cam.colar(parte.contornar(PM.peleO));
+  // 5. saia de folhas e corda
+  parte = new Camada(QW, QH);
+  const fase = Math.floor(t * 7 * (pose.agita ?? 1)) % 2, puxa = Math.round((pose.saia || 0) / 16);
+  const saia = SAIA[fase].map((l, i) => i >= 3 && puxa > 0 ? l.slice(puxa) + '.'.repeat(puxa) : l);
+  parte.carimbo(saia, Math.round(q.x - 6), Math.round(q.y - 1), MAPA_SAIA);
+  cam.colar(parte.contornar(PM.verdeO));
+  for (let x = -6; x <= 6; x++) cam.set(Math.round(q.x + x), Math.round(q.y - 2), x % 3 ? PM.corda : PM.cordaL);
+  // 6. cabeça e orelha
   const cb = pose.cabeca || {};
   const hcL = W(pt(v.cabecaDx + (cb.dx || 0), -Tc - v.cabeca * 0.7 + (cb.dy || 0)));
   const hc = P(hcL), hx = Math.round(hc.x - 9.5), hy = Math.round(hc.y - 9);
-  const q = P(q0), H = Tc * SM, T = (x, y) => soma(q, rot(pt(x, y), inc));
-  parte = new Camada(QW, QH);
-  troncoPx(parte, T, H, [T(0.9, -H + 0.6), pt(hx + 8.5, hy + 15.5)]);
-  cam.colar(parte.contornar(PM.peleO));
-  // 5. saia de folhas e corda
-  saiaPx(cam, T, t, pose.saia || 0, pose.agita ?? 1);
-  // 6. cabeça e orelha
   parte = new Camada(QW, QH);
   parte.carimbo(ORELHA, hx - 2, hy + 8, MAPA_PELE);
   cam.colar(parte.contornar(PM.peleO));
@@ -472,11 +445,8 @@ function curupiraPixel(pose, t, piscando = false, virados = false, exForcada = '
   }
   // 10. braço da frente
   parte = membroPx(o.perto, maoP, bl[1], cot[1], 2.8, corFrente);
-  bracadeiraPx(parte, parte.pts);
   mao(parte, maoP, formas[1], MAPA_PELE);
   cam.colar(parte.contornar(PM.peleO));
-  // agachado e deitado, joelho, mão e quadril encostam no chão: nada passa da linha do contorno
-  for (let y = OY + 1; y < QH; y++) for (let x = 0; x < QW; x++) cam.apagar(x, y);
   return { cam, mao: P(maoP), pontas };
 }
 

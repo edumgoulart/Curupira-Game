@@ -22,11 +22,6 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     batom, e um sobretudo ameixa de gola alta com forro vermelho. O chip vai cravado no peito
     e há uma luz vermelha na faixa de metal do chapéu, que se apaga quando o chip salta na
     derrota. A célula da folha agora é 134×120.
-  - Na quinta rodada, o Curupira ganhou um corpo novo, o "moleque da mata" dos rascunhos
-    (`art/pixel/rascunhos/curupira_versoes.png`), sem a tornozeleira. A cabeça é a mesma de antes.
-    O que mudou: costas retas, pernas retas, mais compridas e mais grossas, pés virados para trás,
-    saia de folhas finas e braçadeira de corda no braço da frente. Tudo do quadril para cima sobe
-    2,5 px (`ESTIRA` em `desenho.js`), e por isso o sprite parado ficou com ~212 px de altura.
   - Os `*_frames.tres` são gerados por script (`art/pixel/gerar_spriteframes.gd`). É exceção
     à regra do `CLAUDE.md` (SpriteFrames é do Arthur): mudar o desenho no gerador e gerar
     de novo, em vez de editar à mão.
@@ -47,8 +42,6 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   - a Cuca nova: o feitiço saindo da garra erguida, a poção da mão, as notas da boca, o
     bote deitada e, na derrota, o chip saltando do peito e a luz do chapéu apagando;
   - os tiros saindo da mão do Curupira nas 8 direções, dos dois lados, agachado e no ar;
-  - o Curupira novo: os pés virados para trás no chão (sem afundar nem flutuar), o agachado
-    sem nada passando do chão, e a derrota sentada;
   - os tiros dos chefes saindo do lugar certo: bola da boca da Mula, feitiço da garra da Cuca, jato do bico do Boto, laser da lente da Máquina;
   - a fase 2 (com 2/3 da vida) e a fase 3 (com 1/3) trazendo o ataque novo logo em seguida;
   - os ataques ganhos: com `LIBERAR_TUDO_PARA_TESTE` (`game_state.gd`) todos já aparecem
@@ -66,7 +59,7 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 - **Regras desatualizadas.** O resumo de regras do `CLAUDE.md` e do `AGENTS.md` ainda diz
   "estado único", "atira para onde está olhando" e que W/S não fazem nada. O GDD e o TDD já
   estão atualizados. A dupla decide quando atualizar.
-- **Pulo × tamanho.** O Curupira tem ~212 px de altura e o pulo do GDD, ~215 px. Testar se
+- **Pulo × tamanho.** O Curupira tem ~204 px de altura e o pulo do GDD, ~215 px. Testar se
   dá para pular por cima dos ataques rasteiros; mudar `velocidade_pulo` é valor de combate e
   tem que sair do GDD.
 - **Boto.** O arco do salto (520 px, `boto_data.gd`) foi pensado para o Curupira antigo.
