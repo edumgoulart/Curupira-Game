@@ -21,6 +21,7 @@ Este documento descreve **como** o jogo é construído. O **o quê** (regras, n�
 - Os ataques ganhos dos chefes, os menus (fonte, botões, título, fundo) e as áreas de dano passaram para a pixel art; a arte antiga foi para `art/antiga/` (seções 7, 10 e 11).
 - **Dificuldade Normal/Expert** escolhida na seleção. As fases de cada chefe dependem dela, os ataques saem embaralhados e às vezes em **combo**, e a troca de fase tem **transição** (seção 8.4). Golpes com retorno visual: pisca branco, faísca, tremor (6.5 e 8.1).
 - **Avisos mais longos** em todos os ataques dos chefes (8.3) e a Canção de ninar virou uma melodia de notas soltas. Sem marca na tela cobrindo a área do golpe (8.1): a Mula ganhou uma investida com a pata raspando a terra e um brilho no céu antes de cada meteoro. O Boto afunda na água até o bico ficar na altura do jato, que sai reto, e o aviso é a água crescendo no bico; em volta dele a água se mexe e respinga (8.3, 9 e 10.5).
+- **Boto mais difícil** (pedido do Eduardo). O chapéu perdeu a linha de aviso: o Boto tira o chapéu com a nadadeira e segura na altura da ida, e o chapéu sai reto dela. O salto ganhou uma segunda forma, o rasante (baixo e reto, abaixa-se), e o salto por cima solta cinco bolhas mais rápidas. Os corações perseguem o Curupira, e o que encosta encanta: puxa o Curupira para o Boto por 1 s (7.6 e 8.3).
 
 ---
 
@@ -299,8 +300,11 @@ Não existe um componente `StatusEffects`. Cada alvo trata o efeito no próprio 
 |---|---|---|
 | Veneno | `Timer` de 1 s: um pulso de dano por segundo; reaplicar só renova o número de pulsos. Chefe fica esverdeado | Só pela poça da Cuca (abaixo) |
 | Lentidão | `fator_tempo()` = `1 − lentidão` (0,6). O sequenciador multiplica o `delta` por ele: avisos, pausas, corridas e cadência ficam mais lentos, e as animações tocam mais devagar (`speed_scale`). Projéteis já soltos não mudam. Chefe fica azulado | `aplicar_lentidao(fonte, fator)` / `remover_lentidao(fonte)` com dicionário por fonte; vale o menor fator. Reduz velocidade horizontal e cadência do tiro. Pulo e dash não mudam |
+| Encanto | Não existe | `_ao_receber_efeito(&"encanto", intensidade, duracao)`: guarda `_tempo_encanto` e `_puxao_encanto`. Enquanto dura, `velocity.x = puxão × fator_lentidao()` e ele olha para o lado do puxão; não anda, não abaixa e não dá dash. Pulo e tiro valem. Chegando durante um dash, é ignorado (dash dá invencibilidade). `EfeitoEncanto` (`efeito_encanto.gd`, criado no `_ready`) tinge o Curupira de rosa e solta coraçõezinhos subindo |
 
-**[Aberto]** Extrair um `StatusEffects` só compensa se aparecer um terceiro tipo de alvo ou um efeito novo.
+O encanto vem do coração do Boto (`coracao_boto.gd`, `_ao_acertar`): ele chama `aplicar_efeito(&"encanto", lado × forca_encanto, duracao_encanto)` na hurtbox que tocou, sem saber de quem é. O sinal da intensidade dá o lado do puxão (para onde o Boto estava quando soltou o coração, `x_origem`). Assim o coração continua sendo só uma hitbox, e quem decide o que o encanto faz é o Curupira.
+
+**[Aberto]** Extrair um `StatusEffects` só compensa se aparecer um terceiro tipo de alvo. O encanto é um efeito novo, mas só existe no Curupira.
 
 Poças da Cuca (`PocaCuca`, `Area2D`, layer `enemy_hitbox`, mask `player`) **[Implementado]**:
 - Duram 5 s; no máximo 2 na arena (ao criar a 3ª, a mais antiga some).
@@ -317,8 +321,8 @@ Poças da Cuca (`PocaCuca`, `Area2D`, layer `enemy_hitbox`, mask `player`) **[Im
    - **Não há marca na tela cobrindo a área do golpe.** Uma versão teve (faixas listradas, alvos no chão, miras), e o Eduardo pediu para tirar: deixava fácil demais.
    - Ficam só os avisos do que vem de fora da vista ou é mirado:
      - o brilho no céu de cada meteoro (`meteoro.gd`);
-     - a linha fina do laser e da varredura (`laser_maquina.gd`);
-     - a linha da altura do chapéu do Boto (`boto.gd`, `_linha_de_aviso`). O jato não tem linha: o próprio Boto mostra a altura, afundando até o bico ficar nela.
+     - a linha fina do laser e da varredura (`laser_maquina.gd`).
+     O jato e o chapéu do Boto não têm linha: o próprio Boto mostra a altura, afundando ou subindo até o bico (jato) ou a nadadeira com o chapéu (chapéu) ficar nela.
      Todas ficam no grupo `ataques_chefe` e somem na transição e na derrota.
 3. Os ataques mais fortes terminam com o chefe parado, cansado ou tonto (janela de ataque).
 4. **[Divergente]** As fases dependem da dificuldade (GDD, Escolha antes da fase): Normal = 1 fase (Máquina: 2); Expert = 2 fases (Máquina: 3). A v0.2 e o `CLAUDE.md` ainda falam em "estado único".
@@ -391,9 +395,9 @@ A coluna Fase é a ordem em que os ataques entram nas lutas com mais fases (Máq
 | Cuca | 2 | `bote` | 0,9 s | 1 | Bote de jacaré: avança a 1100 px/s até 150 px da parede do lado do Curupira (`margem_parede_bote`), levanta e fica lá (provisório) |
 | Cuca | 3 | `ninar` | 0,9 s | 1 cada | Melodia de 6 notas soltas, uma a cada 0,7 s, a 400 px/s: grave (36 px do chão, laranja; pula-se) ou aguda (128 px, azul; abaixa-se), 50/50 (provisório) |
 | Boto | 1 | `jato` | 0,9 s | 1 | Sorteia alto (130 px do chão, dura 0,5 s; abaixa-se) ou baixo (40 px, dura 0,35 s; pula-se), 50/50. No começo do aviso afunda (ou sobe) na água até o bico, na pose `jato`, ficar na altura sorteada (0,3 s, `ajuste_jato`); o alto afunda ~70 px e o baixo ~160 px, só com a cabeça para fora. Nos 0,5 s finais (`crescida_jato`), a água sai do bico fina e vai crescendo (`jato_crescendo`). O jato sai reto do bico; no `fim_jato` ele volta para a linha d'água (também no combo). Depois fica parado 1,2 s (provisório) |
-| Boto | 1 | `beijos` | 0,6 s | 1 cada | 4 corações em onda (280 px/s), um a cada 0,45 s; dá para estourar com tiro (provisório) |
-| Boto | 2 | `chapeu` | 0,8 s | 1 | Chapéu bumerangue: vai baixo (40 px) e volta alto (140 px), ou o contrário (50/50), 0,9 s cada trecho (provisório). Aviso: linha fina na altura da ida |
-| Boto | 3 | `salto` | 0,8 s | 1 cada bolha | Mergulha e pula para o outro lado (1,4 s, arco de 520 px) soltando 3 bolhas que descem a 120 px/s (provisório) |
+| Boto | 1 | `beijos` | 0,6 s | 1 cada | 4 corações, um a cada 0,45 s, que perseguem o Curupira a 240 px/s virando no máximo 90°/s (curva larga, dá para despistar) e ondulam para os lados (24 px, 0,9 Hz). Estouram com tiro ou depois de 6 s. O que encosta também encanta: puxa o Curupira para o lado do Boto a 300 px/s por 1 s (7.6) (provisório) |
+| Boto | 2 | `chapeu` | 0,8 s | 1 | Chapéu bumerangue: vai baixo (40 px) e volta alto (140 px), ou o contrário (50/50), 0,9 s cada trecho (provisório). Aviso: `aviso_chapeu` (tira o chapéu e puxa o braço para trás) e `segura_chapeu` (segura, tremendo). No começo do aviso afunda ou sobe até a nadadeira, no último quadro do `arremesso`, ficar na altura da ida (0,3 s, `ajuste_chapeu`). O chapéu sai reto da nadadeira; no `fim_arremesso` ele volta para a linha d'água |
+| Boto | 3 | `salto` | 0,8 s | 1 cada bolha; contato no rasante | Duas formas, 50/50 (`chance_rasante`). Por cima: `mergulho` (afunda reto) e pula para o outro lado (1,4 s, arco de 520 px) soltando 5 bolhas que descem a 200 px/s balançando 48 px a 1,6 Hz. Rasante: `aviso_rasante` (deita para a frente e bate a cauda, 0,8 s) e atravessa deitado em 1,2 s, com a barriga 120 px acima da areia (entre o Curupira agachado, 86, e em pé, 172); sobe e desce só nos 12% das pontas, sobre a água. Abaixar ou dash (provisório) |
 | Máquina | 1 | `laser` | 1 s | 1 | Linha fina segue o Curupira e trava 0,3 s antes; laser dura 0,4 s |
 | Máquina | 1 | `bombas` | animação `aviso_bombas` | 2 | 3 alçapões abrem no teto e soltam bombas (1 no Curupira, 2 a ±300 px), que explodem 1,5 s depois no chão (raio 180); parada 1,2 s |
 | Máquina | 2 | `pistoes` | 0,9 s | 1 | Duas ondas de placas sobem do chão de um lado ao outro (960 px/s, a 2ª 1,25× mais rápida); cada placa avisa 0,4 s antes (provisório) |
@@ -438,7 +442,7 @@ A v0.2 tinha um `enum Estado` com um valor por passo de cada ataque (`AVISO_BOLA
 
 ### 8.5 Valores no código
 
-Números de balanceamento ficam em `Resource` (`ChefeData` → `MulaData`, `CucaData`, `BotoData`, `MaquinaData`; `AtaqueData`; `EspecialData`; `MovimentoData`; `VidaJogadorData`), editáveis no inspetor. Ficam como `const` só valores visuais ou ligados ao desenho: cores de aviso, tempo e força do pisca, tremores e clarão (`PISCA_*`, `TREMOR_*`, `TRANCO_PX`, `INTERVALO_SUSTO`), a linha de aviso do chapéu do Boto (`COR_LINHA_AVISO`, `ESPESSURA_LINHA_AVISO`, `PISCA_LINHA_AVISO`, `INICIO_LINHA_AVISO`), o pisca da água crescendo no bico (`PISCA_CRESCIDA`), quanto o Boto precisa mexer para a água respingar (`MOVIMENTO_RESPINGO`) e a volta à linha d'água na derrota (`VOLTA_NA_DERROTA`), o brilho do meteoro (`MARGEM_BRILHO`, `PISCA_BRILHO_*`), `QUADRO_PISADA` e `QUADRO_PISADA_TRANSICAO` (em que quadro a pata bate no chão), `DURACAO_POSE_ATAQUE` e `DURACAO_POSE_DANO` do Curupira. **[Aberto]** Mover as duas durações de pose para o `MovimentoData`.
+Números de balanceamento ficam em `Resource` (`ChefeData` → `MulaData`, `CucaData`, `BotoData`, `MaquinaData`; `AtaqueData`; `EspecialData`; `MovimentoData`; `VidaJogadorData`), editáveis no inspetor. Ficam como `const` só valores visuais ou ligados ao desenho: cores de aviso, tempo e força do pisca, tremores e clarão (`PISCA_*`, `TREMOR_*`, `TRANCO_PX`, `INTERVALO_SUSTO`), o pisca da água crescendo no bico (`PISCA_CRESCIDA`), quanto o Boto precisa mexer para a água respingar (`MOVIMENTO_RESPINGO`) e a volta à linha d'água na derrota (`VOLTA_NA_DERROTA`), o brilho do meteoro (`MARGEM_BRILHO`, `PISCA_BRILHO_*`), `QUADRO_PISADA` e `QUADRO_PISADA_TRANSICAO` (em que quadro a pata bate no chão), `DURACAO_POSE_ATAQUE` e `DURACAO_POSE_DANO` do Curupira. **[Aberto]** Mover as duas durações de pose para o `MovimentoData`.
 
 ### 8.6 Derrota do chefe **[Implementado]**
 
@@ -550,7 +554,7 @@ Cenas de ataque dos chefes:
 |---|---|
 | Mula | `bola_de_fogo_mula`, `onda_fogo_mula`, `meteoro` (o brilho no céu é criado no `meteoro.gd`, com `brilho_meteoro_1..12.png`), `explosao_mula`, `poeira_mula` |
 | Cuca | `feitico_cuca`, `pocao_cuca`, `poca_cuca`, `nota_cuca`, `vidro_cuca` |
-| Boto | `jato_boto` (meio repetido em `region` + ponta), `coracao_boto`, `coracao_estoura_boto`, `chapeu_boto`, `bolha_boto`, `respingo_boto`. Criados no código: a água em volta dele (`agua_boto.gd`, ver 9) e a água crescendo no bico no aviso do jato (`jato_crescendo_1..16.png`: 8 tamanhos × 2 variantes, quadro = tamanho × 2 + variante) |
+| Boto | `jato_boto` (meio repetido em `region` + ponta), `coracao_boto`, `coracao_estoura_boto`, `chapeu_boto`, `bolha_boto`, `respingo_boto`. Criados no código: a água em volta dele (`agua_boto.gd`, ver 9) e a água crescendo no bico no aviso do jato (`jato_crescendo_1..16.png`: 8 tamanhos × 2 variantes, quadro = tamanho × 2 + variante). No Curupira, o `EfeitoEncanto` usa o `coracao_1.png` do Boto (7.6) |
 | Máquina | `laser_maquina`, `bomba_maquina`, `explosao_maquina`, `placa_maquina`, `alcapao_maquina`, `faiscas_maquina` |
 | Curupira (ataques ganhos) | `projetil_feitico_perseguidor`, `projetil_bolha_agua`, `projetil_bolha_abissal`, `projetil_pocao_maldita`, `feixe_canhao`, `respingo_agua`, `respingo_veneno`; a Bola de Fogo usa a bola e a explosão da Mula |
 
@@ -655,7 +659,7 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 - **Liberar tudo para testar**: `GameState.LIBERAR_TUDO_PARA_TESTE = true` libera a Máquina e todos os ataques na seleção, sem vencer as fases. Só vale em build de debug (`OS.is_debug_build()`); o jogo exportado ignora. Pôr `false` para testar a progressão de verdade.
 - **`testes/teste_lutas.gd`** **[Implementado]**: roda as quatro arenas no Normal e depois no Expert, 60 s cada, com o Curupira invencível, andando, agachando, mirando e atirando, e tira vida do chefe aos poucos. Imprime as trocas de fase e a ordem das jogadas (`a+b` = combo, `[TRANSICAO]`); qualquer erro de script aparece no log. Rodar com o editor fechado (ou numa cópia de `game/`):
   `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/teste_lutas.gd`
-- **`testes/verificar_desvio.gd`** **[Implementado]**: responde "dá para desviar?" para cada ataque e cada combo das fases, e qual o menor atraso de combo que ainda dá. Grava a luta de verdade (cena, scripts, projéteis) com um boneco no lugar do Curupira, força o ataque ou combo e marca, quadro a quadro, as caixas de dano ligadas numa grade de 8 px. Depois procura uma sequência de comandos (parado, andar, pular, pulo curto, abaixar, dash) com a física do `MovimentoData` e a hurtbox real, primeiro sem dash. Como os chefes miram no Curupira, grava de novo com o boneco seguindo o caminho achado e confere. Testa 3 posições iniciais × 2 sorteios. "FALHOU" = não achou caminho (pode ser impossível ou apertado demais). Também mostra em quantos casos o Curupira parado leva golpe (prova de que a gravação pega o ataque). Leva ~5 min:
+- **`testes/verificar_desvio.gd`** **[Implementado]**: responde "dá para desviar?" para cada ataque e cada combo das fases, e qual o menor atraso de combo que ainda dá. Grava a luta de verdade (cena, scripts, projéteis) com um boneco no lugar do Curupira, força o ataque ou combo e marca, quadro a quadro, as caixas de dano ligadas numa grade de 8 px. Depois procura uma sequência de comandos (parado, andar, pular, pulo curto, abaixar, dash) com a física do `MovimentoData` e a hurtbox real, primeiro sem dash. Como os chefes miram no Curupira, grava de novo com o boneco seguindo o caminho achado e confere. Testa 3 posições iniciais × 2 sorteios (`SORTEIOS`, sementes 11 e 44: o primeiro número de cada uma dá 0,83 e 0,30, então as duas formas dos ataques sorteados 50/50 entram, como jato alto e baixo, chapéu normal e invertido, salto por cima e rasante). O boneco não atira, então coisas que se estouram com tiro (corações do Boto) contam como sólidas. "FALHOU" = não achou caminho (pode ser impossível ou apertado demais). Também mostra em quantos casos o Curupira parado leva golpe (prova de que a gravação pega o ataque). Leva ~5 min:
   `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/verificar_desvio.gd`
   Filtros depois de `--`: `chefe=mula`, `dificuldade=1`, `so=combos` ou `so=ataques`, `rapido` (sem procurar o atraso mínimo), `depurar`.
 - **Cheats de debug (`OS.is_debug_build()`): não implementados [Aberto]**: invencibilidade, carga total do especial, pular para a próxima fase do chefe, desbloquear todos os ataques. Sugestão: autoload `Debug` removível do build.
@@ -687,6 +691,7 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 | Valores "provisório" dos ataques novos | Combate pode estar fácil ou difícil demais | Fechar no GDD (Q16) depois de testar |
 | Fases e combos (chance, atraso, pausa, limiares) | Ritmo da luta | Fechar no GDD (Q16) depois de testar; valores em 8.2 |
 | Trava de mira sem botão no controle | Controle | Escolher o botão (GDD Q15) |
+| Combos do Boto que começam com `beijos` | O `verificar_desvio.gd` não acha desvio com o Curupira em x = 480 (colado na água) desde que os corações perseguem; o boneco não atira | Testar no F6; se for injusto, baixar `curva_beijo` ou `quantidade_beijos`, ou subir o atraso desses combos |
 | Coração do Boto carrega o especial | Pode ser exploit | Decidir; se não, tirar a hurtbox do coração do sinal de acerto |
 | Folhas do dash com a arte antiga | Mistura de estilos | Gerar no `art/pixel/gerador` |
 | `CLAUDE.md` diz "chefes com estado único" | Instrução desatualizada | Atualizar o resumo de regras do `CLAUDE.md` |

@@ -1,8 +1,9 @@
 class_name ChapeuBoto
 extends Hitbox
-## Chapéu bumerangue do Boto: vai baixo até perto da parede do outro lado e volta alto até
-## a cabeça dele, girando. Layer enemy_hitbox; mask player.
-## Desvia-se pulando na ida e abaixando (ou ficando embaixo) na volta.
+## Chapéu bumerangue do Boto: sai da nadadeira dele e vai reto, numa altura, até perto da
+## parede do outro lado, e volta na outra altura até ele, girando. Layer enemy_hitbox; mask player.
+## O Boto sorteia a ordem (baixa e alta, ou alta e baixa) e solta o chapéu já na altura da ida.
+## Desvia-se pulando a baixa e abaixando na alta.
 ## Quem lança chama lancar(); o Boto espera o sinal "voltou" para pegar o chapéu.
 
 signal voltou
@@ -16,7 +17,7 @@ var _duracao_volta: float = 0.9
 var _tempo: float = 0.0
 
 
-## saida: de onde sai (a nadadeira). virada: onde ele vira (baixo, perto da parede).
+## saida: de onde sai (a nadadeira). virada: onde ele vira (perto da parede, na altura da ida).
 ## chegada: o node que ele procura na volta (o Boto). altura_volta: quanto acima do chão volta.
 func lancar(saida: Vector2, virada: Vector2, chegada: Node2D, altura_volta: float, duracao_ida: float, duracao_volta: float) -> void:
 	_saida = saida
@@ -36,13 +37,13 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_tempo += delta
 	if _tempo < _duracao_ida:
-		# Ida: desce logo para a altura baixa e corre até a virada.
+		# Ida: corre até a virada. Se saiu fora da altura da ida, chega nela no primeiro terço.
 		var u: float = _tempo / _duracao_ida
 		var x: float = lerpf(_saida.x, _virada.x, 1.0 - pow(1.0 - u, 2.0))
 		var y: float = lerpf(_saida.y, _virada.y, clampf(u * 3.0, 0.0, 1.0))
 		global_position = Vector2(x, y)
 		return
-	# Volta: sobe até a altura alta e vem até a cabeça do Boto.
+	# Volta: vai para a outra altura e vem até o Boto.
 	var v: float = clampf((_tempo - _duracao_ida) / _duracao_volta, 0.0, 1.0)
 	var destino: Vector2 = _chegada.global_position if is_instance_valid(_chegada) else _saida
 	var alto: float = _virada.y - _altura_volta

@@ -9,12 +9,18 @@ extends Chefe
 ##             altura, incha puxando água, e a água começa a sair do bico, fina, crescendo.
 ##             Então o jato sai reto da boca até a outra margem. Volta para a linha d'água no
 ##             fim do jato e fica parado (janela);
-##   beijos  — faz bico (aviso) e manda N corações lentos e ondulando; um tiro estoura cada um;
-##   chapeu  — gira o chapéu (aviso; a linha fina mostra a altura da ida) e arremessa.
-##             Sorteia a ordem: vai baixo e volta alto, ou vai alto e volta baixo. Ele pega
-##             de volta;
-##   salto   — brilha e mergulha (aviso) e salta num arco por cima da areia até o outro lado,
-##             soltando bolhas. Cada bolha desce devagar balançando.
+##   beijos  — faz bico (aviso) e manda N corações que perseguem o Curupira ondulando; um
+##             tiro estoura cada um. O que encosta, além do golpe, encanta: puxa o Curupira
+##             para o lado do Boto por um tempo (CoracaoBoto, curupira.gd);
+##   chapeu  — sorteia a ordem: vai baixo e volta alto, ou vai alto e volta baixo. No aviso,
+##             tira o chapéu da cabeça, puxa o braço para trás e segura; ao mesmo tempo afunda
+##             (ou sobe) até a nadadeira ficar na altura da ida. Quem mostra a altura é ele, sem
+##             marca na tela. Arremessa: o chapéu sai da nadadeira e vai reto; ele volta para a
+##             linha d'água e pega o chapéu de volta;
+##   salto   — sorteia a forma. Por cima: brilha e afunda reto (aviso) e salta num arco alto
+##             até o outro lado, soltando bolhas que descem balançando. Rasante: brilha, deita
+##             para a frente e bate a cauda (aviso) e salta baixo e reto, deitado, na altura do
+##             peito do Curupira (abaixa-se ou dá dash).
 ## Encadeado (primeiro de um combo): o jato pula a parada do fim.
 ## Os tiros saem dos pontos "bico" e "nadadeira" do desenho, quadro a quadro.
 ## Em volta dele, a água se mexe (AguaBoto: anéis, espuma e gotinhas) e respinga quando ele
@@ -22,20 +28,14 @@ extends Chefe
 ##
 ## Animações usadas (boto_frames.tres):
 ##   idle, aviso_jato, jato, fim_jato, aviso_beijos, beijos, fim_beijos, aviso_chapeu,
-##   arremesso, sem_chapeu, pega_chapeu, mergulho, salto, emergir, derrota,
-##   dano e transicao (usadas pela base Chefe)
+##   segura_chapeu, arremesso, fim_arremesso, sem_chapeu, pega_chapeu, mergulho, salto,
+##   aviso_rasante, rasante, emergir, derrota, dano e transicao (usadas pela base Chefe)
 ## O desenho olha para a esquerda; no lado esquerdo ele vira para olhar a arena.
 
 ## Brilho de aviso do Boto: azul de água. Só visual.
 const COR_AVISO_BOTO: Color = Color(0.8, 1.1, 1.8)
 ## A linha d'água (origem do Boto) fica abaixo da areia (px). Vem do desenho da arena.
 const DESNIVEL_AGUA: float = 24.0
-## Linha de aviso do chapéu: cor, espessura (1 pixel da arte) e pisca. Começa esta distância à
-## frente do bico, ainda sobre a água. Só visual.
-const COR_LINHA_AVISO: Color = Color(0.75, 0.92, 1.0, 0.75)
-const ESPESSURA_LINHA_AVISO: float = 4.0
-const PISCA_LINHA_AVISO: float = 0.12
-const INICIO_LINHA_AVISO: float = 180.0
 ## Aviso do jato: a água crescendo no bico troca de desenho a cada tanto (s), para pulsar.
 const PISCA_CRESCIDA: float = 0.08
 ## Afundar ou subir mais que isto (px) faz a água respingar.
@@ -103,29 +103,6 @@ func _efeitos_da_transicao() -> void:
 		EfeitosTela.tremer(self, 4.0, 0.15)
 
 
-## Linha fina piscando na altura "y", da beira da água até a outra margem, durante o aviso do
-## chapéu: diz se a ida vem alta (abaixa-se) ou baixa (pula-se). Some sozinha na derrota/transição.
-func _linha_de_aviso(y: float) -> Line2D:
-	var linha := Line2D.new()
-	linha.add_to_group("ataques_chefe")
-	linha.width = ESPESSURA_LINHA_AVISO
-	linha.default_color = COR_LINHA_AVISO
-	var x0: float = ponto("bico").x + _direcao_arena() * INICIO_LINHA_AVISO
-	var x1: float = _direcao_arena() * ARENA_MEIA_LARGURA
-	linha.points = PackedVector2Array([Vector2.ZERO, Vector2(x1 - x0, 0.0)])
-	lancar_na_cena(linha)
-	linha.global_position = Vector2(x0, y)
-	var pisca: Tween = linha.create_tween().set_loops()
-	pisca.tween_property(linha, "modulate:a", 0.2, PISCA_LINHA_AVISO)
-	pisca.tween_property(linha, "modulate:a", 1.0, PISCA_LINHA_AVISO)
-	return linha
-
-
-func _apagar(linha: Line2D) -> void:
-	if is_instance_valid(linha):
-		linha.queue_free()
-
-
 func _jato(encadeado: bool) -> void:
 	# Alto (abaixa-se) ou baixo (pula-se). Quem mostra a altura é o próprio Boto: ele afunda
 	# (ou sobe) até o bico ficar nela, e o jato sai reto.
@@ -138,7 +115,7 @@ func _jato(encadeado: bool) -> void:
 	var crescida: float = minf(_d.crescida_jato, _d.aviso_jato - ajuste)
 	avisar(true, COR_AVISO_BOTO)
 	reiniciar(&"aviso_jato")
-	if not await _ir_para_altura(_y_para_bico_em(y_jato), ajuste):
+	if not await _ir_para_altura(_y_para_ponto_em(y_jato, &"jato", "bico"), ajuste):
 		return
 	if not await esperar(_d.aviso_jato - ajuste - crescida):
 		return
@@ -163,13 +140,14 @@ func _jato(encadeado: bool) -> void:
 	await esperar(maxf(_d.parada_apos_jato - FolhaSprites.duracao(sprite, &"fim_jato"), 0.0))
 
 
-## Onde a origem do Boto (linha d'água do desenho) precisa ficar para o bico, na pose "jato",
-## ficar na altura "y". Abaixo de _y_agua = afundar; acima = sair mais da água.
-func _y_para_bico_em(y: float) -> float:
-	var bico: Variant = FolhaSprites.ponto_na_pose(sprite, &"jato", "bico")
-	if bico == null:
+## Onde a origem do Boto (linha d'água do desenho) precisa ficar para o ponto "nome" do
+## desenho, no quadro "quadro" da animação, ficar na altura "y". Ex.: o bico na pose "jato",
+## a nadadeira no quadro em que o chapéu sai. Abaixo de _y_agua = afundar; acima = sair mais.
+func _y_para_ponto_em(y: float, animacao: StringName, nome: String, quadro: int = 0) -> float:
+	var p: Variant = FolhaSprites.ponto_na_pose(sprite, animacao, nome, quadro)
+	if p == null:
 		return _y_agua
-	return y - (_pos_sprite_base.y + (bico as Vector2).y * sprite.scale.y)
+	return y - (_pos_sprite_base.y + (p as Vector2).y * sprite.scale.y)
 
 
 ## Afunda ou sobe, suave, até a origem ficar em "y", no relógio do chefe (a lentidão também
@@ -230,9 +208,14 @@ func _beijos() -> void:
 		coracao.dano = _d.golpes_beijo
 		coracao.direcao = _direcao_arena()
 		coracao.velocidade = _d.velocidade_beijo
+		coracao.curva = _d.curva_beijo
 		coracao.amplitude = _d.amplitude_beijo
 		coracao.frequencia = _d.frequencia_beijo
 		coracao.duracao = _d.duracao_beijo
+		coracao.alvo = alvo
+		coracao.forca_encanto = _d.forca_encanto
+		coracao.duracao_encanto = _d.duracao_encanto
+		coracao.x_origem = global_position.x
 		coracao.global_position = ponto("bico")
 		lancar_na_cena(coracao)
 		if not await esperar(_d.intervalo_beijos):
@@ -245,24 +228,41 @@ func _chapeu() -> void:
 	var invertido: bool = _sorteio.randf() < _d.chance_chapeu_invertido
 	var altura_ida: float = _d.altura_alta_chapeu if invertido else _d.altura_baixa_chapeu
 	var altura_volta: float = _d.altura_baixa_chapeu if invertido else _d.altura_alta_chapeu
-	var chao: float = _chao_da_arena()
+	var y_ida: float = _chao_da_arena() - altura_ida
+	# Quem mostra a altura é o próprio Boto: enquanto tira o chapéu e puxa o braço para trás,
+	# afunda (ida baixa) ou quase não se mexe (ida alta), até a nadadeira, no quadro em que solta
+	# o chapéu (o último do "arremesso"), ficar na altura da ida.
+	var soltura: int = sprite.sprite_frames.get_frame_count(&"arremesso") - 1
+	var ajuste: float = minf(_d.ajuste_chapeu, _d.aviso_chapeu)
 	avisar(true, COR_AVISO_BOTO)
-	tocar(&"aviso_chapeu")
-	var linha: Line2D = _linha_de_aviso(chao - altura_ida)
-	if not await esperar(_d.aviso_chapeu):
+	reiniciar(&"aviso_chapeu")
+	if not await _ir_para_altura(_y_para_ponto_em(y_ida, &"arremesso", "nadadeira", soltura), ajuste):
 		return
-	_apagar(linha)
+	# Termina de puxar o braço e segura, tremendo, até o fim do aviso.
+	var resto: float = _d.aviso_chapeu - ajuste
+	var puxando: float = clampf(FolhaSprites.duracao(sprite, &"aviso_chapeu") - ajuste, 0.0, resto)
+	if not await esperar(puxando):
+		return
+	tocar(&"segura_chapeu")
+	if not await esperar(resto - puxando):
+		return
 	avisar(false)
 	if not await tocar_e_esperar(&"arremesso"):
 		return
-	tocar(&"sem_chapeu")
-	# Vira na altura da ida, perto da parede do outro lado, e volta na outra altura.
-	var virada := Vector2(_direcao_arena() * (ARENA_MEIA_LARGURA - _d.margem_chapeu), chao - altura_ida)
+	# Sai da nadadeira, já na altura da ida, e vai reto até perto da parede do outro lado.
+	var saida := Vector2(ponto("nadadeira").x, y_ida)
+	var virada := Vector2(_direcao_arena() * (ARENA_MEIA_LARGURA - _d.margem_chapeu), y_ida)
 	var chapeu: ChapeuBoto = _d.cena_chapeu.instantiate()
 	chapeu.dano = _d.golpes_chapeu
-	chapeu.lancar(ponto("nadadeira"), virada, self, altura_volta - altura_ida, _d.duracao_ida_chapeu, _d.duracao_volta_chapeu)
+	chapeu.lancar(saida, virada, self, altura_volta - altura_ida, _d.duracao_ida_chapeu, _d.duracao_volta_chapeu)
 	lancar_na_cena(chapeu)
-	if not await esperar(_d.duracao_ida_chapeu + _d.duracao_volta_chapeu):
+	# Volta para a linha d'água enquanto o chapéu vai, e espera ele voltar.
+	tocar(&"fim_arremesso")
+	var subida: float = minf(_d.ajuste_chapeu, _d.duracao_ida_chapeu)
+	if not await _ir_para_altura(_y_agua, subida):
+		return
+	tocar(&"sem_chapeu")
+	if not await esperar(_d.duracao_ida_chapeu + _d.duracao_volta_chapeu - subida):
 		return
 	await tocar_e_esperar(&"pega_chapeu")
 
@@ -282,32 +282,43 @@ func _salto() -> void:
 	var destino: Marker2D = lado_esquerdo if _no_lado_direito else lado_direito
 	if destino == null:
 		return
+	# Duas formas, e o aviso diz qual: afundar reto = por cima (arco alto com bolhas);
+	# deitar para a frente batendo a cauda = rasante (baixo e reto; abaixa-se).
+	var rasante: bool = _sorteio.randf() < _d.chance_rasante
 	var de: Vector2 = global_position
 	var para: Vector2 = destino.global_position
+	var aviso_anim: StringName = &"aviso_rasante" if rasante else &"mergulho"
+	var aviso: float = _d.aviso_rasante if rasante else _d.aviso_salto
 	avisar(true, COR_AVISO_BOTO)
-	if not await tocar_e_esperar(&"mergulho"):
+	if not await tocar_e_esperar(aviso_anim):
 		return
-	if not await esperar(maxf(_d.aviso_salto - FolhaSprites.duracao(sprite, &"mergulho"), 0.0)):
+	if not await esperar(maxf(aviso - FolhaSprites.duracao(sprite, aviso_anim), 0.0)):
 		return
 	avisar(false)
-	# A animação do giro dura o salto inteiro, qualquer que seja a duração no .tres.
-	_ritmo_animacao = FolhaSprites.duracao(sprite, &"salto") / _d.duracao_pulo
-	reiniciar(&"salto")
+	var duracao: float = _d.duracao_rasante if rasante else _d.duracao_pulo
+	var altura: float = _subida_do_rasante() if rasante else _d.altura_pulo
+	if rasante:
+		reiniciar(&"rasante")  # em laço: a cauda batendo
+	else:
+		# A animação do giro dura o salto inteiro, qualquer que seja a duração no .tres.
+		_ritmo_animacao = FolhaSprites.duracao(sprite, &"salto") / duracao
+		reiniciar(&"salto")
 	# Sai da água: respinga onde ele estava e a água em volta some até ele cair do outro lado.
 	_no_ar = true
 	_agua.mostrar(false)
 	_agua.respingar(de.x)
 	var tempo: float = 0.0
 	var bolhas: int = 0
-	while tempo < _d.duracao_pulo:
+	while tempo < duracao:
 		var dt: float = await passo()
 		if derrotado:
 			return
 		tempo += dt
-		var p: float = clampf(tempo / _d.duracao_pulo, 0.0, 1.0)
-		global_position = de.lerp(para, p) + Vector2(0.0, -4.0 * _d.altura_pulo * p * (1.0 - p))
-		# Bolhas em pontos iguais do caminho (para 3: em 1/4, 2/4 e 3/4 do salto).
-		if bolhas < _d.quantidade_bolhas and p >= float(bolhas + 1) / float(_d.quantidade_bolhas + 1):
+		var p: float = clampf(tempo / duracao, 0.0, 1.0)
+		var subida: float = _perfil_rasante(p) if rasante else 4.0 * p * (1.0 - p)
+		global_position = de.lerp(para, p) + Vector2(0.0, -altura * subida)
+		# Bolhas (só por cima) em pontos iguais do caminho (para 5: em 1/6, 2/6... 5/6 do salto).
+		if not rasante and bolhas < _d.quantidade_bolhas and p >= float(bolhas + 1) / float(_d.quantidade_bolhas + 1):
 			bolhas += 1
 			_soltar_bolha()
 	_ritmo_animacao = 1.0
@@ -319,9 +330,26 @@ func _salto() -> void:
 	await tocar_e_esperar(&"emergir")
 
 
+## Rasante: quanto a origem sobe acima da água para a barriga (o pé da caixa do desenho
+## "rasante", que é o pé da caixa de contato) ficar a altura_rasante acima da areia.
+func _subida_do_rasante() -> float:
+	var caixa: Rect2 = _caixa_do_desenho(&"rasante")
+	var barriga: float = caixa.end.y if caixa.size != Vector2.ZERO else 0.0
+	return _y_agua - (_chao_da_arena() - _d.altura_rasante - barriga)
+
+
+## Forma do rasante (0 = na água, 1 = na altura): sobe rápido no começo, fica reto e desce no
+## fim. subida_rasante é a parte do caminho usada para subir (e a mesma para descer).
+func _perfil_rasante(p: float) -> float:
+	var a: float = _d.subida_rasante
+	return sin(PI / 2.0 * clampf(p / a, 0.0, 1.0)) * sin(PI / 2.0 * clampf((1.0 - p) / a, 0.0, 1.0))
+
+
 func _soltar_bolha() -> void:
 	var bolha: BolhaBoto = _d.cena_bolha.instantiate()
 	bolha.dano = _d.golpes_bolha
 	bolha.velocidade = _d.velocidade_bolha
+	bolha.balanco = _d.balanco_bolha
+	bolha.frequencia = _d.frequencia_bolha
 	bolha.global_position = ponto_de_mira()  # sai do corpo do Boto
 	lancar_na_cena(bolha)

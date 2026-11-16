@@ -1051,40 +1051,45 @@ function botoBase(t) {
   const b = Math.sin(t * 2);
   return {
     X: 440, x: 0, y: b * 1.5, inc: Math.sin(t * 1.3) * 3, sx: 1, incha: 0, boca: 0, bico: 0, olho: 'galante', iris: PBO.iris,
-    finP: pt(-16 + Math.sin(t * 4) * 2, -38 + Math.cos(t * 4) * 2), finL: pt(14, -40), chapeu: { dx: 0, dy: 0, ang: -8, solto: false }, chip: true, giro: 0, treme: 0
+    finP: pt(-16 + Math.sin(t * 4) * 2, -38 + Math.cos(t * 4) * 2), finL: pt(14, -40), chapeu: { dx: 0, dy: 0, ang: -8, solto: false, mao: false }, chip: true, giro: 0, treme: 0,
+    cabeca: 0, cauda: 0
   };
 }
 function botoPx(cam, R, t) {
   const sx = R.sx, X = R.X + R.x, Y = AGUA_Y + R.y;
-  const piv = pt(0, -34);
+  const piv = pt(0, -34), pc = pt(-3, -62);
   const B = p => soma(piv, rot(sub(p, piv), -R.inc + R.giro));
+  // cabeça: gira em volta do centro dela (R.cabeca). No rasante, com o corpo deitado, o bico
+  // aponta para a frente e o alto da cabeça (com o chapéu) para cima.
+  const H = p => B(soma(pc, rot(sub(p, pc), R.cabeca)));
   const L = p => pt(X + sx * p.x, Y + p.y);
-  const inc = sx * (-R.inc + R.giro), cr = 1 + R.incha * 0.12;
+  const inc = sx * (-R.inc + R.giro), incC = inc + sx * R.cabeca, cr = 1 + R.incha * 0.12;
   // nadadeira de lá e cauda (aparece quando ele sai da água)
   let parte = nova();
   mecha(parte, L(B(pt(8, -44))).x, L(B(pt(8, -44))).y, Math.atan2(L(B(R.finL)).y - L(B(pt(8, -44))).y, L(B(R.finL)).x - L(B(pt(8, -44))).x) * 180 / Math.PI, 11, 3.2, PBO.rosaS, 0);
   cam.colar(parte.contornar(PBO.rosaO));
   parte = nova();
   const cauda = L(B(pt(4, 14)));
-  for (const lado of [-1, 1]) mecha(parte, cauda.x, cauda.y, 90 + inc + lado * 50, 10, 3.6, PBO.rosaS, 0);
+  for (const lado of [-1, 1]) mecha(parte, cauda.x, cauda.y, 90 + inc + lado * 50 + sx * R.cauda, 10, 3.6, PBO.rosaS, 0);
   cam.colar(parte.contornar(PBO.rosaO));
   // corpo: torpedo em pé, cabeça (melão) e bico comprido
   parte = nova();
   const el = (c, rx, ry, cor) => { const p = L(B(c)); elipse(parte, p.x, p.y, rx * cr, ry, cor, inc); };
-  el(pt(0, -26), 13, 34, PBO.rosa); el(pt(-3, -62), 12, 10, PBO.rosa);
-  poli(parte, [pt(-11, -64), pt(-34 - R.bico, -59), pt(-35 - R.bico, -56), pt(-11, -55)].map(p => L(B(p))), PBO.rosa);
+  el(pt(0, -26), 13, 34, PBO.rosa);
+  { const p = L(B(pc)); elipse(parte, p.x, p.y, 12 * cr, 10, PBO.rosa, incC); }
+  poli(parte, [pt(-11, -64), pt(-34 - R.bico, -59), pt(-35 - R.bico, -56), pt(-11, -55)].map(p => L(H(p))), PBO.rosa);
   sombraB(parte, PBO.rosa, PBO.rosaS, PBO.rosaL, 2);
   el(pt(-6, -26), 6, 26, PBO.barriga);
   // dorso e corcova
   const d = L(B(pt(12, -40)));
   parte.disco(d.x + sx, d.y, 3, PBO.rosaS);
   // boca: linha de sorriso no bico ou aberta no jato
-  const b0 = L(B(pt(-12, -57))), b1 = L(B(pt(-33 - R.bico, -57)));
-  if (R.boca > 0.3) { poli(parte, [b0, b1, L(B(pt(-30, -52))), L(B(pt(-13, -51)))], '#5A1020'); for (let u = 0.1; u < 0.9; u += 0.16) { const p = lerp(b0, b1, u); parte.set(p.x, p.y, PM.branco); } }
+  const b0 = L(H(pt(-12, -57))), b1 = L(H(pt(-33 - R.bico, -57)));
+  if (R.boca > 0.3) { poli(parte, [b0, b1, L(H(pt(-30, -52))), L(H(pt(-13, -51)))], '#5A1020'); for (let u = 0.1; u < 0.9; u += 0.16) { const p = lerp(b0, b1, u); parte.set(p.x, p.y, PM.branco); } }
   else { for (let u = 0; u <= 1; u += 0.04) { const p = lerp(b0, b1, u); parte.set(p.x, p.y + (u < 0.15 ? -1 : 0), PBO.rosaD); } }
   cam.colar(parte.contornar(PBO.rosaO));
   // olho
-  const oc = L(B(pt(-11, -65)));
+  const oc = L(H(pt(-11, -65)));
   if (R.olho === 'feliz') { cam.set(oc.x - 1, oc.y, PBO.rosaO); cam.set(oc.x, oc.y - 1, PBO.rosaO); cam.set(oc.x + 1, oc.y, PBO.rosaO); }
   else if (R.olho === 'tonto') { cam.carimbo(['o.o', '.o.', 'o.o'], Math.round(oc.x) - 1, Math.round(oc.y) - 1, { o: PBO.rosaO }); }
   else if (R.olho === 'dor') { cam.carimbo(['..oo', 'oo..', '..oo'], Math.round(oc.x) - 2, Math.round(oc.y) - 1, { o: PBO.rosaO }); }
@@ -1101,8 +1106,8 @@ function botoPx(cam, R, t) {
   cam.colar(parte.contornar(PBO.rosaO));
   if (R.chip) { const c = L(B(pt(5, -32))); chipPx(cam, c.x, c.y, t); }
   // chapéu (ou o espiráculo espirrando, quando o chapéu sai)
-  const topo = L(B(pt(-2, -71)));
-  if (!R.chapeu.solto) chapeuPx(cam, topo.x + sx * R.chapeu.dx, topo.y + R.chapeu.dy, sx * R.chapeu.ang + inc, t);
+  const topo = L(H(pt(-2, -71)));
+  if (!R.chapeu.solto && !R.chapeu.mao) chapeuPx(cam, topo.x + sx * R.chapeu.dx, topo.y + R.chapeu.dy, sx * R.chapeu.ang + incC, t);
   else {
     cam.set(topo.x, topo.y + 1, PBO.rosaO); cam.set(topo.x + 1, topo.y + 1, PBO.rosaO);
     for (let k = 0; k < 4; k++) { const u = (t * 3 + k / 4) % 1; cam.set(topo.x + Math.sin(k * 2) * 4 * u, topo.y - 2 - 10 * u + 12 * u * u, u < 0.5 ? PBO.aguaL : PBO.agua); }
@@ -1110,10 +1115,12 @@ function botoPx(cam, R, t) {
   // nadadeira de cá (o braço dele)
   parte = nova();
   const ob = L(B(pt(-6, -44))), fp = L(B(R.finP));
+  // chapéu na mão: a aba fica na ponta da nadadeira (ponto "nadadeira"), atrás dela
+  if (R.chapeu.mao) chapeuPx(cam, fp.x + sx * R.chapeu.dx, fp.y + R.chapeu.dy, sx * R.chapeu.ang, t);
   mecha(parte, ob.x, ob.y, Math.atan2(fp.y - ob.y, fp.x - ob.x) * 180 / Math.PI, Math.hypot(fp.x - ob.x, fp.y - ob.y), 3.6, PBO.rosa, 0);
   sombraB(parte, PBO.rosa, PBO.rosaS, PBO.rosaL, 1);
   cam.colar(parte.contornar(PBO.rosaO));
-  return { bico: L(B(pt(-36 - R.bico, -57))), topo, fin: fp, corpo: L(B(pt(5, -32))), olho: oc };
+  return { bico: L(H(pt(-36 - R.bico, -57))), topo, fin: fp, corpo: L(B(pt(5, -32))), olho: oc };
 }
 function chapeuPx(cam, cx, cy, ang, t) {
   const b = nova();
@@ -1300,35 +1307,51 @@ const BOTO_ESTADOS = {
     }
   },
   chapeu: {
-    dur: 2.9, nome: 'Chapéu bumerangue', fase: 2, dica: 'pular na ida, abaixar na volta',
-    desc: 'Gira o chapéu na nadadeira e arremessa: ele vai baixo até o outro lado e volta alto, girando. Sem chapéu, o espiráculo espirra água.',
+    dur: 2.9, nome: 'Chapéu bumerangue', fase: 2, dica: 'olhar a altura da nadadeira: baixa, pular; alta, abaixar',
+    desc: 'Tira o chapéu da cabeça com a nadadeira, puxa o braço para trás e segura, na altura em que vai jogar. No jogo ele afunda ou sobe antes, para a nadadeira ficar na altura da ida. Arremessa: o chapéu vai reto até o outro lado e volta na outra altura, girando. Sem chapéu, o espiráculo espirra água.',
     quadro(s, t) {
-      const R = botoBase(t);
-      const gira = trecho(s, 0, 0.6), joga = elastico(trecho(s, 0.6, 0.75)), pega = trecho(s, 2.45, 2.6);
-      R.finP = s < 0.6 ? pt(-6 + Math.cos(t * 18) * 6, -74 + Math.sin(t * 18) * 3) : lerp(pt(-36, -46), botoBase(t).finP, suave(trecho(s, 0.75, 1.1)));
-      if (s > 2.4) R.finP = lerp(R.finP, pt(-10, -74), suave(trecho(s, 2.4, 2.55)));
-      R.inc = s < 0.6 ? -6 * suave(gira) : 10 * joga * (1 - suave(trecho(s, 0.8, 1.2)));
-      R.chapeu.solto = s >= 0.6 && s < 2.58; R.olho = s > 0.6 && s < 2.5 ? 'bravo' : 'galante';
-      if (s < 0.6) { R.chapeu.dx = 0; R.chapeu.dy = 0; }
+      const R = botoBase(t), base = R.finP;
+      // a mesma altura atrás (segurando) e na frente (soltando), já contando a inclinação do corpo
+      const CAB = pt(-4, -72), ALTO = pt(-2, -80), TRAS = pt(15, -46), FRENTE = pt(-32, -50);
+      if (s < 0.75) {
+        // pega o chapéu na cabeça, tira (de galã, inclinando a aba) e puxa o braço para trás
+        const pega = suave(trecho(s, 0, 0.2)), tira = suave(trecho(s, 0.2, 0.32)), arma = suave(trecho(s, 0.32, 0.55));
+        R.finP = s < 0.2 ? lerp(base, CAB, pega) : s < 0.32 ? lerp(CAB, ALTO, tira) : lerp(ALTO, TRAS, arma);
+        R.chapeu.mao = s >= 0.2;
+        R.chapeu.ang = s < 0.32 ? -20 * tira : -20 * (1 - arma);
+        R.inc = -8 * arma; R.olho = s < 0.32 ? 'galante' : 'bravo';
+        if (s >= 0.55) { R.finP = soma(TRAS, pt(Math.round(Math.sin(t * 40)), 0)); R.chapeu.ang = 4 * Math.sin(t * 40); }   // segura, tremendo
+      } else if (s <= 0.95) {
+        // arremesso: o braço vem de trás para a frente na mesma altura; solta no último quadro
+        const u = trecho(s, 0.75, 0.95);
+        R.finP = lerp(TRAS, FRENTE, u); R.finP.y -= 4 * Math.sin(u * Math.PI);
+        R.chapeu.mao = true; R.chapeu.ang = 0;
+        R.inc = mix(-8, 10, u); R.olho = 'bravo';
+      } else {
+        const solta = suave(trecho(s, 0.95, 1.25));
+        R.chapeu.solto = s < 2.58;
+        R.finP = lerp(FRENTE, base, solta); R.inc = 10 * (1 - solta); R.olho = s < 2.5 ? 'bravo' : 'galante';
+        if (s > 2.4) R.finP = lerp(R.finP, pt(-10, -74), suave(trecho(s, 2.4, 2.55)));
+      }
       return {
         R, depois(cam, info) {
-          if (s < 0.6) chapeuPx(cam, info.fin.x, info.fin.y - 3, t * 900, t);
-          const u = trecho(s, 0.6, 2.5);
+          const u = trecho(s, 0.95, 2.5);
           if (u > 0 && u < 1) {
-            // ida baixa, curva na parede e volta alta
+            // ida reta na altura em que saiu da nadadeira, curva na parede e volta na outra altura
             const ida = u < 0.5, v = ida ? u / 0.5 : (u - 0.5) / 0.5;
-            const x = ida ? mix(info.fin.x, 30, sai(v)) : mix(30, info.topo.x, entra(v) * 0.5 + v * 0.5);
-            const y = ida ? CHAO_PX - 10 : mix(CHAO_PX - 10, CHAO_PX - 58, sai(Math.min(1, v * 3))) + (v > 0.7 ? mix(0, info.topo.y - (CHAO_PX - 58), (v - 0.7) / 0.3) : 0);
+            const x0 = R.X - 34, yIda = AGUA_Y - 44, yVolta = CHAO_PX - 10;
+            const x = ida ? mix(x0, 30, sai(v)) : mix(30, info.topo.x, v * v);
+            let y = ida ? yIda : mix(yIda, yVolta, sai(Math.min(1, v * 3)));
+            if (!ida && v > 0.7) y = mix(yVolta, info.topo.y, (v - 0.7) / 0.3);
             chapeuPx(cam, x, y, t * 1400, t);
-            for (let k = 1; k <= 3; k++) cam.set(x + (ida ? 6 : -6) * k, y + Math.sin(t * 30 + k) * 2, PBO.chapeuS);
           }
         }
       };
     }
   },
   salto: {
-    dur: 3.6, nome: 'Salto do boto', fase: 3, dica: 'correr para baixo dele',
-    desc: 'Afunda, a água borbulha e ele salta num arco enorme por cima da areia, girando e deixando cair gotas, até a outra margem. Depois salta de volta.',
+    dur: 3.6, nome: 'Salto do boto', fase: 3, dica: 'correr para baixo dele e passar entre as bolhas',
+    desc: 'Afunda reto, a água borbulha e ele salta num arco enorme por cima da areia, girando e soltando cinco bolhas que descem balançando, até a outra margem. Depois salta de volta.',
     quadro(s, t) {
       const R = botoBase(t);
       const X2 = 26 - R.X;
@@ -1352,6 +1375,42 @@ const BOTO_ESTADOS = {
           for (const [t0, xs] of [[0.45, R.X], [1.5, 26], [2.1, 26], [3.15, R.X]]) { const u = trecho(s, t0, t0 + 0.4); if (u > 0 && u < 1) respingoPx(cam, xs, AGUA_Y, u); }
           if ((s > 0.6 && s < 1.4) || (s > 2.25 && s < 3.05)) for (let i = 0; i < 2; i++) gotaPx(cam, info.corpo.x + (i - 0.5) * 8, info.corpo.y + 10 + ((t * 4 + i * 0.5) % 1) * 30);
           if ((s > 0.6 && s < 1.4) || (s > 2.25 && s < 3.05)) aviso(() => elipse(cam, info.corpo.x, CHAO_PX + 1, 10, 1.6, '#B88A4A'));
+        }
+      };
+    }
+  },
+  rasante: {
+    dur: 2.4, nome: 'Salto rasante', fase: 3, dica: 'abaixar (ou dash)',
+    desc: 'Deita para a frente na água, de cara para a areia, e bate a cauda espirrando água para trás. Então sai num salto baixo e reto, deitado, na altura do peito do Curupira, até a outra margem. Sem bolhas.',
+    quadro(s, t) {
+      const R = botoBase(t);
+      const X2 = 26 - R.X;
+      if (s < 0.6) {
+        // aviso: inclina para a frente e afunda um pouco; a cauda bate atrás
+        const deita = suave(trecho(s, 0, 0.4));
+        R.giro = -40 * deita; R.y += 14 * deita; R.cabeca = 30 * deita; R.olho = 'bravo';
+        R.finP = lerp(R.finP, pt(-4, -22), deita); R.cauda = 30 * Math.sin(t * TAU * 3) * deita;
+      } else if (s < 1.8) {
+        // voando deitado, reto: o corpo ondula e a cauda bate (o caminho, no jogo, é do código)
+        const u = trecho(s, 0.6, 1.8), a = 0.12;
+        const sobe = Math.sin(Math.PI / 2 * clamp(u / a, 0, 1)) * Math.sin(Math.PI / 2 * clamp((1 - u) / a, 0, 1));
+        R.x = mix(0, X2, u); R.y = 14 - (14 + 15) * sobe;
+        R.giro = -90 * Math.min(1, sobe * 1.5) + 3 * Math.sin(t * TAU * 1.5); R.cabeca = 90 * Math.min(1, sobe * 1.5);
+        R.olho = 'bravo'; R.finP = pt(-8, -18); R.cauda = 30 * Math.sin(t * TAU * 3);
+      } else {
+        R.x = X2; R.sx = -1; R.y = 30 * (1 - suave(trecho(s, 1.9, 2.3)));
+      }
+      return {
+        R, depois(cam, info) {
+          if (s < 0.6) aviso(() => {
+            // água espirrando atrás, onde a cauda bate
+            const xc = R.X + R.x + 26 * R.sx;
+            for (let i = 0; i < 6; i++) { const u = (t * 2.5 + i / 6) % 1; gotaPx(cam, xc + R.sx * (4 + 14 * u + i), AGUA_Y - 2 - 26 * u + 30 * u * u); }
+          });
+          if (s >= 0.6 && s < 1.8) aviso(() => {
+            // gotas ficando para trás
+            for (let i = 0; i < 3; i++) { const u = (t * 3 + i / 3) % 1; gotaPx(cam, info.corpo.x + R.sx * (40 + 30 * u), info.corpo.y + 4 + 16 * u * u); }
+          });
         }
       };
     }
@@ -1763,7 +1822,7 @@ const CHEFES_PX = [
     fases: [
       { nome: 'Fase 1', ataques: ['jato', 'beijos'], roteiro: [['idle', 1.2], ['jato'], ['idle', 0.9], ['beijos'], ['idle', 0.9], ['jato'], ['idle', 0.8], ['beijos']] },
       { nome: 'Fase 2', ataques: ['chapeu'], roteiro: [['idle', 0.8], ['chapeu'], ['idle', 0.6], ['jato'], ['idle', 0.6], ['beijos'], ['idle', 0.6], ['chapeu']] },
-      { nome: 'Fase 3', ataques: ['salto'], roteiro: [['idle', 0.6], ['salto'], ['idle', 0.4], ['chapeu'], ['idle', 0.4], ['jato'], ['idle', 0.4], ['salto'], ['idle', 0.4], ['beijos']] }
+      { nome: 'Fase 3', ataques: ['salto', 'rasante'], roteiro: [['idle', 0.6], ['salto'], ['idle', 0.4], ['chapeu'], ['idle', 0.4], ['rasante'], ['idle', 0.4], ['jato'], ['idle', 0.4], ['salto'], ['idle', 0.4], ['beijos']] }
     ]
   },
   {

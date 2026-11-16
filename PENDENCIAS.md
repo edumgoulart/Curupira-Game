@@ -74,7 +74,14 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
       linha. Ele afunda na água até o bico ficar na altura do jato (o baixo deixa só a cabeça
       de fora), a água sai do bico fina e vai crescendo, e o jato sai reto. Ver se dá para ler
       alto/baixo pela altura dele a tempo, e se ele volta para a linha d'água no fim;
-    - Boto, chapéu: a linha fina na altura da ida (o Eduardo não falou dela; tirar também?);
+    - Boto, chapéu (pedido do Eduardo: "tira o risquinho do chapéu"): sem linha. Ele tira o
+      chapéu da cabeça com a nadadeira, puxa o braço para trás e segura, tremendo; ao mesmo
+      tempo afunda (ida baixa, só a cabeça e o braço de fora) ou sobe (ida alta). Ver se dá para
+      ler a altura pela pose a tempo, se o chapéu sai reto da nadadeira e se ele volta para a
+      linha d'água depois de jogar;
+    - Boto, rasante (novo): deita para a frente e bate a cauda espirrando água, e atravessa
+      baixo e deitado. Ver se dá para diferenciar do mergulho do salto por cima (que afunda
+      reto) a tempo de abaixar, e se abaixar no controle é confortável;
     - Máquina: a linha do laser seguindo e travando, e a da varredura;
     - os outros ataques sem marca nenhuma: se a pose de aviso de cada um basta;
     - se os avisos mais longos deixaram as lutas fáceis demais. Os valores antigos estão no
@@ -83,6 +90,18 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     espuma no corpo e gotinhas, azul na margem esquerda e barrenta na direita; respingo quando
     ele afunda, sobe e na saída e chegada do salto. Ver se os anéis aparecem na faixa clara da
     linha d'água e se a espuma não fica estranha quando ele sai da água na transição;
+  - Boto mais difícil (pedido do Eduardo):
+    - salto por cima: cinco bolhas mais rápidas e balançando mais. Ver se ainda dá para passar
+      entre elas;
+    - corações: perseguem o Curupira com curva larga e ondulando. O que encosta encanta por
+      1 s: o Curupira fica rosa, sobem coraçõezinhos e ele é puxado para o lado do Boto, sem
+      andar, abaixar nem dar dash (pula e atira). Ver se é divertido e se dá para despistar;
+    - o `verificar_desvio.gd` não acha desvio nos combos que começam com `beijos` quando o
+      Curupira está colado na água (x = 480), mas o robô não atira. Se no F6 também for
+      injusto, baixar `curva_beijo` ou `quantidade_beijos` (`boto.tres`) ou subir o atraso
+      desses combos;
+    - para forçar uma forma: `chance_rasante` e `chance_chapeu_invertido` em 0 ou 1 no
+      `boto.tres`;
   - se pular por cima dos ataques rasteiros e correr por baixo do salto do Boto é confortável
     no controle. O `verificar_desvio.gd` achou desvio sem dash para todos os ataques sozinhos,
     mas ele joga como um robô;
@@ -92,7 +111,8 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 ## Decisões em aberto
 
 - **Valores "provisório".** Os ataques novos (pisoteio, investida, bote, ninar, beijos,
-  chapéu, pistões, varredura, jato baixo, chapéu invertido) estão marcados "provisório" nos
+  chapéu, pistões, varredura, jato baixo, chapéu invertido, rasante, e no Boto a perseguição
+  e o encanto dos corações e as bolhas mais rápidas) estão marcados "provisório" nos
   `*_data.gd`. Os avisos subiram a pedido do Eduardo (TDD 8.3): os que o GDD fixa mudaram lá
   também; os outros (pisoteio, investida, bote, ninar, beijos, chapéu, salto, pistões, placa,
   varredura) são provisórios. As fases e os combos (chance, atraso, pausa, limiares) ficam no

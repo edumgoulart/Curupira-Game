@@ -275,61 +275,119 @@
   {
    "nome": "aviso_chapeu",
    "linha": 7,
-   "quadros": 6,
+   "quadros": 7,
+   "fps": 12,
+   "loop": false,
+   "caixa": [
+    -36,
+    -86,
+    29,
+    24
+   ],
+   "pontos": {
+    "bico": [
+     [-36, -57],
+     [-36, -57],
+     [-36, -56],
+     [-36, -56],
+     [-36, -57],
+     [-34, -59],
+     [-32, -60]
+    ],
+    "nadadeira": [
+     [-16, -36],
+     [-10, -52],
+     [-4, -71],
+     [-3, -77],
+     [0, -75],
+     [11, -56],
+     [17, -42]
+    ]
+   },
+   "nota": "pega o chapéu da cabeça, tira e puxa o braço para trás, na altura do arremesso"
+  },
+  {
+   "nome": "segura_chapeu",
+   "linha": 8,
+   "quadros": 4,
    "fps": 12,
    "loop": true,
    "caixa": [
-    -34,
-    -91,
-    19,
+    -33,
+    -75,
+    29,
     23
    ],
    "pontos": {
     "bico": [
-     [-34, -60],
-     [-34, -60],
-     [-34, -59],
-     [-34, -59],
-     [-34, -59],
-     [-34, -59]
+     [-32, -62],
+     [-32, -62],
+     [-32, -62],
+     [-32, -61]
     ],
     "nadadeira": [
-     [3, -74],
-     [0, -71],
-     [-6, -72],
-     [-9, -74],
-     [-6, -76],
-     [0, -76]
+     [17, -44],
+     [18, -44],
+     [17, -44],
+     [16, -44]
     ]
    },
-   "nota": "gira o chapéu na nadadeira"
+   "nota": "segura o chapéu atrás, tremendo; dura o resto do aviso"
   },
   {
    "nome": "arremesso",
-   "linha": 8,
-   "quadros": 2,
+   "linha": 9,
+   "quadros": 3,
+   "fps": 12,
+   "loop": false,
+   "caixa": [
+    -46,
+    -74,
+    28,
+    24
+   ],
+   "pontos": {
+    "bico": [
+     [-32, -60],
+     [-36, -55],
+     [-39, -49]
+    ],
+    "nadadeira": [
+     [17, -42],
+     [-9, -50],
+     [-34, -43]
+    ]
+   },
+   "nota": "solta no último quadro: o chapéu sai da ponta da nadadeira (ponto \"nadadeira\")"
+  },
+  {
+   "nome": "fim_arremesso",
+   "linha": 10,
+   "quadros": 3,
    "fps": 12,
    "loop": false,
    "caixa": [
     -39,
-    -74,
-    22,
+    -75,
+    21,
     23
    ],
    "pontos": {
     "bico": [
-     [-36, -56],
-     [-39, -49]
+     [-39, -50],
+     [-37, -53],
+     [-36, -56]
     ],
     "nadadeira": [
-     [-36, -45],
-     [-36, -38]
+     [-33, -43],
+     [-24, -40],
+     [-18, -37]
     ]
    }
   },
   {
    "nome": "sem_chapeu",
-   "linha": 9,
+   "linha": 11,
    "quadros": 6,
    "fps": 12,
    "loop": true,
@@ -361,7 +419,7 @@
   },
   {
    "nome": "pega_chapeu",
-   "linha": 10,
+   "linha": 12,
    "quadros": 2,
    "fps": 12,
    "loop": false,
@@ -384,7 +442,7 @@
   },
   {
    "nome": "mergulho",
-   "linha": 11,
+   "linha": 13,
    "quadros": 5,
    "fps": 12,
    "loop": false,
@@ -413,7 +471,7 @@
   },
   {
    "nome": "salto",
-   "linha": 12,
+   "linha": 14,
    "quadros": 13,
    "fps": 12,
    "loop": false,
@@ -459,7 +517,7 @@
   },
   {
    "nome": "emergir",
-   "linha": 13,
+   "linha": 15,
    "quadros": 4,
    "fps": 12,
    "loop": false,
@@ -485,8 +543,78 @@
    }
   },
   {
+   "nome": "aviso_rasante",
+   "linha": 16,
+   "quadros": 7,
+   "fps": 12,
+   "loop": false,
+   "caixa": [
+    -52,
+    -81,
+    51,
+    27
+   ],
+   "pontos": {
+    "bico": [
+     [-36, -57],
+     [-39, -53],
+     [-44, -45],
+     [-49, -35],
+     [-52, -27],
+     [-52, -26],
+     [-52, -26]
+    ],
+    "nadadeira": [
+     [-16, -36],
+     [-14, -31],
+     [-8, -21],
+     [-1, -12],
+     [4, -8],
+     [5, -7],
+     [5, -7]
+    ]
+   },
+   "nota": "deita para a frente e bate a cauda espirrando água para trás"
+  },
+  {
+   "nome": "rasante",
+   "linha": 17,
+   "quadros": 8,
+   "fps": 12,
+   "loop": true,
+   "caixa": [
+    -61,
+    -53,
+    59,
+    -18
+   ],
+   "pontos": {
+    "bico": [
+     [-61, -26],
+     [-61, -28],
+     [-61, -29],
+     [-61, -27],
+     [-61, -25],
+     [-60, -22],
+     [-60, -21],
+     [-60, -22]
+    ],
+    "nadadeira": [
+     [16, -26],
+     [16, -26],
+     [16, -25],
+     [16, -26],
+     [16, -26],
+     [16, -27],
+     [17, -27],
+     [17, -27]
+    ]
+   },
+   "nota": "voando deitado; o caminho é do código. Sem as gotas da galeria: elas aumentariam a caixa de dano"
+  },
+  {
    "nome": "derrota",
-   "linha": 14,
+   "linha": 18,
    "quadros": 36,
    "fps": 10,
    "loop": false,
@@ -577,7 +705,7 @@
   },
   {
    "nome": "transicao",
-   "linha": 15,
+   "linha": 19,
    "quadros": 24,
    "fps": 12,
    "loop": false,
@@ -645,7 +773,7 @@
   },
   {
    "nome": "dano",
-   "linha": 16,
+   "linha": 20,
    "quadros": 4,
    "fps": 12,
    "loop": false,

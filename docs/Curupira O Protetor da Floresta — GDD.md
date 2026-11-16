@@ -293,14 +293,15 @@ Cada ser folclórico derrotado concede ao Curupira um ataque básico e um especi
 
 ### Efeitos de estado
 
-O jogo tem dois efeitos de estado:
+O jogo tem três efeitos de estado:
 
 - **Envenenamento.** Causa dano constante ao longo do tempo.
 - **Lentidão.** Deixa movimentos e ataques mais lentos.
+- **Encanto.** Só no Curupira. Ele é puxado na direção do Boto por um tempo e não anda, não abaixa nem dá dash. Pular e atirar continuam valendo.
 
 No chefe, os efeitos vêm dos especiais do Curupira. A Poção Maldita envenena por 8 s, com 20 de dano por segundo; reaplicar só renova o tempo. A Bolha Abissal deixa o chefe 40% mais lento por 6 s.
 
-No Curupira, os efeitos vêm das poças da Cuca. A poça de veneno tira 1 golpe se ele ficar 1 s dentro dela. A poça de lentidão o deixa 40% mais lento enquanto ele estiver nela.
+No Curupira, os efeitos vêm das poças da Cuca e dos corações do Boto. A poça de veneno tira 1 golpe se ele ficar 1 s dentro dela. A poça de lentidão o deixa 40% mais lento enquanto ele estiver nela. O coração do Boto que encosta, além do golpe, encanta por 1 s, puxando a 300 px/s, como na lenda em que o Boto leva as pessoas para o rio (valores provisórios, Q16).
 
 ### Escolha antes da fase
 
@@ -382,7 +383,7 @@ Os números das fases e dos combos (chance, atraso, pausa) são provisórios e f
 Três regras valem para todos os chefes:
 
 - O chefe pode levar dano o tempo todo.
-- Todo ataque tem um aviso visual antes do golpe: o chefe brilha e faz a animação de aviso, e o jogador lê o ataque pela pose. Não há marca na tela cobrindo a área do golpe; o Eduardo achou que deixava fácil demais. As exceções são o que vem de fora da vista ou é mirado: o brilho no céu dos meteoros, a linha fina do laser e a linha da altura do chapéu do Boto. No jato, quem mostra a altura é o próprio Boto, afundando na água até o bico ficar nela.
+- Todo ataque tem um aviso visual antes do golpe: o chefe brilha e faz a animação de aviso, e o jogador lê o ataque pela pose. Não há marca na tela cobrindo a área do golpe; o Eduardo achou que deixava fácil demais. As exceções são o que vem de fora da vista ou é mirado: o brilho no céu dos meteoros e a linha fina do laser. No jato e no chapéu, quem mostra a altura é o próprio Boto: ele afunda ou sobe na água até o bico (no jato) ou a nadadeira com o chapéu (no chapéu) ficar nela.
 - Depois do ataque mais forte, o chefe fica parado por um instante. É a janela para o jogador atacar.
 
 | Chefe | Perfil | Vida | Duração-alvo | Pausa entre ataques | Concede ao Curupira |
@@ -407,9 +408,9 @@ Ataques de cada chefe. Os avisos ficaram mais longos a pedido do Eduardo, para d
 | Cuca | 2 | Bote de jacaré: abre a boca, se joga de barriga e desliza até perto da outra parede abocanhando. Levanta e fica daquele lado | 0,9 s (0,6) | A definir | Pular |
 | Cuca | 3 | Canção de ninar: uma melodia de seis notas, uma de cada vez. A grave vem rente ao chão e a aguda na altura do peito, cada uma de uma cor | 0,9 s (0,4) | A definir | Pular a grave e abaixar na aguda |
 | Boto cor-de-rosa | 1 | Jato de água saindo reto da boca até a outra margem, alto (na altura do peito) ou baixo (rente à areia), sorteado. No aviso, o Boto afunda na água até o bico ficar na altura do jato (no baixo, só a cabeça fica de fora), e a água começa a sair do bico, fina, e vai crescendo até virar o jato. Depois o Boto fica parado por 1,2 s | 0,9 s (0,7) | 1 | Abaixar (alto) ou pular (baixo) |
-| Boto cor-de-rosa | 1 | Beijos de bolha: quatro corações lentos e ondulando, que estouram com um tiro | 0,6 s | A definir | Atirar neles |
-| Boto cor-de-rosa | 2 | Chapéu bumerangue: o chapéu vai baixo e volta alto, ou vai alto e volta baixo (sorteado). Uma linha fina mostra a altura da ida | 0,8 s (0,6) | A definir | Pular o baixo e abaixar no alto |
-| Boto cor-de-rosa | 3 | Salto: mergulha (o aviso) e troca de lado pulando por cima da areia, girando e soltando três bolhas lentas | 0,8 s (sem aviso) | 1 cada | Correr para baixo dele |
+| Boto cor-de-rosa | 1 | Beijos de bolha: quatro corações que perseguem o Curupira ondulando, virando devagar, e estouram com um tiro. O que encosta, além do golpe, encanta (ver Efeitos de estado) | 0,6 s | A definir | Atirar neles ou despistar correndo e pulando |
+| Boto cor-de-rosa | 2 | Chapéu bumerangue: o chapéu vai baixo e volta alto, ou vai alto e volta baixo (sorteado). No aviso, o Boto tira o chapéu da cabeça com a nadadeira, puxa o braço para trás e segura, e ao mesmo tempo afunda (ida baixa) ou fica quase todo fora da água (ida alta), até a nadadeira ficar na altura da ida. O chapéu sai reto da nadadeira | 0,8 s (0,6) | A definir | Pular o baixo e abaixar no alto |
+| Boto cor-de-rosa | 3 | Salto, de duas formas sorteadas. Por cima: afunda reto (o aviso) e troca de lado num arco alto, girando e soltando cinco bolhas que descem balançando. Rasante: deita para a frente e bate a cauda espirrando água (o aviso), e atravessa baixo e reto, deitado, na altura do peito do Curupira | 0,8 s (sem aviso) | 1 cada bolha; contato no rasante | Por cima: correr para baixo dele e passar entre as bolhas. Rasante: abaixar ou dash |
 | Máquina controlada por IA | 1 | Raio laser. Uma linha fina segue o Curupira, trava 0,3 s antes e dispara | 1 s (0,8) | 1 | Sair da linha |
 | Máquina controlada por IA | 1 | Bombas, que caem dos alçapões do teto e explodem 1,5 s depois de cair. Depois a Máquina fica parada por 1,2 s | 1,5 s | 2 | Sair da área |
 | Máquina controlada por IA | 2 | Piso traiçoeiro: as placas do chão saltam em sequência, em duas ondas vindo na direção do Curupira. Cada placa pisca 0,4 s (0,25) antes de saltar | 0,9 s (0,5) | A definir | Pular as placas |
@@ -421,7 +422,7 @@ Animações dos chefes no Godot (nomes no `SpriteFrames`):
 | --- | --- |
 | Mula sem Cabeça | `idle`, `aviso_bolas`, `bolas`, `fim_bolas`, `aviso_pisoteio`, `pisoteio_alto`, `pisoteio`, `aviso_investida`, `galope`, `batida`, `tonta`, `aviso_meteoros`, `meteoros`, `cansada`, `dano`, `transicao`, `derrota` |
 | Cuca | `idle`, `aviso_feitico`, `feitico`, `fim_feitico`, `aviso_pocao`, `pocao`, `fim_pocao`, `aviso_bote`, `bote`, `levantar`, `aviso_ninar`, `ninar`, `fim_ninar`, `dano`, `transicao`, `derrota` |
-| Boto cor-de-rosa | `idle`, `aviso_jato`, `jato`, `fim_jato`, `aviso_beijos`, `beijos`, `fim_beijos`, `aviso_chapeu`, `arremesso`, `sem_chapeu`, `pega_chapeu`, `mergulho`, `salto`, `emergir`, `dano`, `transicao`, `derrota` |
+| Boto cor-de-rosa | `idle`, `aviso_jato`, `jato`, `fim_jato`, `aviso_beijos`, `beijos`, `fim_beijos`, `aviso_chapeu`, `segura_chapeu`, `arremesso`, `fim_arremesso`, `sem_chapeu`, `pega_chapeu`, `mergulho`, `salto`, `aviso_rasante`, `rasante`, `emergir`, `dano`, `transicao`, `derrota` |
 | Máquina controlada por IA | `idle`, `aviso_laser`, `mirando`, `laser`, `fim_laser`, `aviso_bombas`, `bombas`, `fim_bombas`, `aviso_pistoes`, `pistoes`, `descer`, `varredura`, `varredura_chao`, `subir`, `dano`, `transicao`, `derrota` |
 
 `dano` é um susto curto (0,33 s), tocado quando o chefe leva tiro parado entre ataques. Cada tiro também faz o chefe piscar de branco, soltar uma faísca onde bateu e recuar alguns pixels. `transicao` é a animação da troca de fase (2 s). O Curupira tem a própria animação `dano`: ao levar golpe, pisca de branco e a tela treme.
@@ -519,7 +520,7 @@ Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do docum
 
 - [ ] **Q14. Áudio.** Bibliotecas, faixas e efeitos usados, com a fonte e a licença de cada um.
 - [ ] **Q15. Travar a mira no controle.** No teclado ficou o Shift (ação `aim_lock`). Falta o botão do controle.
-- [ ] **Q16. Fases, combos e ataques novos.** A estrutura está decidida (fases por dificuldade, trocando na metade ou a cada terço). Faltam, depois de testar: a chance e o atraso dos combos, a pausa de cada fase e o aviso, a duração, a velocidade e os golpes dos ataques marcados como "a definir". Valores provisórios no `.tres` de cada chefe.
+- [ ] **Q16. Fases, combos e ataques novos.** A estrutura está decidida (fases por dificuldade, trocando na metade ou a cada terço). Faltam, depois de testar: a chance e o atraso dos combos, a pausa de cada fase e o aviso, a duração, a velocidade e os golpes dos ataques marcados como "a definir". No Boto, também a perseguição e o encanto dos corações, o rasante e as bolhas mais rápidas. Valores provisórios no `.tres` de cada chefe.
 
 ### Resolvidas
 

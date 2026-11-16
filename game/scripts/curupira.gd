@@ -17,6 +17,7 @@ extends CharacterBody2D
 ##   abaixar, agachado, agachado_atirar, levantar
 ## Se uma animação ainda não existir, toca a idle no lugar (não dá erro).
 ## O dash tem efeito próprio (fantasmas, folhas, vento, corpo esticado) no node EfeitoDash.
+## Encanto (coração do Boto): puxado para o lado do Boto por um tempo; visual no EfeitoEncanto.
 
 enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, AGACHADO, DASH, ESPECIAL, DERROTADO }
 
@@ -74,6 +75,10 @@ var _formas_agachado: Array = []
 var _dash_aereo_disponivel: bool = true
 # Lentidão ativa: quem está deixando lento (ex.: poça da Cuca) -> fator de velocidade.
 var _lentidoes: Dictionary = {}
+# Encanto (coração do Boto): tempo que falta e velocidade do puxão (o sinal é o lado).
+var _tempo_encanto: float = 0.0
+var _puxao_encanto: float = 0.0
+var _efeito_encanto: EfeitoEncanto
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var atirador: Atirador = $Atirador
@@ -95,6 +100,8 @@ func _ready() -> void:
 
 	# Hurtbox avisa que algo encostou -> take_damage decide se conta -> Vida desconta.
 	hurtbox.golpe_recebido.connect(take_damage)
+	# Efeitos de estado que chegam pela hurtbox (hoje só o encanto do Boto).
+	hurtbox.efeito_recebido.connect(_ao_receber_efeito)
 	vida.zerou.connect(_ao_zerar_vida)
 	vida.configurar(dados_vida.golpes)
 
@@ -110,6 +117,9 @@ func _ready() -> void:
 	_material_pisca = EfeitosTela.preparar_pisca(sprite)
 	atirador.seguindo_mao = true
 	_preparar_formas_agachado()
+	_efeito_encanto = EfeitoEncanto.new()
+	_efeito_encanto.desenho = sprite
+	add_child(_efeito_encanto)
 
 
 func _physics_process(delta: float) -> void:
@@ -137,6 +147,7 @@ func _physics_process(delta: float) -> void:
 	_atualizar_animacao()
 	_por_atirador_na_mao()
 	_atualizar_invencibilidade(delta)
+	_efeito_encanto.mostrar(esta_encantado())
 
 	if atirando:
 		atirador.tentar_atirar(olhando_para, fator_lentidao(), mira)
@@ -169,6 +180,22 @@ func fator_lentidao() -> float:
 	for f in _lentidoes.values():
 		fator = minf(fator, f)
 	return fator
+
+
+## Efeito de estado vindo da hurtbox. Quem causa só chama aplicar_efeito nela.
+## &"encanto" (coração do Boto): por "duracao" segundos o Curupira é puxado na horizontal, a
+## "intensidade" px/s (negativa = para a esquerda); não anda, não abaixa nem dá dash, mas pula
+## e atira. Chega junto com o golpe do coração, então não olha a invencibilidade de depois do
+## golpe; só o dash (o coração nem encosta) e a derrota impedem.
+func _ao_receber_efeito(efeito: StringName, intensidade: float, duracao: float) -> void:
+	if efeito != &"encanto" or estado == Estado.DASH or estado == Estado.DERROTADO:
+		return
+	_tempo_encanto = maxf(_tempo_encanto, duracao)
+	_puxao_encanto = intensidade
+
+
+func esta_encantado() -> bool:
+	return _tempo_encanto > 0.0 and estado != Estado.DERROTADO
 
 
 ## Chamado pela Hurtbox quando uma hitbox de inimigo encosta.
@@ -336,6 +363,7 @@ func _atualizar_janelas(delta: float) -> void:
 		_tempo_buffer_pulo -= delta
 
 	_tempo_recarga_dash -= delta
+	_tempo_encanto -= delta
 	_tempo_ataque -= delta
 	_tempo_pouso -= delta
 	_tempo_dano -= delta
@@ -347,6 +375,13 @@ func _aplicar_gravidade(delta: float) -> void:
 
 
 func _mover_horizontal() -> void:
+	# Encantado: anda sozinho para o lado do Boto, olhando para ele.
+	if esta_encantado():
+		velocity.x = _puxao_encanto * fator_lentidao()
+		if _puxao_encanto != 0.0:
+			olhando_para = int(signf(_puxao_encanto))
+			sprite.scale.x = absf(sprite.scale.x) * olhando_para
+		return
 	# get_axis já anula esquerda + direita juntas. signf deixa o analógico com
 	# velocidade fixa (sem "andar devagar" com o analógico meio inclinado).
 	var direcao: float = signf(Input.get_axis("move_left", "move_right"))
@@ -380,7 +415,7 @@ func _cortar_pulo() -> void:
 
 ## Retorna true se o dash começou neste frame.
 func _tentar_dash() -> bool:
-	if not Input.is_action_just_pressed("dash") or _tempo_recarga_dash > 0.0:
+	if not Input.is_action_just_pressed("dash") or _tempo_recarga_dash > 0.0 or esta_encantado():
 		return false
 	var no_ar: bool = not is_on_floor()
 	if no_ar and not _dash_aereo_disponivel:
@@ -425,7 +460,7 @@ func _atualizar_estado() -> void:
 	if is_on_floor():
 		if _estava_no_ar:
 			_tempo_pouso = FolhaSprites.duracao(sprite, &"pouso")
-		var agachar: bool = Input.get_axis("aim_up", "crouch") > 0.0 and not Input.is_action_pressed("aim_lock")
+		var agachar: bool = Input.get_axis("aim_up", "crouch") > 0.0 and not Input.is_action_pressed("aim_lock") and not esta_encantado()
 		if agachar:
 			estado = Estado.AGACHADO
 		else:

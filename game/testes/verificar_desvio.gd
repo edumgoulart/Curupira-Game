@@ -35,7 +35,10 @@ const ARENAS := {
 	"maquina": "res://scenes/level4.tscn",
 }
 const NOMES_DIFICULDADE := ["Normal", "Expert"]
-const SORTEIOS := [11, 22]
+## Sementes do sorteio. O primeiro sorteio de cada uma cai acima (11: 0,83) e abaixo (44: 0,30)
+## de 0,5, para os ataques com duas formas sorteadas (jato alto ou baixo, ordem do chapéu, salto
+## por cima ou rasante) passarem pelas duas. Antes era [11, 22], e as duas davam 0,83.
+const SORTEIOS := [11, 44]
 ## Atrasos testados para achar o mínimo de cada combo (s).
 const ATRASOS := [0.0, 0.2, 0.4, 0.6, 0.8, 1.0]
 
