@@ -52,6 +52,15 @@
   "centro": [10, 10],
   "quadros": 2
  },
+ "acerto": {
+  "nome": "acerto",
+  "fps": 20,
+  "loop": false,
+  "tamanho": [20, 20],
+  "centro": [10, 9],
+  "nota": "onde o tiro bate no chefe; simétrico, não gira",
+  "quadros": 6
+ },
  "feitico": {
   "nome": "feitico",
   "fps": 16,

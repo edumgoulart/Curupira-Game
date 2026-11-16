@@ -33,32 +33,25 @@ extends Resource
 @export var fracao_contato: Vector2 = Vector2(0.55, 0.7)
 
 @export_group("Fases")
-## Fração da vida em que começa a fase 2 (0,667 = quando perde um terço).
-## Proposta do GDD (Q16): a cada terço da vida.
-@export_range(0.0, 1.0, 0.01) var vida_fase_2: float = 0.667
-## Fração da vida em que começa a fase 3.
-@export_range(0.0, 1.0, 0.01) var vida_fase_3: float = 0.333
-## Ataques sorteados em cada fase (nomes que o script do chefe conhece).
-## O primeiro ataque de uma fase nova que não estava na anterior sai logo que a fase começa.
-@export var ataques_fase_1: Array[StringName] = []
-@export var ataques_fase_2: Array[StringName] = []
-@export var ataques_fase_3: Array[StringName] = []
+## Fases da luta em cada dificuldade (escolhida na tela de seleção, antes de cada luta).
+## Cada fase diz em que fração da vida começa, os ataques sorteados e os combos.
+## Combinado com o Eduardo: Normal = 1 fase (Máquina: 2); Expert = 2 fases (Máquina: 3).
+@export var fases_normal: Array[FaseChefe] = []
+@export var fases_expert: Array[FaseChefe] = []
+
+@export_group("Transição de fase")
+## Duração mínima da transição (s): o chefe para, a tela limpa e ele faz a animação
+## "transicao". Se a animação for mais longa, vale a animação. Ele continua levando dano.
+## Provisório: 1,2.
+@export_range(0.0, 5.0, 0.05, "suffix:s") var duracao_transicao: float = 1.2
+## Respiro parado depois da transição, antes do primeiro combo da fase nova (s). Provisório: 0,5.
+@export_range(0.0, 3.0, 0.05, "suffix:s") var pausa_apos_transicao: float = 0.5
 
 
-func ataques_da_fase(fase: int) -> Array[StringName]:
-	match fase:
-		0:
-			return ataques_fase_1
-		1:
-			return ataques_fase_2 if not ataques_fase_2.is_empty() else ataques_fase_1
-		_:
-			return ataques_fase_3 if not ataques_fase_3.is_empty() else ataques_da_fase(1)
-
-
-## Em que fase o chefe está com esta fração da vida (0 = fase 1).
-func fase_para(fracao_vida: float) -> int:
-	if fracao_vida <= vida_fase_3:
-		return 2
-	if fracao_vida <= vida_fase_2:
-		return 1
-	return 0
+## As fases da dificuldade, da primeira à última (ordenadas pela vida em que começam).
+## Expert sem fases próprias usa as do Normal.
+func fases_para(dificuldade: int) -> Array[FaseChefe]:
+	var lista: Array[FaseChefe] = fases_expert if dificuldade == GameState.Dificuldade.EXPERT and not fases_expert.is_empty() else fases_normal
+	lista = lista.duplicate()
+	lista.sort_custom(func(a: FaseChefe, b: FaseChefe) -> bool: return a.comeca_com_vida > b.comeca_com_vida)
+	return lista

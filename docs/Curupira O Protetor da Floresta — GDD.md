@@ -14,7 +14,7 @@ O design está em definição e a implementação ainda não começou.
 O trabalho é dividido de forma igualitária; a tabela indica só o foco de cada um.
 
 - **Definido:** história, elenco de chefes, direção de arte em pixel art, controles, telas, público e plataforma. Há sprites em pixel art do Curupira, dos quatro chefes e das quatro arenas, já exportados para o Godot.
-- **Em definição:** números dos ataques novos dos chefes, regra de troca de fase, botão de travar a mira e lista de áudio.
+- **Em definição:** números dos ataques novos dos chefes e dos combos, botão de travar a mira e lista de áudio.
 - **Implementação:** não iniciada. A estrutura de cenas e o movimento do Curupira estão planejados em Documentação técnica.
 - **Bloqueios:** decisões listadas em Questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do documento apontam para essa lista.
 
@@ -183,7 +183,7 @@ Este é o cenário da fase da Mula sem Cabeça.
 
 ### Cenário: península do Boto
 
-A arena é uma península de areia com água dos dois lados. O Boto cor-de-rosa alterna entre os dois lados, pulando de um para o outro. No design inicial, a água é azul de um lado e barrenta do outro. O Curupira fica só na areia: as beiras dela seguram ele, e o Boto fica na água, do lado de fora.
+A arena é uma península de areia com água dos dois lados. O Boto cor-de-rosa alterna entre os dois lados, pulando de um para o outro. No design inicial, a água é azul de um lado e barrenta do outro. O Curupira fica só na areia: as beiras dela seguram ele, e o Boto fica na água, do lado de fora. A água em volta dele se mexe (anéis, espuma e gotinhas) e respinga quando ele afunda, sobe ou salta.
 
 &#91;image: Design inicial da arena do Boto cor-de-rosa: península de areia entre água azul e água barrenta\]
 
@@ -228,7 +228,7 @@ O jogo tem nove tipos de tela:
 
 - **Cenas de abertura.** Cenas estáticas no início do jogo, que explicam a história.
 - **Menu inicial.** Mostra também os botões de cada ação; é assim que o jogador aprende os controles.
-- **Seleção de fase e de ataques.** O jogador escolhe o chefe e, na mesma tela, o ataque básico e o especial.
+- **Seleção de fase e de ataques.** O jogador escolhe o chefe, a dificuldade (Normal ou Expert) e, na mesma tela, o ataque básico e o especial.
 - **Arena.** Uma por chefe, quatro no total.
 - **Pausa.**
 - **Opções.** Volume, alternância entre tela cheia e janela e, quando aberta no meio de uma fase, a opção de voltar para a seleção de fase.
@@ -306,6 +306,13 @@ No Curupira, os efeitos vêm das poças da Cuca. A poça de veneno tira 1 golpe 
 
 O jogador escolhe o ataque básico e o especial antes de cada fase, na mesma tela em que escolhe o chefe. Durante a fase não há troca.
 
+Na mesma tela ele escolhe a dificuldade da próxima luta (decisão do Eduardo):
+
+- **Normal.** Mula, Cuca e Boto lutam numa fase só; a máquina, em duas.
+- **Expert.** Os seres folclóricos lutam em duas fases; a máquina, em três. Os combos vêm mais vezes e mais colados.
+
+Vencer no Normal já concede os ataques e conta para liberar a máquina. A vitória no Expert fica marcada à parte na seleção ("derrotada · Expert"). A dificuldade escolhida fica salva.
+
 ## Objetos do jogo
 
 O jogo tem um personagem jogável e quatro chefes.
@@ -356,18 +363,26 @@ Especiais:
 
 Cada um dos três seres folclóricos concede um ataque básico e um especial ao ser derrotado. A máquina controlada por IA é o chefe final, liberada depois dos três, e não concede ataque.
 
-Cada luta tem três fases. Cada chefe tem quatro ataques:
+Cada chefe tem quatro ataques. Quantas fases a luta tem depende da dificuldade (ver Escolha antes da fase):
 
-- **Fase 1:** dois ataques.
-- **Fase 2:** entra um terceiro ataque, mais difícil, misturado aos dois primeiros.
-- **Fase 3:** entra o quarto, o mais difícil, e os quatro se alternam.
+| Chefe | Normal | Expert |
+| --- | --- | --- |
+| Mula, Cuca e Boto | 1 fase, com os 4 ataques | 2 fases, trocando na metade da vida. A fase 1 tem 3 ataques e a fase 2 traz o quarto |
+| Máquina controlada por IA | 2 fases, trocando na metade. A fase 1 tem 3 ataques e a fase 2 traz a varredura | 3 fases, trocando a cada terço. Os ataques entram 2 + 1 + 1 |
 
-A ideia, como no Cuphead, é variar o ritmo e brincar com o jogador em vez de repetir dois ataques a luta inteira. Ainda não está decidido quando cada fase começa (Q16); a proposta é trocar quando o chefe perde um terço e dois terços da vida.
+A ideia, como no Cuphead, é variar o ritmo e brincar com o jogador em vez de repetir dois ataques a luta inteira:
+
+- **Ordem.** Não há ordem fixa. Os ataques da fase saem embaralhados, como cartas de um baralho: todos saem uma vez antes de algum repetir.
+- **Combos.** De vez em quando o chefe emenda dois ataques: o primeiro sai sem a parada do fim e o segundo vem logo depois de um atraso curto. Cada fase tem a lista de combos permitidos, a chance de sair um combo e o atraso de cada um. Os combos foram conferidos por um teste automático (`verificar_desvio.gd`, ver Testes): para cada combo, ele procura um jeito de o Curupira sair sem levar golpe, a partir de três posições.
+- **Troca de fase.** O chefe termina o ataque em andamento, a tela treme, dá um clarão, todos os tiros do chefe somem e ele faz uma animação de transição (2 s). Ele continua levando dano nesse tempo. A primeira jogada da fase nova é um combo com o ataque novo.
+- **Lado.** A Mula (investida) e a Cuca (bote) atravessam a arena e ficam do outro lado; não voltam de costas. Os ataques seguintes saem de lá, espelhados.
+
+Os números das fases e dos combos (chance, atraso, pausa) são provisórios e ficam no `.tres` de cada chefe (Q16).
 
 Três regras valem para todos os chefes:
 
 - O chefe pode levar dano o tempo todo.
-- Todo ataque tem um aviso visual antes do golpe.
+- Todo ataque tem um aviso visual antes do golpe: o chefe brilha e faz a animação de aviso, e o jogador lê o ataque pela pose. Não há marca na tela cobrindo a área do golpe; o Eduardo achou que deixava fácil demais. As exceções são o que vem de fora da vista ou é mirado: o brilho no céu dos meteoros, a linha fina do laser e a linha da altura do chapéu do Boto. No jato, quem mostra a altura é o próprio Boto, afundando na água até o bico ficar nela.
 - Depois do ataque mais forte, o chefe fica parado por um instante. É a janela para o jogador atacar.
 
 | Chefe | Perfil | Vida | Duração-alvo | Pausa entre ataques | Concede ao Curupira |
@@ -379,35 +394,37 @@ Três regras valem para todos os chefes:
 
 A duração-alvo supõe que o jogador acerta o chefe em 60% do tempo. Uma partida sem derrotas soma cerca de 7 min 30 s.
 
-Ataques de cada chefe. Os avisos e golpes que já existiam continuam valendo; os dos ataques novos estão marcados como "a definir" (Q16).
+Ataques de cada chefe. Os avisos ficaram mais longos a pedido do Eduardo, para dar tempo de desviar (o valor antigo está entre parênteses). Os golpes dos ataques novos continuam "a definir" (Q16).
 
 | Chefe | Fase | Ataque | Aviso | Golpes | Como desviar |
 | --- | --- | --- | --- | --- | --- |
-| Mula sem Cabeça | 1 | Rajada rasteira: abaixa o peito até o chão e cospe três bolas de fogo em sequência, rente ao chão | 0,5 s | 1 cada | Pular |
-| Mula sem Cabeça | 1 | Pisoteio: empina, segura no alto e bate as patas da frente; uma onda de fogo corre pelo chão | A definir | A definir | Pular |
-| Mula sem Cabeça | 2 | Investida: raspa o casco duas vezes, atravessa a arena e bate na parede. Fica tonta depois | A definir | A definir | Dash |
-| Mula sem Cabeça | 3 | Chuva de meteoros: lança três meteoros para cima; uma sombra no chão marca a queda de cada um. Depois fica parada por 1,5 s | 1 s cada | 2 cada | Sair das sombras |
-| Cuca | 1 | Feitiço em leque: três feitiços grandes e bem separados, o do meio mirado no Curupira | 0,5 s | 1 cada | Passar entre eles |
-| Cuca | 1 | Poção que deixa uma poça de veneno ou de lentidão por 5 s. No máximo duas poças na arena | 0,6 s | Ver Efeitos de estado | Sair da poça |
-| Cuca | 2 | Bote de jacaré: abre a boca, se joga de barriga e desliza pela arena abocanhando | A definir | A definir | Pular |
-| Cuca | 3 | Canção de ninar: duas fileiras de notas em onda, com uma brecha entre elas que sobe e desce | A definir | A definir | Passar na brecha |
-| Boto cor-de-rosa | 1 | Jato de água reto, saindo da boca, na altura do peito do Curupira, até a outra margem. Depois o Boto fica parado por 1,2 s | 0,7 s | 1 | Abaixar |
-| Boto cor-de-rosa | 1 | Beijos de bolha: quatro corações lentos e ondulando, que estouram com um tiro | A definir | A definir | Atirar neles |
-| Boto cor-de-rosa | 2 | Chapéu bumerangue: o chapéu vai baixo até o outro lado e volta alto | A definir | A definir | Pular na ida e abaixar na volta |
-| Boto cor-de-rosa | 3 | Salto: troca de lado pulando por cima da areia, girando e soltando três bolhas lentas | Sem aviso | 1 cada | Correr para baixo dele |
-| Máquina controlada por IA | 1 | Raio laser. Uma linha fina mostra o trajeto antes do disparo | 0,8 s | 1 | Sair da linha |
+| Mula sem Cabeça | 1 | Rajada rasteira: abaixa o peito até o chão e cospe três bolas de fogo em sequência, rente ao chão | 0,8 s (0,5) | 1 cada | Pular |
+| Mula sem Cabeça | 1 | Pisoteio: empina, segura no alto e bate as patas da frente; uma onda de fogo corre pelo chão | 1 s (0,8) | A definir | Pular |
+| Mula sem Cabeça | 2 | Investida: agacha e raspa a pata da frente na terra duas vezes, jogando terra para trás, como cavalo antes de correr. Depois atravessa a arena e bate na parede. Fica tonta e fica daquele lado | 1,1 s (0,9) | A definir | Pular por cima ou dash |
+| Mula sem Cabeça | 3 | Chuva de meteoros: cospe três meteoros para o céu (dá para ver cada um subir). Um brilho no alto da tela, bem em cima de onde cada um vai cair, fica mais forte e pisca mais rápido até a pedra descer; no chão, uma sombra cresce. Depois fica parada por 1,5 s | 1,3 s cada (1) | 2 cada | Sair de baixo dos brilhos |
+| Cuca | 1 | Feitiço em leque: três feitiços grandes e bem separados, o do meio mirado no Curupira | 0,8 s (0,5) | 1 cada | Passar entre eles |
+| Cuca | 1 | Poção que deixa uma poça de veneno ou de lentidão por 5 s. No máximo duas poças na arena | 0,8 s (0,6) | Ver Efeitos de estado | Sair da poça |
+| Cuca | 2 | Bote de jacaré: abre a boca, se joga de barriga e desliza até perto da outra parede abocanhando. Levanta e fica daquele lado | 0,9 s (0,6) | A definir | Pular |
+| Cuca | 3 | Canção de ninar: uma melodia de seis notas, uma de cada vez. A grave vem rente ao chão e a aguda na altura do peito, cada uma de uma cor | 0,9 s (0,4) | A definir | Pular a grave e abaixar na aguda |
+| Boto cor-de-rosa | 1 | Jato de água saindo reto da boca até a outra margem, alto (na altura do peito) ou baixo (rente à areia), sorteado. No aviso, o Boto afunda na água até o bico ficar na altura do jato (no baixo, só a cabeça fica de fora), e a água começa a sair do bico, fina, e vai crescendo até virar o jato. Depois o Boto fica parado por 1,2 s | 0,9 s (0,7) | 1 | Abaixar (alto) ou pular (baixo) |
+| Boto cor-de-rosa | 1 | Beijos de bolha: quatro corações lentos e ondulando, que estouram com um tiro | 0,6 s | A definir | Atirar neles |
+| Boto cor-de-rosa | 2 | Chapéu bumerangue: o chapéu vai baixo e volta alto, ou vai alto e volta baixo (sorteado). Uma linha fina mostra a altura da ida | 0,8 s (0,6) | A definir | Pular o baixo e abaixar no alto |
+| Boto cor-de-rosa | 3 | Salto: mergulha (o aviso) e troca de lado pulando por cima da areia, girando e soltando três bolhas lentas | 0,8 s (sem aviso) | 1 cada | Correr para baixo dele |
+| Máquina controlada por IA | 1 | Raio laser. Uma linha fina segue o Curupira, trava 0,3 s antes e dispara | 1 s (0,8) | 1 | Sair da linha |
 | Máquina controlada por IA | 1 | Bombas, que caem dos alçapões do teto e explodem 1,5 s depois de cair. Depois a Máquina fica parada por 1,2 s | 1,5 s | 2 | Sair da área |
-| Máquina controlada por IA | 2 | Piso traiçoeiro: as placas do chão saltam em sequência, em duas ondas vindo na direção do Curupira | A definir | A definir | Pular as placas |
-| Máquina controlada por IA | 3 | Varredura: desce até a altura do Curupira e varre a arena com o laser, primeiro reto na altura da cabeça e depois mirando o chão | A definir | A definir | Abaixar e depois pular |
+| Máquina controlada por IA | 2 | Piso traiçoeiro: as placas do chão saltam em sequência, em duas ondas vindo na direção do Curupira. Cada placa pisca 0,4 s (0,25) antes de saltar | 0,9 s (0,5) | A definir | Pular as placas |
+| Máquina controlada por IA | 3 | Varredura: desce até a altura do Curupira e varre a arena com o laser, primeiro reto na altura da cabeça e depois mirando o chão. Uma linha fina mostra cada passada antes | 0,8 s cada (0,5) | A definir | Abaixar e depois pular |
 
 Animações dos chefes no Godot (nomes no `SpriteFrames`):
 
 | Chefe | Animações |
 | --- | --- |
-| Mula sem Cabeça | `idle`, `aviso_bolas`, `bolas`, `fim_bolas`, `aviso_pisoteio`, `pisoteio_alto`, `pisoteio`, `aviso_investida`, `galope`, `batida`, `tonta`, `trote`, `aviso_meteoros`, `meteoros`, `cansada`, `derrota` |
-| Cuca | `idle`, `aviso_feitico`, `feitico`, `fim_feitico`, `aviso_pocao`, `pocao`, `fim_pocao`, `aviso_bote`, `bote`, `levantar`, `andar`, `aviso_ninar`, `ninar`, `fim_ninar`, `derrota` |
-| Boto cor-de-rosa | `idle`, `aviso_jato`, `jato`, `fim_jato`, `aviso_beijos`, `beijos`, `fim_beijos`, `aviso_chapeu`, `arremesso`, `sem_chapeu`, `pega_chapeu`, `mergulho`, `salto`, `emergir`, `derrota` |
-| Máquina controlada por IA | `idle`, `aviso_laser`, `mirando`, `laser`, `fim_laser`, `aviso_bombas`, `bombas`, `fim_bombas`, `aviso_pistoes`, `pistoes`, `descer`, `varredura`, `varredura_chao`, `subir`, `derrota` |
+| Mula sem Cabeça | `idle`, `aviso_bolas`, `bolas`, `fim_bolas`, `aviso_pisoteio`, `pisoteio_alto`, `pisoteio`, `aviso_investida`, `galope`, `batida`, `tonta`, `aviso_meteoros`, `meteoros`, `cansada`, `dano`, `transicao`, `derrota` |
+| Cuca | `idle`, `aviso_feitico`, `feitico`, `fim_feitico`, `aviso_pocao`, `pocao`, `fim_pocao`, `aviso_bote`, `bote`, `levantar`, `aviso_ninar`, `ninar`, `fim_ninar`, `dano`, `transicao`, `derrota` |
+| Boto cor-de-rosa | `idle`, `aviso_jato`, `jato`, `fim_jato`, `aviso_beijos`, `beijos`, `fim_beijos`, `aviso_chapeu`, `arremesso`, `sem_chapeu`, `pega_chapeu`, `mergulho`, `salto`, `emergir`, `dano`, `transicao`, `derrota` |
+| Máquina controlada por IA | `idle`, `aviso_laser`, `mirando`, `laser`, `fim_laser`, `aviso_bombas`, `bombas`, `fim_bombas`, `aviso_pistoes`, `pistoes`, `descer`, `varredura`, `varredura_chao`, `subir`, `dano`, `transicao`, `derrota` |
+
+`dano` é um susto curto (0,33 s), tocado quando o chefe leva tiro parado entre ataques. Cada tiro também faz o chefe piscar de branco, soltar uma faísca onde bateu e recuar alguns pixels. `transicao` é a animação da troca de fase (2 s). O Curupira tem a própria animação `dano`: ao levar golpe, pisca de branco e a tela treme.
 
 Os projéteis e efeitos de cada chefe (bola de fogo, onda de fogo, meteoro, feitiço, poção, poça, nota, jato, coração, chapéu, laser, bomba, alçapão, placa, explosões) são animações separadas, em `game/assets/pixel/<chefe>/efeitos/`. Quantidade, espaçamento, velocidade e tempo de cada ataque ficam no `.tres` de dados do chefe, no Godot.
 
@@ -502,7 +519,7 @@ Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do docum
 
 - [ ] **Q14. Áudio.** Bibliotecas, faixas e efeitos usados, com a fonte e a licença de cada um.
 - [ ] **Q15. Travar a mira no controle.** No teclado ficou o Shift (ação `aim_lock`). Falta o botão do controle.
-- [ ] **Q16. Fases e ataques novos.** Em que ponto da vida cada fase começa (proposta: a cada terço) e o aviso, a duração, a velocidade e os golpes dos ataques marcados como "a definir".
+- [ ] **Q16. Fases, combos e ataques novos.** A estrutura está decidida (fases por dificuldade, trocando na metade ou a cada terço). Faltam, depois de testar: a chance e o atraso dos combos, a pausa de cada fase e o aviso, a duração, a velocidade e os golpes dos ataques marcados como "a definir". Valores provisórios no `.tres` de cada chefe.
 
 ### Resolvidas
 
@@ -516,7 +533,8 @@ Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do docum
 | Para onde o Curupira atira? | Em oito direções: para cima, nas diagonais e para a frente; para baixo só no ar. Também atira agachado | Sistemas e funcionalidades |
 | O dash dá invencibilidade? | Sim | Sistemas e funcionalidades |
 | O que acontece no quarto golpe e como é o salvamento? | O jogador perde a fase. O progresso é salvo a cada chefe derrotado e permanece depois de fechar o jogo | Sistemas e funcionalidades |
-| Os chefes mudam de fase durante a luta? | Sim. Três fases, com quatro ataques por chefe | Objetos do jogo |
+| Os chefes mudam de fase durante a luta? | Depende da dificuldade. Normal: 1 fase (máquina: 2). Expert: 2 fases (máquina: 3). Quatro ataques por chefe | Objetos do jogo |
+| Os ataques têm ordem fixa? | Não. Saem embaralhados, e às vezes dois vêm emendados (combo) | Objetos do jogo |
 | Tamanho dos sprites e quadros por animação (Q5)? | Pixel art em 480×270 ampliada 4×. Curupira com ~61 px, chefes entre 80 e 110 px, chefes a 12 quadros por segundo | Arte, som e música |
 | Qual é o design da máquina e da arena dela? | O Núcleo pendurado no teto, numa câmara de testes branca | Objetos do jogo e Mundo do jogo |
 | As arenas têm plataformas ou perigos próprios? | Não. Só chão e paredes | Mundo do jogo |

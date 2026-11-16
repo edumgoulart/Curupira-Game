@@ -43,6 +43,15 @@
   "nota": "aviso no chão; tocar durante o tempo de queda",
   "quadros": 8
  },
+ "brilho_meteoro": {
+  "nome": "brilho_meteoro",
+  "fps": 12,
+  "loop": false,
+  "tamanho": [27, 27],
+  "centro": [13, 13],
+  "nota": "brilho no céu antes do meteoro: 6 forças × 2 piscadas (quadro = 2 × força + piscada)",
+  "quadros": 12
+ },
  "explosao": {
   "nome": "explosao",
   "fps": 24,

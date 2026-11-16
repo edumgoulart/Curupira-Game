@@ -1,15 +1,42 @@
 class_name Meteoro
 extends Node2D
 ## Meteoro da Mula. Nasce no chão, no ponto onde vai cair:
-##   1. a sombra aparece e cresce durante o aviso (é o telegrafo);
-##   2. nos últimos instantes a bola de fogo aparece caindo do alto;
+##   1. durante o aviso (é o telegrafo), um brilho no alto da tela, bem em cima do ponto, fica
+##      mais forte e pisca mais rápido; no chão a sombra cresce;
+##   2. nos últimos instantes a bola de fogo cai do alto, saindo do brilho (que some quando ela
+##      passa por ele);
 ##   3. no impacto a área machuca por um instante, o fogo estoura e tudo some.
-## O fogo é só visual; quem machuca é a área "Impacto" (Hitbox).
+## O fogo e o brilho são só visuais; quem machuca é a área "Impacto" (Hitbox).
+## O brilho é criado aqui por código (não está na cena) e fica no meteoro: some junto com ele.
 
 signal impactou
 
 ## Altura de onde o fogo começa a cair, acima do chão (px). Só visual.
 const ALTURA_QUEDA: float = 1200.0
+
+## Brilho no céu: 6 forças × 2 piscadas (quadro = 2 × força + piscada), do gerador de pixel art.
+const QUADROS_BRILHO: Array[Texture2D] = [
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_1.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_2.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_3.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_4.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_5.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_6.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_7.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_8.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_9.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_10.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_11.png"),
+	preload("res://assets/pixel/mula/efeitos/brilho_meteoro_12.png"),
+]
+const FORCAS_BRILHO: int = 6
+## Centro do desenho do brilho (efeitos.json da Mula, "centro").
+const CENTRO_BRILHO: Vector2 = Vector2(13, 13)
+## Distância do brilho até a borda de cima da tela (px): abaixo da barra de vida do chefe.
+const MARGEM_BRILHO: float = 150.0
+## Piscadas por segundo, do começo ao fim do aviso (pisca mais rápido perto da queda).
+const PISCA_BRILHO_INICIO: float = 6.0
+const PISCA_BRILHO_FIM: float = 16.0
 
 ## Explosão criada no impacto. Só visual.
 @export var cena_estouro: PackedScene
@@ -20,6 +47,8 @@ var _duracao_impacto: float = 0.15
 var _golpes: int = 2
 var _tempo: float = 0.0
 var _impactou: bool = false
+var _brilho: Sprite2D
+var _pisca: float = 0.0
 
 @onready var sombra: AnimacaoQuadros = $Sombra
 @onready var fogo: Node2D = $Fogo
@@ -41,11 +70,13 @@ func _ready() -> void:
 	impacto.dano = _golpes
 	forma_impacto.disabled = true
 	fogo.visible = false
+	_criar_brilho()
 	_atualizar_visual()
 
 
 func _physics_process(delta: float) -> void:
 	_tempo += delta
+	_pisca += delta * lerpf(PISCA_BRILHO_INICIO, PISCA_BRILHO_FIM, _forca_do_aviso())
 	_atualizar_visual()
 	if not _impactou and _passou(_aviso):
 		_impactou = true
@@ -66,6 +97,34 @@ func _atualizar_visual() -> void:
 		fogo.visible = true
 		var q: float = clampf((_tempo - inicio_queda) / _queda, 0.0, 1.0)
 		fogo.position.y = lerpf(_y_final_fogo - ALTURA_QUEDA, _y_final_fogo, q)
+	_atualizar_brilho()
+
+
+## O brilho fica no alto da tela visível (a câmera é fixa), na mesma coluna do ponto de queda.
+func _criar_brilho() -> void:
+	_brilho = Sprite2D.new()
+	_brilho.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_brilho.scale = Vector2(4.0, 4.0)
+	_brilho.centered = false
+	_brilho.offset = -CENTRO_BRILHO
+	add_child(_brilho)
+	var topo_da_tela: float = (get_viewport().get_canvas_transform().affine_inverse() * Vector2.ZERO).y
+	_brilho.global_position = Vector2(global_position.x, topo_da_tela + MARGEM_BRILHO)
+
+
+## Força do aviso de 0 a 1: do nascimento até a pedra começar a cair.
+func _forca_do_aviso() -> float:
+	return clampf(_tempo / maxf(_aviso - _queda, 0.01), 0.0, 1.0)
+
+
+func _atualizar_brilho() -> void:
+	if _brilho == null:
+		return
+	# Some quando a pedra passa por ele (ela sai do brilho) ou no impacto.
+	var pedra_passou: bool = fogo.visible and fogo.global_position.y > _brilho.global_position.y
+	_brilho.visible = not _impactou and not pedra_passou
+	var forca: int = mini(int(_forca_do_aviso() * FORCAS_BRILHO), FORCAS_BRILHO - 1)
+	_brilho.texture = QUADROS_BRILHO[forca * 2 + int(_pisca) % 2]
 
 
 ## Impacto: a bola some num estouro. O estouro vai para a arena (e não fica no meteoro)

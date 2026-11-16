@@ -88,6 +88,40 @@ function feixeBocaPx(cam, cx, cy, t) {
   cam.colar(b.contornar(PM.fogo1));
 }
 
+// acerto do tiro no chefe: estalo claro no meio, depois folhinhas e faíscas espirrando para os lados
+// (u = 0..1 do efeito, k = quadro). Simétrico: não precisa girar nem espelhar.
+function acertoPx(cam, cx, cy, u, k) {
+  const x = Math.round(cx), y = Math.round(cy);
+  if (k === 0) {
+    const b = nova();
+    b.disco(x + 0.5, y + 0.5, 3.2, PM.verdeLL); b.disco(x + 0.5, y + 0.5, 1.8, PM.branco);
+    cam.colar(b.contornar(PM.verdeO));
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) for (let d = 5; d <= 6; d++) cam.set(x + dx * d, y + dy * d, d < 6 ? PM.verdeLL : PM.verdeL);
+    for (const [dx, dy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) cam.set(x + dx * 4, y + dy * 4, PM.fogo6);
+    return;
+  }
+  const e = sai(u);
+  if (k === 1) {
+    for (let i = 0; i < 16; i += 2) { const a = i / 16 * TAU; cam.set(x + 0.5 + Math.cos(a) * 4.5, y + 0.5 + Math.sin(a) * 4.5, PM.verdeLL); }
+    cam.disco(x + 0.5, y + 0.5, 1.2, PM.fogo6);
+  }
+  // folhinhas girando (troca de desenho a cada quadro) e caindo um pouco
+  const folhas = nova();
+  for (let i = 0; i < 5; i++) {
+    const a = i / 5 * TAU + 0.4 + hash(i) * 0.5, d = 2.5 + 5 * e * (0.8 + 0.4 * hash(i + 7));
+    const px = Math.round(x + Math.cos(a) * d), py = Math.round(y + Math.sin(a) * d + 3 * u * u);
+    if (u < 0.75) folhas.carimbo((i + k) % 2 ? ['lG.', '.Gg'] : ['.Gl', 'gG.'], px - 1, py - 1, { l: PM.verdeLL, G: PM.verdeL, g: PM.verdeM });
+    else folhas.carimbo(['lG'], px, py, { l: PM.verdeLL, G: PM.verdeL });
+  }
+  cam.colar(folhas.contornar(PM.verde));
+  // faíscas claras, mais rápidas que as folhas
+  for (let i = 0; i < 6; i++) {
+    const a = i / 6 * TAU + 0.1, d = 3.5 + 6 * e;
+    if (u < 0.7) cam.set(x + Math.cos(a) * d, y + Math.sin(a) * d, i % 2 ? PM.verdeLL : PM.fogo6);
+    if (u < 0.45) cam.set(x + Math.cos(a) * (d - 1.3), y + Math.sin(a) * (d - 1.3), PM.verdeL);
+  }
+}
+
 function exportarAtaquesJogador() {
   efeito('curupira', 'feitico', [0, 0.06, 0.12, 0.18].map(t => em((c, x, y) => feiticoJogadorPx(c, x, y, t))), 16, true, [C0.x, C0.y], 'aponta para a direita; o jogo gira na direção do voo');
   efeito('curupira', 'bolha_agua', [0, 0.1, 0.2, 0.3].map(t => em((c, x, y) => bolhaAguaPx(c, x, y, t))), 10, true, [C0.x, C0.y]);

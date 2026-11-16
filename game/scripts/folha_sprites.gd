@@ -56,6 +56,18 @@ static func ponto_arte(sprite: AnimatedSprite2D, nome: String) -> Variant:
 	return Vector2(p[0], p[1])
 
 
+## Ponto do desenho (pixels da arte, relativo à âncora) num quadro de outra animação, sem
+## precisar tocá-la. Para saber antes onde o ponto vai estar (ex.: o bico do Boto no jato).
+## null se a animação não tem o ponto.
+static func ponto_na_pose(sprite: AnimatedSprite2D, animacao: StringName, nome: String, quadro: int = 0) -> Variant:
+	var anim: Dictionary = dados(sprite).get("por_nome", {}).get(animacao, {})
+	var pontos: Array = anim.get("pontos", {}).get(nome, [])
+	if pontos.is_empty():
+		return null
+	var p: Array = pontos[clampi(quadro, 0, pontos.size() - 1)]
+	return Vector2(p[0], p[1])
+
+
 ## Ponto do desenho no mundo (já com escala e espelhamento do sprite).
 ## Sem o ponto na animação atual, devolve "padrao" (ou a âncora, se padrao for null).
 static func ponto(sprite: AnimatedSprite2D, nome: String, padrao: Variant = null) -> Vector2:

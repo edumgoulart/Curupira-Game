@@ -39,8 +39,8 @@ func _ligar_chefe() -> void:
 	if chefe == null:
 		push_warning("HUD sem chefe no campo 'chefe'; a barra de vida do chefe não vai aparecer.")
 		return
-	var limiares := PackedFloat32Array([chefe.dados.vida_fase_2, chefe.dados.vida_fase_3])
-	barra_chefe.configurar(chefe.dados.nome, limiares)
+	# Os entalhes dependem da dificuldade (Normal: Mula, Cuca e Boto sem troca de fase).
+	barra_chefe.configurar(chefe.dados.nome, chefe.limiares_fase())
 	chefe.vida.vida_mudou.connect(barra_chefe.mostrar)
 	barra_chefe.mostrar(chefe.vida.atual, chefe.vida.maximo)
 	chefe.chefe_derrotado.connect(barra_chefe.esconder)

@@ -19,6 +19,8 @@ Este documento descreve **como** o jogo é construído. O **o quê** (regras, n�
 - As arenas trocaram o fundo antigo por `FundoArena` e o chão foi para y = 340 (seção 9).
 - O Input Map ganhou `aim_up`, `crouch` e `aim_lock` (seção 12).
 - Os ataques ganhos dos chefes, os menus (fonte, botões, título, fundo) e as áreas de dano passaram para a pixel art; a arte antiga foi para `art/antiga/` (seções 7, 10 e 11).
+- **Dificuldade Normal/Expert** escolhida na seleção. As fases de cada chefe dependem dela, os ataques saem embaralhados e às vezes em **combo**, e a troca de fase tem **transição** (seção 8.4). Golpes com retorno visual: pisca branco, faísca, tremor (6.5 e 8.1).
+- **Avisos mais longos** em todos os ataques dos chefes (8.3) e a Canção de ninar virou uma melodia de notas soltas. Sem marca na tela cobrindo a área do golpe (8.1): a Mula ganhou uma investida com a pata raspando a terra e um brilho no céu antes de cada meteoro. O Boto afunda na água até o bico ficar na altura do jato, que sai reto, e o aviso é a água crescendo no bico; em volta dele a água se mexe e respinga (8.3, 9 e 10.5).
 
 ---
 
@@ -31,7 +33,7 @@ Revisão v0.3 feita sobre a pasta `game/` (branch `movimento-curupira`), depois 
 | Curupira (movimento, coyote, jump buffer, pulo variável, dash, vida, invencibilidade) | Pronto |
 | Curupira: mira em 8 direções, agachar, poses de tiro por direção | Pronto (falta teste manual) |
 | Ataques básicos (4) e especiais (4), carga do especial | Pronto, todos em pixel art (a Bola de Fogo só tem o desenho de lado) |
-| Chefes: Mula, Cuca, Boto, Máquina, 3 fases × 4 ataques | Pronto (falta teste manual e balanceamento) |
+| Chefes: Mula, Cuca, Boto, Máquina, 4 ataques, fases por dificuldade, combos e transição | Pronto (falta teste manual e balanceamento) |
 | Arte em pixel: Curupira, 4 chefes, efeitos dos chefes, 4 arenas | Pronta, ligada nas cenas |
 | Efeitos de estado (veneno, lentidão) no chefe e no Curupira | Pronto, sem componente `StatusEffects` (ver 7.6) |
 | Arenas (4), HUD, pausa, derrota, vitória, créditos | Pronto |
@@ -211,6 +213,7 @@ Valores em `dados/curupira_vida.tres` (`VidaJogadorData`): 4 golpes, 1,5 s de in
 - Cada golpe tira 1 ou 2 (tabela de ataques dos chefes).
 - **Invencibilidade por física**: `esta_invencivel()` (dash, derrotado, ou tempo pós-golpe) liga/desliga a `Hurtbox` (`ligada`), que desabilita as `CollisionShape2D` com `set_deferred`. Não é um `if` na hitbox. `take_damage` repete a checagem para o caso de dois ataques no mesmo frame.
 - O pisca é por `sprite.visible` (alternância).
+- **Retorno do golpe** (só visual): o sprite pisca de branco por 0,15 s (`clarao.gdshader`, via `EfeitosTela.preparar_pisca`), a câmera treme 9 px por 0,25 s (`EfeitosTela.tremer`) e a pose `dano` (5 quadros, 0,33 s) recomeça do primeiro quadro. A duração da pose vem da animação; `DURACAO_POSE_DANO` só vale se ela não existir.
 - Ao zerar a vida: estado `DERROTADO`, emite `derrotado`; `TelaDerrota` espera 1 s e pausa.
 - Sem cura. Tentar de novo = `reload_current_scene()` (vida e barra voltam cheias).
 - Religar o `monitorable` de uma `Area2D` **não** re-dispara quem já estava encostado; religar a forma de colisão dispara. Por isso a `Hurtbox` desliga as formas.
@@ -220,7 +223,7 @@ Valores em `dados/curupira_vida.tres` (`VidaJogadorData`): 4 golpes, 1,5 s de in
 Lista completa no topo de `curupira.gd`. Qual animação toca é decidido pela ordem:
 
 1. `derrota`, `especial`, `dash` (estados que só saem pelo tempo);
-2. `dano` por 0,2 s depois de um golpe (`DURACAO_POSE_DANO`);
+2. `dano` pela duração da animação (0,33 s) depois de um golpe (`DURACAO_POSE_DANO`, 0,2 s, se ela não existir);
 3. **tiro** (0,3 s depois do último tiro, `DURACAO_POSE_ATAQUE`), escolhido pela mira e pelo estado: `atirar`, `atirar_diag_cima`, `atirar_cima`, `atirar_diag_baixo` de pé; `correr_atirar`, `correr_atirar_diag_cima` andando; `ar_atirar_<cima|diag_cima|lado|diag_baixo|baixo>` no ar; `agachado_atirar` agachado;
 4. movimento: `abaixar` → `agachado` → `levantar`, `correr`, `pular`, `cair`, `pouso` (curto, ao tocar o chão), `idle`.
 
@@ -310,21 +313,59 @@ Poças da Cuca (`PocaCuca`, `Area2D`, layer `enemy_hitbox`, mask `player`) **[Im
 ### 8.1 Regras globais
 
 1. Pode levar dano o tempo todo.
-2. Todo ataque tem aviso: uma animação de aviso (`aviso_<ataque>`) e um brilho colorido no sprite (`avisar()`: laranja Mula, verde Cuca, azul Boto, vermelho Máquina).
+2. Todo ataque tem aviso: uma animação de aviso (`aviso_<ataque>`) e um brilho colorido no sprite (`avisar()`: laranja Mula, verde Cuca, azul Boto, vermelho Máquina). O jogador lê o ataque pela pose.
+   - **Não há marca na tela cobrindo a área do golpe.** Uma versão teve (faixas listradas, alvos no chão, miras), e o Eduardo pediu para tirar: deixava fácil demais.
+   - Ficam só os avisos do que vem de fora da vista ou é mirado:
+     - o brilho no céu de cada meteoro (`meteoro.gd`);
+     - a linha fina do laser e da varredura (`laser_maquina.gd`);
+     - a linha da altura do chapéu do Boto (`boto.gd`, `_linha_de_aviso`). O jato não tem linha: o próprio Boto mostra a altura, afundando até o bico ficar nela.
+     Todas ficam no grupo `ataques_chefe` e somem na transição e na derrota.
 3. Os ataques mais fortes terminam com o chefe parado, cansado ou tonto (janela de ataque).
-4. **[Divergente]** A luta tem **três fases**, trocadas pela vida que sobra (GDD, seção dos chefes; números em Q16). A v0.2 e o `CLAUDE.md` ainda falam em "estado único".
+4. **[Divergente]** As fases dependem da dificuldade (GDD, Escolha antes da fase): Normal = 1 fase (Máquina: 2); Expert = 2 fases (Máquina: 3). A v0.2 e o `CLAUDE.md` ainda falam em "estado único".
+5. Os ataques saem embaralhados, às vezes em combo (8.4). Mula e Cuca ficam do lado em que pararam e os ataques espelham.
 
-A vida do chefe aparece numa barra no alto da tela (`hud_chefe.gd`, 11.1), e cada acerto ainda faz o chefe piscar de branco.
+A vida do chefe aparece numa barra no alto da tela (`hud_chefe.gd`, 11.1). Cada acerto faz o chefe piscar de branco (`clarao.gdshader`, força 0,85 por 0,1 s), solta uma faísca no ponto do tiro (`efeito_acerto.tscn`, no máximo uma a cada 0,05 s), dá um tranco de 4 px para longe do Curupira e, se ele estiver parado entre ataques, toca o susto `dano` (no máximo a cada 0,8 s). As caixas de dano não tremem junto: `_ajustar_caixas` usa a posição de base do sprite.
 
 ### 8.2 Dados **[Implementado]**
 
-`ChefeData` (base) tem nome, vida, pausa entre ataques, golpes de contato, `id_progresso` e o grupo **Fases**:
+`ChefeData` (base) tem nome, vida, pausa entre ataques, golpes de contato, `id_progresso` e os grupos **Fases** e **Transição de fase**:
 
 | Campo | Valor | Para quê |
 |---|---|---|
-| `vida_fase_2` | 0,667 | Fração da vida em que começa a fase 2 (provisório, GDD Q16) |
-| `vida_fase_3` | 0,333 | Fração da vida em que começa a fase 3 (provisório, GDD Q16) |
-| `ataques_fase_1..3` | `Array[StringName]` | Nomes dos ataques sorteados em cada fase |
+| `fases_normal` / `fases_expert` | `Array[FaseChefe]` | Fases de cada dificuldade. Expert vazio = usa as do Normal |
+| `duracao_transicao` | 1,2 s | Duração mínima da transição; vale a animação `transicao` (2 s) se for mais longa (provisório) |
+| `pausa_apos_transicao` | 0,5 s | Respiro antes do primeiro combo da fase nova (provisório) |
+
+Cada `FaseChefe` (`scripts/fase_chefe.gd`, sub-recurso no `.tres` do chefe):
+
+| Campo | Para quê |
+|---|---|
+| `comeca_com_vida` | Fração da vida em que a fase começa (1,0 = começo da luta; 0,5 = metade) |
+| `ataques` | Ataques do saco desta fase |
+| `combos` | `Array[ComboChefe]`: `primeiro`, `segundo` e `atraso` (s entre os dois) |
+| `chance_combo` | Chance de a próxima jogada ser um combo |
+| `fator_pausa` | Multiplica `pausa_entre_ataques` nesta fase (0,8 = 20% mais curta) |
+
+Tudo isso se edita no inspetor: abrir o `.tres` do chefe, expandir a fase e o combo. Os valores atuais (provisórios, GDD Q16):
+
+| Chefe | Dificuldade | Fase (vida) | Ataques | Chance | Pausa | Combos (atraso) |
+|---|---|---|---|---|---|---|
+| Mula | Normal | 1 (1,0) | 4 | 0,2 | ×1 | meteoros+bolas (0,6), investida+pisoteio (0,6) |
+| Mula | Expert | 1 (1,0) | bolas, pisoteio, investida | 0,3 | ×0,9 | investida+pisoteio (0,4), bolas+investida (0,5) |
+| Mula | Expert | 2 (0,5) | 4 | 0,5 | ×0,8 | meteoros+bolas (0,3), meteoros+pisoteio (0,3), investida+bolas (0,3), investida+meteoros (0,2) |
+| Cuca | Normal | 1 (1,0) | 4 | 0,2 | ×1 | pocao+leque (0,6), bote+leque (0,6) |
+| Cuca | Expert | 1 (1,0) | leque, pocao, bote | 0,3 | ×0,9 | pocao+leque (0,4), bote+leque (0,4) |
+| Cuca | Expert | 2 (0,5) | 4 | 0,5 | ×0,8 | pocao+ninar (0,3), bote+leque (0,4), pocao+bote (0,4) |
+| Boto | Normal | 1 (1,0) | 4 | 0,2 | ×1 | beijos+jato (0,6), salto+jato (0,6) |
+| Boto | Expert | 1 (1,0) | jato, beijos, chapeu | 0,3 | ×0,9 | beijos+jato (0,4), jato+beijos (0,3) |
+| Boto | Expert | 2 (0,5) | 4 | 0,5 | ×0,8 | salto+jato (0,3), salto+beijos (0,3), beijos+chapeu (0,4), beijos+jato (0,3) |
+| Máquina | Normal | 1 (1,0) | laser, bombas, pistoes | 0,2 | ×1 | bombas+laser (0,6) |
+| Máquina | Normal | 2 (0,5) | 4 | 0,35 | ×0,9 | bombas+laser (0,5), pistoes+laser (0,5), pistoes+varredura (0,5) |
+| Máquina | Expert | 1 (1,0) | laser, bombas | 0,3 | ×0,9 | bombas+laser (0,4) |
+| Máquina | Expert | 2 (0,667) | + pistoes | 0,45 | ×0,85 | bombas+laser (0,3), pistoes+laser (0,3), bombas+pistoes (0,5) |
+| Máquina | Expert | 3 (0,333) | 4 | 0,6 | ×0,8 | bombas+laser (0,25), pistoes+laser (0,25), pistoes+varredura (0,3), bombas+varredura (0,4) |
+
+Todos os combos passaram no `verificar_desvio.gd` (15.3). O bote+leque do Expert fase 2 subiu de 0,3 para 0,4 s: com 0,3 s, o Curupira encurralado no canto não escapava.
 
 | Chefe | Vida | Pausa entre ataques | Concede | `id_progresso` |
 |---|---|---|---|---|
@@ -337,32 +378,36 @@ Cada chefe tem a própria classe de dados (`MulaData`, `CucaData`, `BotoData`, `
 
 ### 8.3 Ataques **[Implementado]**
 
-Fase 1 usa os dois primeiros ataques; a fase 2 acrescenta o terceiro; a fase 3, o quarto. "Provisório" = não está no GDD, ajustar testando no `.tres`.
+A coluna Fase é a ordem em que os ataques entram nas lutas com mais fases (Máquina no Expert); quais ataques cada fase usa está em 8.2. "Provisório" = não está no GDD, ajustar testando no `.tres`.
 
 | Chefe | Fase | Ataque | Aviso | Golpes | O que acontece (valores no `.tres`) |
 |---|---|---|---|---|---|
-| Mula | 1 | `bolas` | 0,5 s | 1 cada | Abaixa o peito e cospe 3 bolas rente ao chão (60 px), a 700 px/s, uma a cada 0,35 s |
-| Mula | 1 | `pisoteio` | 0,8 s | 1 | Empina, bate as patas e solta uma onda de fogo pelo chão a 650 px/s (provisório) |
-| Mula | 2 | `investida` | 0,9 s | 1 | Corre até a parede a 1400 px/s, fica tonta 1,4 s e volta trotando (provisório) |
-| Mula | 3 | `meteoros` | 1 s cada | 2 cada | 3 meteoros, o 1º no Curupira e os outros a ±300 px, com sombra no chão; depois fica cansada 1,5 s |
-| Cuca | 1 | `leque` | 0,5 s | 1 cada | 3 feitiços em leque (abertura 20°) saindo da garra, o do meio mirado no Curupira; 700 px/s |
-| Cuca | 1 | `pocao` | 0,6 s | ver poças (7.6) | Poção em arco (600 px/s, gravidade 1800) até onde o Curupira estava; depois fica parada 1,5 s |
-| Cuca | 2 | `bote` | 0,6 s | 1 | Bote de jacaré: avança a 1100 px/s até 200 px além do Curupira e volta a 420 px/s (provisório) |
-| Cuca | 3 | `ninar` | 0,4 s | 1 cada | 2,4 s de notas pela boca em duas fileiras (56 e 256 px do chão) com uma brecha que sobe e desce (provisório) |
-| Boto | 1 | `jato` | 0,7 s | 1 | Jato reto saindo do bico, dura 0,5 s; depois fica parado 1,2 s |
-| Boto | 1 | `beijos` | 0,4 s | 1 cada | 4 corações em onda (280 px/s), um a cada 0,45 s; dá para estourar com tiro (provisório) |
-| Boto | 2 | `chapeu` | 0,6 s | 1 | Chapéu bumerangue: vai baixo (0,9 s) até perto da parede e volta alto (0,9 s) (provisório) |
-| Boto | 3 | `salto` | — | 1 cada bolha | Pula para o outro lado (1,4 s, arco de 520 px) soltando 3 bolhas que descem a 120 px/s |
-| Máquina | 1 | `laser` | 0,8 s | 1 | Linha fina segue o Curupira e trava 0,2 s antes; laser dura 0,4 s |
+| Mula | 1 | `bolas` | 0,8 s | 1 cada | Abaixa o peito e cospe 3 bolas rente ao chão (60 px), a 700 px/s, uma a cada 0,35 s |
+| Mula | 1 | `pisoteio` | 1 s | 1 | Empina, bate as patas e solta uma onda de fogo pelo chão a 650 px/s (provisório) |
+| Mula | 2 | `investida` | 1,1 s | 1 | Aviso: agacha e raspa a pata da frente na terra duas vezes (`aviso_investida`, 13 quadros a 12/s, do tamanho do aviso). Corre até a parede do lado do Curupira a 1400 px/s, fica tonta 1,4 s e fica lá, virada para ele (provisório) |
+| Mula | 3 | `meteoros` | 1,3 s cada | 2 cada | 3 meteoros, o 1º no Curupira e os outros a ±300 px. Cada um sobe da boca (dá para ver). No alto da tela, em cima do ponto de queda, um brilho fica mais forte e pisca mais rápido até a pedra cair (0,3 s finais), e a pedra sai dele; no chão a sombra cresce. Depois fica cansada 1,5 s |
+| Cuca | 1 | `leque` | 0,8 s | 1 cada | 3 feitiços em leque (abertura 20°) saindo da garra, o do meio mirado no Curupira na hora do disparo; 700 px/s |
+| Cuca | 1 | `pocao` | 0,8 s | ver poças (7.6) | Poção em arco (600 px/s, gravidade 1800) até onde o Curupira estava na hora de jogar; depois fica parada 1,5 s |
+| Cuca | 2 | `bote` | 0,9 s | 1 | Bote de jacaré: avança a 1100 px/s até 150 px da parede do lado do Curupira (`margem_parede_bote`), levanta e fica lá (provisório) |
+| Cuca | 3 | `ninar` | 0,9 s | 1 cada | Melodia de 6 notas soltas, uma a cada 0,7 s, a 400 px/s: grave (36 px do chão, laranja; pula-se) ou aguda (128 px, azul; abaixa-se), 50/50 (provisório) |
+| Boto | 1 | `jato` | 0,9 s | 1 | Sorteia alto (130 px do chão, dura 0,5 s; abaixa-se) ou baixo (40 px, dura 0,35 s; pula-se), 50/50. No começo do aviso afunda (ou sobe) na água até o bico, na pose `jato`, ficar na altura sorteada (0,3 s, `ajuste_jato`); o alto afunda ~70 px e o baixo ~160 px, só com a cabeça para fora. Nos 0,5 s finais (`crescida_jato`), a água sai do bico fina e vai crescendo (`jato_crescendo`). O jato sai reto do bico; no `fim_jato` ele volta para a linha d'água (também no combo). Depois fica parado 1,2 s (provisório) |
+| Boto | 1 | `beijos` | 0,6 s | 1 cada | 4 corações em onda (280 px/s), um a cada 0,45 s; dá para estourar com tiro (provisório) |
+| Boto | 2 | `chapeu` | 0,8 s | 1 | Chapéu bumerangue: vai baixo (40 px) e volta alto (140 px), ou o contrário (50/50), 0,9 s cada trecho (provisório). Aviso: linha fina na altura da ida |
+| Boto | 3 | `salto` | 0,8 s | 1 cada bolha | Mergulha e pula para o outro lado (1,4 s, arco de 520 px) soltando 3 bolhas que descem a 120 px/s (provisório) |
+| Máquina | 1 | `laser` | 1 s | 1 | Linha fina segue o Curupira e trava 0,3 s antes; laser dura 0,4 s |
 | Máquina | 1 | `bombas` | animação `aviso_bombas` | 2 | 3 alçapões abrem no teto e soltam bombas (1 no Curupira, 2 a ±300 px), que explodem 1,5 s depois no chão (raio 180); parada 1,2 s |
-| Máquina | 2 | `pistoes` | 0,5 s | 1 | Duas ondas de placas sobem do chão de um lado ao outro (960 px/s, a 2ª 1,25× mais rápida); cada placa avisa 0,25 s antes (provisório) |
-| Máquina | 3 | `varredura` | 0,5 s | 1 | Desce até a altura do Curupira e dispara um laser reto na altura da cabeça (0,6 s; agachar desvia); depois mira o chão e o ponto de impacto corre até a parede (0,85 s; pular desvia) (provisório) |
+| Máquina | 2 | `pistoes` | 0,9 s | 1 | Duas ondas de placas sobem do chão de um lado ao outro (960 px/s, a 2ª 1,25× mais rápida); cada placa avisa 0,4 s antes (provisório) |
+| Máquina | 3 | `varredura` | 0,8 s cada | 1 | Desce até a altura do Curupira e dispara um laser reto na altura da cabeça (0,6 s; agachar desvia); depois mira o chão e o ponto de impacto corre até a parede (0,85 s; pular desvia) (provisório). Linha fina antes de cada passada |
+
+Os avisos subiram a pedido do Eduardo ("não dá tempo de desviar"). Valores antigos: bolas 0,5, pisoteio 0,8, investida 0,9, meteoros 1, leque 0,5, poção 0,6, bote 0,6, ninar 0,4, jato 0,7, beijos 0,4 (não era usado), chapéu 0,6, salto sem aviso, laser 0,8 (trava 0,2), pistões 0,5 (placa 0,25), varredura 0,5. Os que o GDD fixa (bolas, meteoros, leque, poção, jato, laser) mudaram também no GDD.
+
+**[Divergente]** O `ninar` antigo (2,4 s de duas fileiras de notas com uma brecha que subia e descia) não dava para desviar: a brecha era menor que o Curupira. Agora é uma nota por vez, cada uma numa das duas alturas que o Curupira já sabe desviar (pular ou abaixar).
 
 ### 8.4 Sequenciador de ataques **[Implementado]** **[Divergente]**
 
 A v0.2 tinha um `enum Estado` com um valor por passo de cada ataque (`AVISO_BOLAS`, `BOLAS`, `PARADA`...) e um `_tempo` decrescente. Com 4 ataques e 3 animações por ataque, isso passaria de 20 estados por chefe. Agora:
 
-- A base `Chefe` tem uma máquina de estados simples, `EstadoLuta { ESPERANDO, ATACANDO, DERROTADO }`, num laço (`_lutar()`): pausa → atualiza a fase → sorteia um ataque da fase → `await _executar(nome)` → pausa...
+- A base `Chefe` tem uma máquina de estados simples, `EstadoLuta { ESPERANDO, ATACANDO, TRANSICAO, DERROTADO }`, num laço (`_lutar()`): pausa → troca de fase, se passou do limiar → sorteia uma jogada (um ataque ou um combo) → `await` → pausa...
 - **Cada ataque é uma função** no script do chefe, escrita de cima a baixo na ordem em que acontece:
 
   ```gdscript
@@ -381,22 +426,25 @@ A v0.2 tinha um `enum Estado` com um valor por passo de cada ataque (`AVISO_BOLA
   ```
 
 - `esperar(s)` conta pelo **relógio do chefe**: a base emite o sinal `_passo(delta × fator_tempo())` no `_physics_process`, e `esperar` soma esses passos. Por isso a lentidão e a pausa do jogo valem para todos os ataques sem código extra. `esperar` devolve `false` se o chefe for derrotado no meio, e o ataque sai com `return`.
-- Outras ajudas da base: `tocar`, `reiniciar`, `tocar_e_esperar(anim)`, `andar_ate(x, velocidade)`, `virar(para_direita)`, `lado_do_alvo()`, `pos_do_alvo()`, `x_do_alvo()`, `ponto(nome)` (ponto do desenho no mundo, 10.4), `lancar_na_cena(no)`.
-- **Fases**: `_atualizar_fase()` compara a fração da vida com `vida_fase_2/3` e emite `fase_mudou`. O ataque novo da fase é usado logo no primeiro sorteio, para o jogador ver a novidade.
-- **Sorteio**: aleatório entre os ataques da fase, **sem repetir o último**.
+- Outras ajudas da base: `tocar`, `reiniciar`, `tocar_e_esperar(anim)`, `andar_ate(x, velocidade)`, `virar(para_direita)`, `lado_do_alvo()`, `pos_do_alvo()`, `x_do_alvo()`, `ponto(nome)` (ponto do desenho no mundo, 10.4) e `lancar_na_cena(no)`.
+- **Fases**: `fases_para(GameState.dificuldade)` dá a lista de `FaseChefe` da luta; `_atualizar_fase()` compara a fração da vida com `comeca_com_vida` e emite `fase_mudou`. `limiares_fase()` dá os entalhes da barra do HUD.
+- **Transição** (`_transicao_de_fase()`): espera o ataque em andamento acabar (a pausa entre jogadas é cortada se o limiar passar no meio dela), estado `TRANSICAO`, remove tudo do grupo `ataques_chefe`, vira para o Curupira (`_virar_para_alvo()`, o Boto olha para a arena), treme a tela 14 px, clarão claro de 0,45 s, pisca branco e toca `transicao`. Espera `max(animação, duracao_transicao)` + `pausa_apos_transicao`. Continua levando dano. `_efeitos_da_transicao()` (virtual) põe tremores nos quadros da animação (a pisada da Mula, os respingos do Boto).
+- **Sorteio** (`_sortear_combo()` e `_tirar_do_saco()`): a cada jogada, sai um combo com chance `chance_combo`, senão o próximo ataque do **saco**. O saco tem os ataques da fase embaralhados (Fisher-Yates) e só enche de novo quando esvazia, então todos saem antes de repetir. Os ataques de um combo saem do saco. Não repete o mesmo combo seguido, nem começa um combo com o ataque que acabou de sair; se nenhum combo puder, vai um ataque sozinho.
+- **Combo** (`_jogar_combo()`): `await _executar(primeiro, true)`, espera `atraso`, `await _executar(segundo, false)`. Com `encadeado = true`, o ataque não espera os próprios projéteis sumirem e pula a recuperação do fim (tonta, cansada, parada). A primeira jogada depois de uma transição é sempre um combo com um ataque novo ou um combo novo da fase.
+- **Lado**: cada `_executar` começa com `_virar_para_alvo()`. A investida da Mula e o bote da Cuca param do lado do Curupira e ficam lá; os ataques seguintes usam `lado_do_alvo()` e saem espelhados.
 - **[Divergente]** O Boto não tem mais ciclo fixo: sorteia como os outros, e só troca de lado com o `salto` (fase 3).
-- **Nó raiz**: `Node2D` para todos. Mula (investida) e Cuca (bote) andam com `andar_ate`, sem física, e param a `margem_parede` da parede. Nenhum chefe colide com o mundo.
+- **Nó raiz**: `Node2D` para todos. Mula (investida) e Cuca (bote) andam com `andar_ate`, sem física, e param perto da parede (`margem_parede`, `margem_parede_bote`). Nenhum chefe colide com o mundo.
 - Projéteis e perigos do chefe vão para a **cena atual**, não para o chefe, para não andarem junto com ele.
 
 ### 8.5 Valores no código
 
-Números de balanceamento ficam em `Resource` (`ChefeData` → `MulaData`, `CucaData`, `BotoData`, `MaquinaData`; `AtaqueData`; `EspecialData`; `MovimentoData`; `VidaJogadorData`), editáveis no inspetor. Ficam como `const` só valores visuais ou ligados ao desenho: cores de aviso, tempo de pisca, `QUADRO_PISADA` (em que quadro da animação a pata bate no chão), `DURACAO_POSE_ATAQUE` e `DURACAO_POSE_DANO` do Curupira. **[Aberto]** Mover as duas durações de pose para o `MovimentoData`.
+Números de balanceamento ficam em `Resource` (`ChefeData` → `MulaData`, `CucaData`, `BotoData`, `MaquinaData`; `AtaqueData`; `EspecialData`; `MovimentoData`; `VidaJogadorData`), editáveis no inspetor. Ficam como `const` só valores visuais ou ligados ao desenho: cores de aviso, tempo e força do pisca, tremores e clarão (`PISCA_*`, `TREMOR_*`, `TRANCO_PX`, `INTERVALO_SUSTO`), a linha de aviso do chapéu do Boto (`COR_LINHA_AVISO`, `ESPESSURA_LINHA_AVISO`, `PISCA_LINHA_AVISO`, `INICIO_LINHA_AVISO`), o pisca da água crescendo no bico (`PISCA_CRESCIDA`), quanto o Boto precisa mexer para a água respingar (`MOVIMENTO_RESPINGO`) e a volta à linha d'água na derrota (`VOLTA_NA_DERROTA`), o brilho do meteoro (`MARGEM_BRILHO`, `PISCA_BRILHO_*`), `QUADRO_PISADA` e `QUADRO_PISADA_TRANSICAO` (em que quadro a pata bate no chão), `DURACAO_POSE_ATAQUE` e `DURACAO_POSE_DANO` do Curupira. **[Aberto]** Mover as duas durações de pose para o `MovimentoData`.
 
 ### 8.6 Derrota do chefe **[Implementado]**
 
 Ao zerar a vida: `EstadoLuta.DERROTADO` (o ataque em andamento sai no próximo `esperar`), desliga hurtbox e contato, remove tudo do grupo `ataques_chefe`, toca `derrota` e emite `chefe_derrotado`. **[Divergente]** O fade de 1 s saiu: agora existe a animação `derrota`.
 
-A `TelaVitoria` (filha da arena) chama `GameState.marcar_concluida(dados.id_progresso)` (que salva), espera 1,5 s e pausa mostrando "Você libertou…" e os ataques ganhos. A Máquina leva aos créditos; os outros, à seleção. **Não é vitória se o Curupira já tinha sido derrotado.**
+A `TelaVitoria` (filha da arena) chama `GameState.marcar_concluida(dados.id_progresso)` (que salva; no Expert também marca `concluidas_expert`), espera 1,5 s e pausa mostrando "Você libertou…" e os ataques ganhos. A Máquina leva aos créditos; os outros, à seleção. **Não é vitória se o Curupira já tinha sido derrotado.**
 
 ## 9. Arenas
 
@@ -429,6 +477,7 @@ LevelN (Node2D)                   # texture_filter = Nearest (pixel art)
 - **[Divergente]** O `Fundo`/`SalaBranca`/`TileMapLayer` antigos saíram. `FundoArena` lê `fundo_1.png...` e `frente_1.png...` da pasta e anima no `fps` do `arena.json` (o `fps` exportado no node só vale se o json não tiver); trocar a arte é só exportar de novo a pasta.
 - **Arte das arenas** (`arenas_px.js`): fundo em planos (céu, mata ao longe, árvores do meio, troncos das bordas, chão). Quanto mais longe, mais perto da cor do céu e com menos contraste, com neblina pontilhada entre os planos. O meio da arena fica escuro e liso para o Curupira e o chefe se destacarem. O fogo do fundo da Mula é pequeno, sem contorno e numa rampa apagada (`RAMPA_FOGO_LONGE`), atrás da fumaça, para não competir com o fogo dela. A floresta da Cuca é azulada de noite, para a Cuca verde e roxa saltar. O laço tem 2 s: tudo que mexe no fundo repete a cada 2 s (`volta(t)`).
 - A frente do Boto (água) fica por cima dos personagens.
+- A água em volta do Boto (`AguaBoto`, `agua_boto.gd`, criada no `_ready` do Boto) fica na linha d'água e segue o Boto em x; ele afunda e sobe para o jato, e ela não. Duas camadas: a de trás (metade de lá dos anéis, z −1) e a da frente (espuma colada no corpo, gotinhas e metade de cá dos anéis, z 6, por cima da água da frente). Duas paletas, como a arena: `agua_*_azul` na margem esquerda e `agua_*_barro` na direita, trocadas pelo lado em que ele está. `respingar(x)` solta `agua_respingo_*` quando ele afunda ou sobe mais de 16 px e na saída e na chegada do salto; no ar a água em volta some. Quantidade de quadros, fps e centro saem do `efeitos.json`.
 - **[Assumido]** Extrair uma `arena_base.tscn` só se as quatro começarem a divergir; hoje a duplicação é de poucos nós.
 
 ## 10. Arte e animações (pixel art)
@@ -468,6 +517,7 @@ A arte é pixel art em 480×270, ampliada 4× para 1920×1080. Ela é desenhada 
 
 - `preparar(sprite)`: liga `Nearest` e põe a âncora na origem do node (`centered = true`, `offset = celula/2 − ancora`). A base `Chefe` chama no `_ready`.
 - `ponto(sprite, nome, padrao)`: posição no mundo do ponto `nome` no quadro que está na tela, já com escala e espelhamento. É assim que o tiro sai da mão do Curupira, a bola sai da boca da Mula, o feitiço da garra da Cuca e o jato do bico do Boto, em qualquer quadro.
+- `ponto_na_pose(sprite, anim, nome, quadro)`: o ponto `nome` (em pixels da arte) num quadro de outra animação, sem tocá-la. O Boto usa para saber onde o bico vai estar na pose `jato` e afundar até a altura certa antes de disparar.
 - `duracao(sprite, anim)`: duração da animação em segundos.
 - `caixa(sprite, anim)`: a `caixa` da animação, em pixels da arte. A base `Chefe` usa para que `Hurtbox` e `Contato` acompanhem a pose: a cada troca de animação (e ao virar), as duas viram retângulos com uma fração do desenho (`fracao_hurtbox`, centrada; `fracao_contato`, presa embaixo, nos pés), definidas no `ChefeData`. A Máquina fica de fora: as caixas dela estão no `Nucleo`, que segue a lente.
 
@@ -498,9 +548,9 @@ Cenas de ataque dos chefes:
 
 | Chefe | Cenas |
 |---|---|
-| Mula | `bola_de_fogo_mula`, `onda_fogo_mula`, `meteoro`, `explosao_mula`, `poeira_mula` |
+| Mula | `bola_de_fogo_mula`, `onda_fogo_mula`, `meteoro` (o brilho no céu é criado no `meteoro.gd`, com `brilho_meteoro_1..12.png`), `explosao_mula`, `poeira_mula` |
 | Cuca | `feitico_cuca`, `pocao_cuca`, `poca_cuca`, `nota_cuca`, `vidro_cuca` |
-| Boto | `jato_boto` (meio repetido em `region` + ponta), `coracao_boto`, `coracao_estoura_boto`, `chapeu_boto`, `bolha_boto`, `respingo_boto` |
+| Boto | `jato_boto` (meio repetido em `region` + ponta), `coracao_boto`, `coracao_estoura_boto`, `chapeu_boto`, `bolha_boto`, `respingo_boto`. Criados no código: a água em volta dele (`agua_boto.gd`, ver 9) e a água crescendo no bico no aviso do jato (`jato_crescendo_1..16.png`: 8 tamanhos × 2 variantes, quadro = tamanho × 2 + variante) |
 | Máquina | `laser_maquina`, `bomba_maquina`, `explosao_maquina`, `placa_maquina`, `alcapao_maquina`, `faiscas_maquina` |
 | Curupira (ataques ganhos) | `projetil_feitico_perseguidor`, `projetil_bolha_agua`, `projetil_bolha_abissal`, `projetil_pocao_maldita`, `feixe_canhao`, `respingo_agua`, `respingo_veneno`; a Bola de Fogo usa a bola e a explosão da Mula |
 
@@ -512,7 +562,7 @@ Cenas de ataque dos chefes:
 Pixel art do gerador (`art/pixel/gerador/hud_px.js` → `assets/pixel/ui/hud_*.png`, já ampliada 4×). O `hud.gd` só liga sinais; cada parte desenha a si mesma em `_draw()`, em passos de 4 px (1 pixel da arte).
 - **Canto inferior esquerdo** (`hud_vida.gd`): retrato do Curupira num aro de madeira e um coração por golpe. O retrato muda de cara: dor logo depois de um golpe, fúria (cabelo em chamas) com o especial cheio, assustado com 1 golpe e normal no resto. O coração perdido treme e pisca; o último pula como um batimento.
 - **Especial** (`hud_especial.gd`): moldura de cipó que enche de verde; cheia, vira brasa e a cabeça da onça acende.
-- **Chefe** (`hud_chefe.gd`): nome (`dados.nome`) e barra de metal com o chip na ponta, no alto da tela. Enche do zero na entrada, deixa um rastro claro a cada golpe, tem entalhes em `vida_fase_2` e `vida_fase_3`, e o LED do chip apaga quando o chefe é libertado. Cada `levelN` aponta o campo `chefe` do HUD para o chefe da arena.
+- **Chefe** (`hud_chefe.gd`): nome (`dados.nome`) e barra de metal com o chip na ponta, no alto da tela. Enche do zero na entrada, deixa um rastro claro a cada golpe, tem entalhes nos limiares das fases da dificuldade (`chefe.limiares_fase()`), e o LED do chip apaga quando o chefe é libertado. Cada `levelN` aponta o campo `chefe` do HUD para o chefe da arena.
 - O vão de cada moldura (onde entra o enchimento) está em `HUD_PX` no gerador e na constante `VAO` dos scripts: mudar nos dois.
 
 ### 11.2 Telas
@@ -521,7 +571,7 @@ Pixel art do gerador (`art/pixel/gerador/hud_px.js` → `assets/pixel/ui/hud_*.p
 |---|---|
 | Cenas de abertura | **Não feito [Aberto]** |
 | Menu inicial | Pronto: Novo Jogo (apaga o save), Continuar (desabilitado sem save), Opções, Sair. **[Aberto]** o GDD pede os botões de cada ação do controle na tela |
-| Seleção de fase e ataques | Pronto: lista só ataques liberados, troca com ←/→, salva a escolha; Máquina bloqueada até as 3 fases |
+| Seleção de fase e ataques | Pronto: lista só ataques liberados, troca com ←/→, salva a escolha; Máquina bloqueada até as 3 fases. Botão **Dificuldade** (Normal/Expert, ←/→) com uma linha de explicação; chefe vencido no Expert aparece como "(derrotada · Expert)" |
 | Arena (×4) | Pronto (seção 9) |
 | Pausa | Pronto: Continuar / Tentar de novo / Seleção |
 | Opções | **Só placeholder** ("Volume e tela cheia chegam em breve") |
@@ -569,11 +619,14 @@ Um único `ConfigFile` em `user://save.cfg`:
 
 ```
 [progresso]  concluidas = ["fase1", "fase2", ...]
+             concluidas_expert = ["fase1", ...]   # vencidas no Expert (só marca)
+[opcoes]     dificuldade = 0                      # 0 = Normal, 1 = Expert
 [equipamento] basico = "res://dados/ataques/....tres"   # "" = padrão
               especial = "res://dados/ataques/....tres"
 ```
 
-- Carregar ao abrir o jogo (`GameState._ready`) e no Continuar; salvar a cada fase concluída e a cada mudança de equipamento.
+- Carregar ao abrir o jogo (`GameState._ready`) e no Continuar; salvar a cada fase concluída e a cada mudança de equipamento ou de dificuldade.
+- **[Assumido]** Vencer no Normal já concede os ataques e libera a Máquina; o Expert só marca a vitória à parte.
 - Novo Jogo apaga o arquivo e zera a memória.
 - Equipamento guarda **caminhos** de `.tres`: renomear ou mover um `.tres` de ataque quebra saves existentes. **[Aberto]** Guardar um id (`tiro_de_folha`) em vez do caminho, ou tratar o `load` nulo (hoje não há).
 - Sem versão de formato no arquivo. **[Aberto]** Adicionar `versao` antes do lançamento.
@@ -600,9 +653,12 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 - `Debug > Visible Collision Shapes` para conferir hitboxes; aba Remote para valores em execução.
 - Validação headless: `godot --headless --path game --quit-after 120`. Depois de criar scripts com `class_name` ou PNGs novos, importar antes (`--headless --editor --quit`).
 - **Liberar tudo para testar**: `GameState.LIBERAR_TUDO_PARA_TESTE = true` libera a Máquina e todos os ataques na seleção, sem vencer as fases. Só vale em build de debug (`OS.is_debug_build()`); o jogo exportado ignora. Pôr `false` para testar a progressão de verdade.
-- **`testes/teste_lutas.gd`** **[Implementado]**: roda as quatro arenas por 60 s cada, com o Curupira invencível, andando, agachando, mirando e atirando, e tira vida do chefe aos poucos. Imprime as trocas de fase e os ataques que apareceram; qualquer erro de script aparece no log. Rodar com o editor fechado (ou numa cópia de `game/`):
-  `godot --headless --path game --script res://testes/teste_lutas.gd`
-- **Cheats de debug (`OS.is_debug_build()`): não implementados [Aberto]**: invencibilidade, carga total do especial, pular para a fase 2/3 do chefe, desbloquear todos os ataques. Sugestão: autoload `Debug` removível do build.
+- **`testes/teste_lutas.gd`** **[Implementado]**: roda as quatro arenas no Normal e depois no Expert, 60 s cada, com o Curupira invencível, andando, agachando, mirando e atirando, e tira vida do chefe aos poucos. Imprime as trocas de fase e a ordem das jogadas (`a+b` = combo, `[TRANSICAO]`); qualquer erro de script aparece no log. Rodar com o editor fechado (ou numa cópia de `game/`):
+  `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/teste_lutas.gd`
+- **`testes/verificar_desvio.gd`** **[Implementado]**: responde "dá para desviar?" para cada ataque e cada combo das fases, e qual o menor atraso de combo que ainda dá. Grava a luta de verdade (cena, scripts, projéteis) com um boneco no lugar do Curupira, força o ataque ou combo e marca, quadro a quadro, as caixas de dano ligadas numa grade de 8 px. Depois procura uma sequência de comandos (parado, andar, pular, pulo curto, abaixar, dash) com a física do `MovimentoData` e a hurtbox real, primeiro sem dash. Como os chefes miram no Curupira, grava de novo com o boneco seguindo o caminho achado e confere. Testa 3 posições iniciais × 2 sorteios. "FALHOU" = não achou caminho (pode ser impossível ou apertado demais). Também mostra em quantos casos o Curupira parado leva golpe (prova de que a gravação pega o ataque). Leva ~5 min:
+  `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/verificar_desvio.gd`
+  Filtros depois de `--`: `chefe=mula`, `dificuldade=1`, `so=combos` ou `so=ataques`, `rapido` (sem procurar o atraso mínimo), `depurar`.
+- **Cheats de debug (`OS.is_debug_build()`): não implementados [Aberto]**: invencibilidade, carga total do especial, pular para a próxima fase do chefe, desbloquear todos os ataques. Sugestão: autoload `Debug` removível do build.
 
 ### 15.4 Créditos
 `CREDITS.md` com fonte, autor e licença de cada asset: **não existe [Aberto]**. Há placeholders antigos em `art/antiga/placeholder/` (fora do jogo) cuja origem e licença precisam ser registradas.
@@ -629,7 +685,7 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 |---|---|---|
 | Teste manual das 4 lutas | Nada da pixel art foi visto rodando no Godot | Rodar cada `levelN` com F6 (ver `PENDENCIAS.md`) |
 | Valores "provisório" dos ataques novos | Combate pode estar fácil ou difícil demais | Fechar no GDD (Q16) depois de testar |
-| Limiares das fases (0,667 / 0,333) | Ritmo da luta | Fechar no GDD (Q16) |
+| Fases e combos (chance, atraso, pausa, limiares) | Ritmo da luta | Fechar no GDD (Q16) depois de testar; valores em 8.2 |
 | Trava de mira sem botão no controle | Controle | Escolher o botão (GDD Q15) |
 | Coração do Boto carrega o especial | Pode ser exploit | Decidir; se não, tirar a hurtbox do coração do sinal de acerto |
 | Folhas do dash com a arte antiga | Mistura de estilos | Gerar no `art/pixel/gerador` |
@@ -649,9 +705,9 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 
 ## 18. Fora do MVP
 
-Ideias do GDD ainda não adotadas: hitstop, tremor de câmera e squash and stretch; exportação para Web.
+Ideias do GDD ainda não adotadas: hitstop e squash and stretch; exportação para Web.
 
-Já implementados (saíram da lista): coyote time, jump buffer, pulo de altura variável, valores em `Resource`, partículas no dash (`EfeitoDash`).
+Já implementados (saíram da lista): tremor de câmera (golpe no Curupira e troca de fase), coyote time, jump buffer, pulo de altura variável, valores em `Resource`, partículas no dash (`EfeitoDash`).
 
 ## 19. Decisões registradas (para o Arthur vetar)
 

@@ -1,22 +1,26 @@
 extends Chefe
 ## Máquina de IA (o Núcleo) — chefe final. Pendurada no trilho do teto por um braço; a origem
-## do node é o ponto do trilho. Três fases (vida em maquina.tres):
-##   fase 1: laser, bombas;   fase 2: + pistoes;   fase 3: + varredura.
-## Não concede ataque.
+## do node é o ponto do trilho. Ataques, fases e combos por dificuldade no maquina.tres
+## (Normal: 2 fases; Expert: 3). Não concede ataque.
 ##
 ## Cada ataque, na ordem em que acontece:
 ##   laser      — a lente abre e uma linha fina segue o Curupira; trava e dispara;
 ##   bombas     — recolhe para o alto, os alçapões do teto abrem e caem N bombas
-##                (uma no Curupira, as outras ao lado); depois fica parada (janela);
-##   pistoes    — a lente olha o chão e as placas do piso saltam em ondas na direção do Curupira;
+##                (uma no Curupira, as outras ao lado). Depois fica parada (janela);
+##   pistoes    — a lente olha o chão (aviso) e as placas do piso saltam em ondas na direção do
+##                Curupira; cada placa pisca antes de saltar;
 ##   varredura  — desce até a altura do Curupira: laser reto na altura da cabeça (abaixar),
-##                depois mira o chão e o ponto de impacto corre até a parede (pular).
+##                depois mira o chão e o ponto de impacto corre até a parede (pular). A linha fina
+##                mostra cada passada antes.
+## Encadeado (primeiro de um combo): bombas e pistões não esperam as bombas/placas terminarem
+## nem a parada do fim.
 ## A hurtbox e o contato ficam no "Nucleo", que acompanha a lente do desenho (ponto "lente")
 ## a cada frame, porque o corpo desce e sobe dentro das próprias animações.
 ##
 ## Animações usadas (maquina_frames.tres):
 ##   idle, aviso_laser, mirando, laser, fim_laser, aviso_bombas, bombas, fim_bombas,
-##   aviso_pistoes, pistoes, descer, varredura, varredura_chao, subir, derrota
+##   aviso_pistoes, pistoes, descer, varredura, varredura_chao, subir, derrota,
+##   dano e transicao (usadas pela base Chefe)
 
 ## Brilho de aviso da Máquina: vermelho. Só visual.
 const COR_AVISO_MAQUINA: Color = Color(1.8, 0.6, 0.6)
@@ -37,16 +41,21 @@ func _process(delta: float) -> void:
 	nucleo.global_position = ponto("lente") + LENTE_AO_CENTRO * Vector2(signf(sprite.scale.x), 1.0)
 
 
-func _executar(nome: StringName) -> void:
+func _executar(nome: StringName, encadeado: bool = false) -> void:
 	match nome:
 		&"laser":
 			await _laser()
 		&"bombas":
-			await _bombas()
+			await _bombas(encadeado)
 		&"pistoes":
-			await _pistoes()
+			await _pistoes(encadeado)
 		&"varredura":
 			await _varredura()
+
+
+## Pendurada no trilho, ela não se vira na transição (o laser é que mira o Curupira).
+func _virar_para_alvo() -> void:
+	pass
 
 
 ## Onde a Máquina está pendurada fica fora da arena: o chão é medido a partir do trilho.
@@ -88,7 +97,7 @@ func _laser() -> void:
 	await tocar_e_esperar(&"fim_laser")
 
 
-func _bombas() -> void:
+func _bombas(encadeado: bool) -> void:
 	avisar(true, COR_AVISO_MAQUINA)
 	if not await tocar_e_esperar(&"aviso_bombas"):
 		return
@@ -111,6 +120,8 @@ func _bombas() -> void:
 		bomba.get_node("Corpo").position.y = global_position.y - _chao()
 		bomba.explodiu.connect(func() -> void: pendentes[0] -= 1)
 		lancar_na_cena(bomba)
+	if encadeado:
+		return  # as bombas caem sozinhas; o próximo ataque do combo já começa
 	while pendentes[0] > 0:
 		await passo()
 		if derrotado:
@@ -122,7 +133,7 @@ func _bombas() -> void:
 	await esperar(maxf(_d.parada_apos_bombas - FolhaSprites.duracao(sprite, &"fim_bombas"), 0.0))
 
 
-func _pistoes() -> void:
+func _pistoes(encadeado: bool) -> void:
 	avisar(true, COR_AVISO_MAQUINA)
 	reiniciar(&"aviso_pistoes")
 	if not await esperar(_d.aviso_pistoes):
@@ -148,6 +159,8 @@ func _pistoes() -> void:
 		if not await esperar(_d.intervalo_ondas_pistoes):
 			return
 		velocidade *= _d.aceleracao_onda_pistoes
+	if encadeado:
+		return  # as placas saltam sozinhas
 	await esperar(maxf(duracao_total - _d.intervalo_ondas_pistoes, 0.0) + _d.aviso_placa)
 
 

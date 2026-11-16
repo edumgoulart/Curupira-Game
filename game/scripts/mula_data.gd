@@ -2,13 +2,15 @@ class_name MulaData
 extends ChefeData
 ## Números da Mula sem Cabeça. Os marcados "GDD" vêm da tabela de chefes do GDD;
 ## os "provisório" ainda não estão no GDD (Q16) e devem ser ajustados testando.
-## Nome, vida (GDD: 1200), pausa entre ataques (GDD: 1,2 s), contato e fases ficam em
+## Avisos: o Eduardo pediu mais tempo para desviar, então todos subiram (o valor antigo fica
+## anotado).
+## Nome, vida (GDD: 1200), pausa entre ataques (GDD: 1,2 s), contato, fases e combos ficam em
 ## ChefeData e estão preenchidos no mula.tres.
 ## Ataques (nomes usados nas fases): bolas, pisoteio, investida, meteoros.
 
 @export_group("Rajada rasteira (bolas)")
-## Aviso antes da primeira bola (s). GDD: 0,5.
-@export_range(0.0, 3.0, 0.05, "suffix:s") var aviso_bolas: float = 0.5
+## Aviso antes da primeira bola (s). GDD: 0,8 (era 0,5).
+@export_range(0.0, 3.0, 0.05, "suffix:s") var aviso_bolas: float = 0.8
 ## Quantas bolas por ataque. GDD: 3.
 @export var quantidade_bolas: int = 3
 ## Golpes por bola. GDD: 1.
@@ -23,8 +25,8 @@ extends ChefeData
 @export var cena_bola: PackedScene
 
 @export_group("Pisoteio (onda de fogo)")
-## Aviso: empina e segura no alto (s). Provisório: 0,8.
-@export_range(0.1, 3.0, 0.05, "suffix:s") var aviso_pisoteio: float = 0.8
+## Aviso: empina e segura no alto (s). Provisório: 1,0 (era 0,8).
+@export_range(0.1, 3.0, 0.05, "suffix:s") var aviso_pisoteio: float = 1.0
 ## Velocidade da onda de fogo pelo chão (px/s). Provisório: 650.
 @export var velocidade_onda: float = 650.0
 ## Golpes da onda. Provisório: 1.
@@ -36,8 +38,8 @@ extends ChefeData
 @export var cena_onda: PackedScene
 
 @export_group("Investida")
-## Aviso: raspa o casco antes de correr (s). Provisório: 0,9.
-@export_range(0.1, 3.0, 0.05, "suffix:s") var aviso_investida: float = 0.9
+## Aviso: raspa o casco antes de correr (s). Provisório: 1,1 (era 0,9).
+@export_range(0.1, 3.0, 0.05, "suffix:s") var aviso_investida: float = 1.1
 ## Velocidade da corrida (px/s). Provisório: 1400 (passa-se com o dash, invencível).
 @export var velocidade_investida: float = 1400.0
 ## Golpes de quem for atropelado. Provisório: 1.
@@ -45,9 +47,8 @@ extends ChefeData
 ## Onde ela para, medido da parede (px), para o corpo não entrar na parede. Provisório: 180.
 @export var margem_parede: float = 180.0
 ## Tonta depois de bater na parede (s); é a janela para atacar. Provisório: 1,4.
+## Depois ela fica naquela parede (não volta para o lugar).
 @export_range(0.0, 5.0, 0.05, "suffix:s") var tempo_tonta: float = 1.4
-## Velocidade da volta ao lugar, trotando (px/s). Provisório: 520.
-@export var velocidade_volta: float = 520.0
 
 @export_group("Chuva de meteoros")
 ## Quantos meteoros. Provisório: 3 (o primeiro cai onde o Curupira está).
@@ -56,8 +57,8 @@ extends ChefeData
 @export var distancia_meteoros: float = 300.0
 ## Tempo entre um meteoro e o próximo (s). Provisório: 0,35.
 @export_range(0.05, 2.0, 0.05, "suffix:s") var intervalo_meteoros: float = 0.35
-## Aviso: tempo da sombra no chão até o impacto (s), de cada meteoro. GDD: 1.
-@export_range(0.1, 3.0, 0.05, "suffix:s") var aviso_meteoro: float = 1.0
+## Aviso: tempo do brilho no céu até o impacto (s), de cada meteoro. GDD: 1,3 (era 1).
+@export_range(0.1, 3.0, 0.05, "suffix:s") var aviso_meteoro: float = 1.3
 ## Golpes de cada meteoro. GDD: 2.
 @export var golpes_meteoro: int = 2
 ## A Mula fica parada depois dos meteoros (s); é a janela para atacar. GDD: 1,5.
@@ -68,8 +69,3 @@ extends ChefeData
 @export_range(0.05, 1.0, 0.05, "suffix:s") var duracao_impacto_meteoro: float = 0.15
 @export var cena_meteoro: PackedScene
 
-
-func _init() -> void:
-	ataques_fase_1 = [&"bolas", &"pisoteio"]
-	ataques_fase_2 = [&"bolas", &"pisoteio", &"investida"]
-	ataques_fase_3 = [&"bolas", &"pisoteio", &"investida", &"meteoros"]

@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="1_anim"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/acerto_1.png" id="2_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/acerto_2.png" id="3_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/acerto_3.png" id="4_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/acerto_4.png" id="5_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/acerto_5.png" id="6_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/acerto_6.png" id="7_q"]
+
+[node name="EfeitoAcerto" type="Sprite2D"]
+z_index = 5
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("2_q")
+centered = false
+offset = Vector2(-10, -9)
+script = ExtResource("1_anim")
+quadros = Array[Texture2D]([ExtResource("2_q"), ExtResource("3_q"), ExtResource("4_q"), ExtResource("5_q"), ExtResource("6_q"), ExtResource("7_q")])
+fps = 20.0
+loop = false
+apagar_ao_terminar = true

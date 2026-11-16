@@ -1,37 +1,45 @@
 extends Chefe
-## Cuca — segundo chefe. Três fases (vida em cuca.tres):
-##   fase 1: leque, pocao;   fase 2: + bote;   fase 3: + ninar.
-## Leva dano o tempo todo. Vida, fases, sorteio e derrota vêm da classe base Chefe.
+## Cuca — segundo chefe. Ataques, fases e combos por dificuldade no cuca.tres.
+## Leva dano o tempo todo. Vida, fases, sorteio, combos e derrota vêm da classe base Chefe.
 ##
-## Cada ataque, na ordem em que acontece:
-##   leque  — ergue as garras com bolas verdes (aviso) e empurra: N feitiços em leque,
-##            o do meio mirado no Curupira;
-##   pocao  — tira a poção do cinto e chacoalha (aviso), joga em arco onde o Curupira está;
-##            vira poça de veneno ou de lentidão. Depois fica parada (janela);
-##   bote   — agacha com a boca aberta (aviso), desliza de barriga abocanhando até passar do
-##            Curupira, levanta e volta andando;
-##   ninar  — canta: duas fileiras de notas em onda, com uma brecha entre elas que sobe e desce.
+## Cada ataque, na ordem em que acontece (o aviso é a animação aviso_*):
+##   leque  — ergue as garras com bolas verdes (aviso) e empurra: N feitiços em leque, o do meio
+##            mirado no Curupira;
+##   pocao  — tira a poção do cinto e chacoalha (aviso) e joga em arco até onde o Curupira está;
+##            vira poça de veneno ou de lentidão. Depois fica parada;
+##   bote   — agacha com a boca aberta (aviso), desliza de barriga abocanhando até a parede do lado
+##            do Curupira e levanta. Fica lá: não volta de costas para o lugar (isso prendia o
+##            Curupira). Os ataques seguintes saem de onde ela está, espelhados;
+##   ninar  — canta uma melodia: as notas vêm uma de cada vez, graves (rente ao chão; pula-se) ou
+##            agudas (na altura do peito; abaixa-se), cada tipo de uma cor.
+##            Antes eram duas fileiras com uma brecha menor que o Curupira: não dava para passar.
 ## Os tiros saem dos pontos "garra" e "boca" do desenho, quadro a quadro.
+## Encadeado (primeiro de um combo): a poção pula a parada do fim e o bote pula o "levantar".
 ##
 ## Animações usadas (cuca_frames.tres):
 ##   idle, aviso_feitico, feitico, fim_feitico, aviso_pocao, pocao, fim_pocao, aviso_bote,
-##   bote, levantar, andar, aviso_ninar, ninar, fim_ninar, derrota
+##   bote, levantar, aviso_ninar, ninar, fim_ninar, derrota,
+##   dano e transicao (usadas pela base Chefe)
 
 ## Brilho de aviso da Cuca: verde de magia (o da Mula é laranja). Só visual.
 const COR_AVISO_CUCA: Color = Color(0.85, 1.6, 0.85)
+## Cor das notas: grave (pula-se) quente, aguda (abaixa-se) fria. Só visual.
+const COR_NOTA_GRAVE: Color = Color(1.0, 0.75, 0.35)
+const COR_NOTA_AGUDA: Color = Color(0.55, 0.9, 1.0)
 
 @onready var _d: CucaData = dados as CucaData
-@onready var _x_inicial: float = global_position.x
 
 
-func _executar(nome: StringName) -> void:
+func _executar(nome: StringName, encadeado: bool = false) -> void:
+	# Todo ataque começa de frente para o Curupira (ela pode estar em qualquer lado).
+	_virar_para_alvo()
 	match nome:
 		&"leque":
 			await _leque()
 		&"pocao":
-			await _pocao()
+			await _pocao(encadeado)
 		&"bote":
-			await _bote()
+			await _bote(encadeado)
 		&"ninar":
 			await _ninar()
 
@@ -65,7 +73,7 @@ func _lancar_feiticos() -> void:
 		lancar_na_cena(feitico)
 
 
-func _pocao() -> void:
+func _pocao(encadeado: bool) -> void:
 	avisar(true, COR_AVISO_CUCA)
 	reiniciar(&"aviso_pocao")
 	if not await esperar(_d.aviso_pocao):
@@ -74,6 +82,8 @@ func _pocao() -> void:
 	reiniciar(&"pocao")
 	_jogar_pocao()
 	if not await tocar_e_esperar(&"fim_pocao"):
+		return
+	if encadeado:
 		return
 	# Parada depois da poção: é a janela para atacar.
 	tocar(&"idle")
@@ -89,9 +99,10 @@ func _jogar_pocao() -> void:
 	lancar_na_cena(pocao)
 
 
-func _bote() -> void:
+func _bote(encadeado: bool) -> void:
 	var lado: float = lado_do_alvo()
-	var destino: float = clampf(x_do_alvo() + lado * _d.alcance_alem_do_alvo, -ARENA_MEIA_LARGURA + 150.0, ARENA_MEIA_LARGURA - 150.0)
+	# Vai até a parede do lado do Curupira: para passar, tem que pular por cima ou dar dash.
+	var destino: float = lado * (ARENA_MEIA_LARGURA - _d.margem_parede_bote)
 	avisar(true, COR_AVISO_CUCA)
 	virar(lado > 0.0)
 	reiniciar(&"aviso_bote")
@@ -103,16 +114,18 @@ func _bote() -> void:
 	if not await andar_ate(destino, _d.velocidade_bote):
 		return
 	contato.dano = dados.golpes_contato
+	if encadeado:
+		# Levanta já virando para o próximo ataque do combo.
+		_virar_para_alvo()
+		return
 	if not await tocar_e_esperar(&"levantar"):
 		return
-	virar(_x_inicial > global_position.x)
-	tocar(&"andar")
-	if not await andar_ate(_x_inicial, _d.velocidade_volta):
-		return
-	virar(x_do_alvo() > global_position.x)
+	# Fica nesta parede e só se vira para o Curupira.
+	_virar_para_alvo()
 
 
 func _ninar() -> void:
+	var lado: float = lado_do_alvo()
 	avisar(true, COR_AVISO_CUCA)
 	if not await tocar_e_esperar(&"aviso_ninar"):
 		return
@@ -120,28 +133,21 @@ func _ninar() -> void:
 		return
 	avisar(false)
 	tocar(&"ninar")
-	var lado: float = lado_do_alvo()
-	var tempo: float = 0.0
-	var proxima: float = 0.0
-	while tempo < _d.duracao_ninar:
-		if tempo >= proxima:
-			proxima += _d.intervalo_notas
-			# A brecha entre as duas fileiras sobe e desce com o tempo.
-			var onda: float = sin(tempo * TAU * _d.frequencia_brecha) * _d.amplitude_brecha
-			for altura in [_d.altura_fileira_baixa, _d.altura_fileira_alta]:
-				_soltar_nota(Vector2(ponto("boca").x, global_position.y - altura - onda), lado)
-		var dt: float = await passo()
-		if derrotado:
+	for i in _d.quantidade_notas:
+		var aguda: bool = _sorteio.randf() < _d.chance_nota_aguda
+		_soltar_nota(aguda, lado)
+		if not await esperar(_d.intervalo_notas):
 			return
-		tempo += dt
 	await tocar_e_esperar(&"fim_ninar")
 
 
-func _soltar_nota(posicao: Vector2, lado: float) -> void:
+## Grave: rente ao chão (pula-se). Aguda: na altura do peito (abaixa-se).
+func _soltar_nota(aguda: bool, lado: float) -> void:
 	var nota: ProjetilChefe = _d.cena_nota.instantiate()
 	nota.dano = _d.golpes_nota
-	# Nunca abaixo do chão: a fileira baixa desce no máximo até rente a ele.
-	nota.global_position = Vector2(posicao.x, minf(posicao.y, global_position.y - 30.0))
+	nota.modulate = COR_NOTA_AGUDA if aguda else COR_NOTA_GRAVE
+	var altura: float = _d.altura_nota_aguda if aguda else _d.altura_nota_grave
+	nota.global_position = Vector2(ponto("boca").x, global_position.y - altura)
 	nota.lancar(Vector2(lado * _d.velocidade_notas, 0.0))
 	lancar_na_cena(nota)
 

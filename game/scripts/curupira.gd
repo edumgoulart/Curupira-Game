@@ -28,8 +28,13 @@ const MIRA_DIAG_BAIXO: float = 45.0
 const MIRA_BAIXO: float = 90.0
 ## Altura da cápsula agachado, em fração da de pé (GDD: ~40%). Só a forma; o desenho é da folha.
 const ALTURA_AGACHADO: float = 0.5
-## Quanto tempo a pose de dano fica na tela depois de um golpe (s). Só visual.
+## Quanto tempo a pose de dano fica na tela depois de um golpe (s), se a animação "dano" não
+## existir. Com ela, vale a duração da animação (0,33 s). Só visual.
 const DURACAO_POSE_DANO: float = 0.2
+## Retorno do golpe (só visual): pisca branco e tremor da câmera.
+const PISCA_DANO_DURACAO: float = 0.15
+const TREMOR_DANO_PX: float = 9.0
+const TREMOR_DANO_DURACAO: float = 0.25
 
 ## Emitido no último golpe. A arena escuta para mostrar a tela de derrota.
 signal derrotado
@@ -59,6 +64,8 @@ var _tempo_especial: float = 0.0
 var _tempo_ataque: float = 0.0
 var _tempo_pouso: float = 0.0
 var _tempo_dano: float = 0.0
+var _material_pisca: ShaderMaterial
+var _tween_pisca: Tween
 var _estava_no_ar: bool = false
 # Formas de pé e agachado (corpo e hurtbox), trocadas ao agachar.
 var _formas_de_pe: Array = []
@@ -100,6 +107,7 @@ func _ready() -> void:
 
 	# Pixel art: âncora nos pés, filtro Nearest; o Atirador vai para a mão a cada frame.
 	FolhaSprites.preparar(sprite)
+	_material_pisca = EfeitosTela.preparar_pisca(sprite)
 	atirador.seguindo_mao = true
 	_preparar_formas_agachado()
 
@@ -171,9 +179,25 @@ func take_damage(amount: int, _from: Node) -> void:
 	if esta_invencivel():
 		return
 	vida.perder(amount)
+	_retorno_do_golpe()
 	if vida.esta_viva():
 		_tempo_invencivel = dados_vida.invencibilidade_apos_golpe
-		_tempo_dano = DURACAO_POSE_DANO
+		var duracao: float = FolhaSprites.duracao(sprite, &"dano")
+		_tempo_dano = duracao if duracao > 0.0 else DURACAO_POSE_DANO
+		# A pose de dano recomeça do primeiro quadro (o tranco), mesmo se já estava nela.
+		if sprite.sprite_frames and sprite.sprite_frames.has_animation(&"dano"):
+			sprite.play(&"dano")
+			sprite.set_frame_and_progress(0, 0.0)
+
+
+## Pisca branco e treme a câmera: o golpe tem que ser sentido, não só um "vermelhinho".
+func _retorno_do_golpe() -> void:
+	if _tween_pisca:
+		_tween_pisca.kill()
+	_material_pisca.set_shader_parameter("forca", 1.0)
+	_tween_pisca = create_tween()
+	_tween_pisca.tween_property(_material_pisca, "shader_parameter/forca", 0.0, PISCA_DANO_DURACAO)
+	EfeitosTela.tremer(self, TREMOR_DANO_PX, TREMOR_DANO_DURACAO)
 
 
 ## Enquanto true, o Curupira não leva golpe: no dash, logo depois de um golpe e derrotado.

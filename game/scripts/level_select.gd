@@ -1,8 +1,13 @@
 extends Control
-## Seleção de fase (GDD): escolhe o ataque básico, o especial e o chefe, na mesma tela.
+## Seleção de fase (GDD): escolhe o ataque básico, o especial, a dificuldade e o chefe,
+## na mesma tela.
 ## Os ataques são escolhidos aqui e ficam travados durante a luta.
 ## Só aparecem os ataques liberados: os iniciais + os dos chefes já derrotados
 ## (campo fase_que_libera de cada ataque no catálogo).
+##
+## Dificuldade (combinado com o Eduardo): Normal = Mula, Cuca e Boto com uma fase e a Máquina
+## com duas; Expert = duas fases e a Máquina com três. As fases de cada uma ficam no .tres de
+## cada chefe (fases_normal / fases_expert). Vencer no Expert marca "Expert" no chefe.
 ##
 ## Ids de progresso no GameState: fase1 = Mula sem Cabeça, fase2 = Cuca,
 ## fase3 = Boto cor-de-rosa, boss = Máquina (liberada depois dos três).
@@ -12,6 +17,11 @@ const CENA_CUCA: String = "res://scenes/level2.tscn"
 const CENA_BOTO: String = "res://scenes/level3.tscn"
 const CENA_MAQUINA: String = "res://scenes/level4.tscn"
 const CATALOGO: CatalogoAtaques = preload("res://dados/ataques/catalogo.tres")
+## O que cada dificuldade muda, mostrado embaixo do botão.
+const DETALHE_DIFICULDADE := [
+	"Mula, Cuca e Boto numa fase só · Máquina em duas",
+	"Duas fases e mais combos · Máquina em três",
+]
 
 var _basicos: Array[AtaqueData] = []
 var _especiais: Array[EspecialData] = []
@@ -27,19 +37,18 @@ var _i_especial: int = 0
 @onready var detalhe_basico: Label = %DetalheBasico
 @onready var detalhe_especial: Label = %DetalheEspecial
 @onready var aviso: Label = %AtaquesAviso
+@onready var dificuldade: Button = %Dificuldade
+@onready var detalhe_dificuldade: Label = %DetalheDificuldade
 
 
 func _ready() -> void:
-	if GameState.concluiu("fase1"):
-		mula.text += "  (derrotada)"
-	if GameState.concluiu("fase2"):
-		cuca.text += "  (derrotada)"
-	if GameState.concluiu("fase3"):
-		boto.text += "  (derrotado)"
+	mula.text += _marca("fase1", "derrotada")
+	cuca.text += _marca("fase2", "derrotada")
+	boto.text += _marca("fase3", "derrotado")
 	# A Máquina (chefe final) só libera depois dos três (GDD).
 	if GameState.boss_liberado():
 		maquina.disabled = false
-		maquina.text = "Máquina de IA" + ("  (derrotada)" if GameState.zerou() else "")
+		maquina.text = "Máquina de IA" + _marca("boss", "derrotada")
 		maquina.pressed.connect(func() -> void: get_tree().change_scene_to_file(CENA_MAQUINA))
 
 	_basicos.assign(CATALOGO.basicos.filter(func(a: AtaqueData) -> bool: return GameState.liberado(a.fase_que_libera)))
@@ -53,6 +62,8 @@ func _ready() -> void:
 	especial.pressed.connect(_trocar_especial.bind(1))
 	basico.gui_input.connect(_setas.bind(_trocar_basico))
 	especial.gui_input.connect(_setas.bind(_trocar_especial))
+	dificuldade.pressed.connect(_trocar_dificuldade.bind(1))
+	dificuldade.gui_input.connect(_setas.bind(_trocar_dificuldade))
 	_atualizar_textos()
 
 	# Foco no primeiro chefe: dá para entrar direto na luta com o controle.
@@ -64,6 +75,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		_on_voltar_pressed()
+
+
+## "  (derrotada)" e, se venceu no Expert, "  (derrotada · Expert)". Vazio se não venceu.
+func _marca(id: String, palavra: String) -> String:
+	if GameState.concluiu_expert(id):
+		return "  (%s · Expert)" % palavra
+	if GameState.concluiu(id):
+		return "  (%s)" % palavra
+	return ""
 
 
 ## Posição do ataque equipado na lista de liberados; se não estiver (ou não houver escolha), o primeiro.
@@ -97,6 +117,12 @@ func _trocar_especial(passo: int) -> void:
 	_salvar_escolha()
 
 
+func _trocar_dificuldade(passo: int) -> void:
+	var nova: int = wrapi(GameState.dificuldade + passo, 0, GameState.NOMES_DIFICULDADE.size())
+	GameState.escolher_dificuldade(nova as GameState.Dificuldade)
+	_atualizar_textos()
+
+
 func _salvar_escolha() -> void:
 	GameState.equipar(_basicos[_i_basico].resource_path, _especiais[_i_especial].resource_path)
 	_atualizar_textos()
@@ -105,6 +131,8 @@ func _salvar_escolha() -> void:
 func _atualizar_textos() -> void:
 	var b: AtaqueData = _basicos[_i_basico]
 	var e: EspecialData = _especiais[_i_especial]
+	dificuldade.text = "Dificuldade: " + _com_setas(GameState.nome_dificuldade(), GameState.NOMES_DIFICULDADE.size())
+	detalhe_dificuldade.text = DETALHE_DIFICULDADE[GameState.dificuldade]
 	basico.text = "Básico: " + _com_setas(b.nome, _basicos.size())
 	especial.text = "Especial: " + _com_setas(e.nome, _especiais.size())
 	detalhe_basico.text = "%d de dano · %s tiros/s · +%d de carga por acerto" % [b.dano, _numero(b.tiros_por_segundo), b.carga_por_acerto]

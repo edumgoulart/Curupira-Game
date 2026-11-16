@@ -118,6 +118,34 @@ function poseArAtirarPx(p, t, ang) {
   };
 }
 
+/* ---------- dano ----------
+   Leva o golpe: tranco para trás, cabeça jogada para trás, cabelo arrepiado, braços abertos e
+   olhos apertados; depois amortece nos joelhos e volta à pose parada. k = 0 (golpe) .. 4 (recuperado). */
+function poseDanoPx(k, t) {
+  const parado = poseParado(0.25, t);
+  const qG = pt(-6, -53), oG = ombrosDe(qG, -20);
+  const golpe = {
+    quadril: qG, inclina: -20, pes: [pe(-12, 0, -10), pe(12, -6, -26)],
+    maos: [soma(oG.longe, pt(-36, 12)), soma(oG.perto, pt(40, 8))], bracoL: [39, 42], cotovelo: [-1, 1], formaMao: ['palma', 'palma'],
+    cabeca: { dx: -2, dy: 1, inc: -16 }, ex: 'dor', saia: -14, vento: [0.6, -2.8], agita: 0.2
+  };
+  const qA = pt(-3, -45), oA = ombrosDe(qA, -6);
+  const amortece = {
+    quadril: qA, inclina: -6, pes: [pe(-12), pe(13)],
+    maos: [pendura(oA.longe, -0.7, 38), pendura(oA.perto, 0.9, 38)], bracoL: [40, 40], formaMao: ['palma', 'punho'],
+    cabeca: { dy: 1, inc: -4 }, ex: 'dor', saia: -6, vento: [0.3, -1.6], agita: 0.6
+  };
+  const pose = [
+    () => mixPose(parado, golpe, 0.8),
+    () => golpe,
+    () => mixPose(golpe, amortece, 0.55),
+    () => amortece,
+    () => ({ ...mixPose(amortece, parado, 0.7), ex: 'determinado' })
+  ][k]();
+  pose.rotulo = 'dano';
+  return pose;
+}
+
 const ANIMS_PX = ANIMS.flatMap(A => {
   if (A.id === 'parado') return [{ ...A, desc: 'Respira e balança no lugar. O cabelo é vermelho e só mexe com o corpo.' }];
   if (A.id === 'especial') return [{ ...A, pose: poseEspecialPx, desc: 'Carrega a energia, o cabelo pega fogo, ele grita e solta a onça. Depois o fogo apaga.' }];

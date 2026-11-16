@@ -5,6 +5,74 @@
 [ext_resource type="PackedScene" path="res://scenes/pocao_cuca.tscn" id="3_pocao"]
 [ext_resource type="PackedScene" path="res://scenes/poca_cuca.tscn" id="4_poca"]
 [ext_resource type="PackedScene" path="res://scenes/nota_cuca.tscn" id="5_nota"]
+[ext_resource type="Script" path="res://scripts/fase_chefe.gd" id="fase_chefe"]
+[ext_resource type="Script" path="res://scripts/combo_chefe.gd" id="combo_chefe"]
+
+[sub_resource type="Resource" id="Combo_normal1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"pocao"
+segundo = &"leque"
+atraso = 0.6
+
+[sub_resource type="Resource" id="Combo_normal1_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"bote"
+segundo = &"leque"
+atraso = 0.6
+
+[sub_resource type="Resource" id="Fase_normal1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"leque", &"pocao", &"bote", &"ninar"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_normal1_1"), SubResource("Combo_normal1_2")])
+chance_combo = 0.2
+fator_pausa = 1.0
+
+[sub_resource type="Resource" id="Combo_expert1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"pocao"
+segundo = &"leque"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Combo_expert1_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"bote"
+segundo = &"leque"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Fase_expert1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"leque", &"pocao", &"bote"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert1_1"), SubResource("Combo_expert1_2")])
+chance_combo = 0.3
+fator_pausa = 0.9
+
+[sub_resource type="Resource" id="Combo_expert2_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"pocao"
+segundo = &"ninar"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"bote"
+segundo = &"leque"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Combo_expert2_3"]
+script = ExtResource("combo_chefe")
+primeiro = &"pocao"
+segundo = &"bote"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Fase_expert2"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 0.5
+ataques = Array[StringName]([&"leque", &"pocao", &"bote", &"ninar"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert2_1"), SubResource("Combo_expert2_2"), SubResource("Combo_expert2_3")])
+chance_combo = 0.5
+fator_pausa = 0.8
 
 [resource]
 script = ExtResource("1_dados")
@@ -14,16 +82,15 @@ recompensa = "Feitiço Perseguidor e Poção Maldita"
 vida = 1600
 pausa_entre_ataques = 1.6
 golpes_contato = 1
-ataques_fase_1 = Array[StringName]([&"leque", &"pocao"])
-ataques_fase_2 = Array[StringName]([&"leque", &"pocao", &"bote"])
-ataques_fase_3 = Array[StringName]([&"leque", &"pocao", &"bote", &"ninar"])
-aviso_feitico = 0.5
+fases_normal = Array[ExtResource("fase_chefe")]([SubResource("Fase_normal1")])
+fases_expert = Array[ExtResource("fase_chefe")]([SubResource("Fase_expert1"), SubResource("Fase_expert2")])
+aviso_feitico = 0.8
 golpes_feitico = 1
 quantidade_feiticos = 3
 abertura_feitico = 20.0
 velocidade_feitico = 700.0
 cena_feitico = ExtResource("2_feitico")
-aviso_pocao = 0.6
+aviso_pocao = 0.8
 parada_apos_pocao = 1.5
 velocidade_horizontal_pocao = 600.0
 gravidade_pocao = 1800.0

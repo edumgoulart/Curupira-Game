@@ -1,9 +1,9 @@
 class_name JatoBoto
 extends Hitbox
-## Jato de água do Boto: faixa reta que sai da boca dele e vai até a outra margem,
-## ligada por alguns décimos de segundo (GDD: aviso 0,7 s, 1 golpe). Passa na altura do peito
-## do Curupira: desvia-se abaixando.
-## Layer enemy_hitbox; mask player. A origem é a boca; o jato cresce para o lado "direcao".
+## Jato de água do Boto: sai reto da boca dele até a outra margem, ligado por alguns décimos
+## de segundo (GDD: aviso 0,9 s, 1 golpe). Alto (abaixa-se) ou baixo (pula-se): quem escolhe é
+## o Boto, que afunda ou sobe na água para a boca ficar na altura certa.
+## Layer enemy_hitbox; mask player. A origem é a boca; o jato vai para o lado "direcao".
 ## O desenho é o pedaço "jato_meio" repetido na horizontal (região com repetição) e a ponta.
 
 ## Comprimento (px): passa da largura da arena.

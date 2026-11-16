@@ -4,6 +4,80 @@
 [ext_resource type="PackedScene" path="res://scenes/bola_de_fogo_mula.tscn" id="2_bola"]
 [ext_resource type="PackedScene" path="res://scenes/meteoro.tscn" id="3_met"]
 [ext_resource type="PackedScene" path="res://scenes/onda_fogo_mula.tscn" id="4_onda"]
+[ext_resource type="Script" path="res://scripts/fase_chefe.gd" id="fase_chefe"]
+[ext_resource type="Script" path="res://scripts/combo_chefe.gd" id="combo_chefe"]
+
+[sub_resource type="Resource" id="Combo_normal1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"meteoros"
+segundo = &"bolas"
+atraso = 0.6
+
+[sub_resource type="Resource" id="Combo_normal1_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"investida"
+segundo = &"pisoteio"
+atraso = 0.6
+
+[sub_resource type="Resource" id="Fase_normal1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"bolas", &"pisoteio", &"investida", &"meteoros"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_normal1_1"), SubResource("Combo_normal1_2")])
+chance_combo = 0.2
+fator_pausa = 1.0
+
+[sub_resource type="Resource" id="Combo_expert1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"investida"
+segundo = &"pisoteio"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Combo_expert1_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"bolas"
+segundo = &"investida"
+atraso = 0.5
+
+[sub_resource type="Resource" id="Fase_expert1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"bolas", &"pisoteio", &"investida"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert1_1"), SubResource("Combo_expert1_2")])
+chance_combo = 0.3
+fator_pausa = 0.9
+
+[sub_resource type="Resource" id="Combo_expert2_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"meteoros"
+segundo = &"bolas"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"meteoros"
+segundo = &"pisoteio"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_3"]
+script = ExtResource("combo_chefe")
+primeiro = &"investida"
+segundo = &"bolas"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_4"]
+script = ExtResource("combo_chefe")
+primeiro = &"investida"
+segundo = &"meteoros"
+atraso = 0.2
+
+[sub_resource type="Resource" id="Fase_expert2"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 0.5
+ataques = Array[StringName]([&"bolas", &"pisoteio", &"investida", &"meteoros"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert2_1"), SubResource("Combo_expert2_2"), SubResource("Combo_expert2_3"), SubResource("Combo_expert2_4")])
+chance_combo = 0.5
+fator_pausa = 0.8
 
 [resource]
 script = ExtResource("1_dados")
@@ -13,9 +87,8 @@ recompensa = "Bola de Fogo e Canhão Flamejante"
 vida = 1200
 pausa_entre_ataques = 1.2
 golpes_contato = 1
-ataques_fase_1 = Array[StringName]([&"bolas", &"pisoteio"])
-ataques_fase_2 = Array[StringName]([&"bolas", &"pisoteio", &"investida"])
-ataques_fase_3 = Array[StringName]([&"bolas", &"pisoteio", &"investida", &"meteoros"])
+fases_normal = Array[ExtResource("fase_chefe")]([SubResource("Fase_normal1")])
+fases_expert = Array[ExtResource("fase_chefe")]([SubResource("Fase_expert1"), SubResource("Fase_expert2")])
 cena_bola = ExtResource("2_bola")
 cena_onda = ExtResource("4_onda")
 cena_meteoro = ExtResource("3_met")

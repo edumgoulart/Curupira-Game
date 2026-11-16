@@ -85,6 +85,19 @@ function anelAviso(cam, cx, cy, rx, ry, t, cor) {
     cam.set(cx + Math.cos(a) * rx, cy + Math.sin(a) * ry, cor);
   }
 }
+// brilho no céu em cima de onde o meteoro vai cair; n 0..1 = força (cresce até a queda).
+// variante 0 = raios em ×, 1 = em +: alternando, o brilho pisca.
+function brilhoMeteoroPx(cam, cx, cy, n, variante) {
+  cx = Math.round(cx); cy = Math.round(cy);
+  const r = 0.9 + 2.1 * n, L = Math.round(2 + 8 * n) * (variante ? 1 : 0.6);
+  const dirs = variante ? [[1, 0], [-1, 0], [0, 1], [0, -1]] : [[1, 1], [-1, 1], [1, -1], [-1, -1]];
+  const fim = Math.ceil(r) + Math.round(L);
+  for (const [dx, dy] of dirs) for (let i = 1; i <= fim; i++) cam.set(cx + dx * i, cy + dy * i, i <= fim * 0.6 ? (n > 0.6 ? PM.fogo5 : PM.fogo4) : PM.fogo3);
+  if (n > 0.3) elipse(cam, cx + 0.5, cy + 0.5, r + 1, r + 1, PM.fogo2);
+  elipse(cam, cx + 0.5, cy + 0.5, r + 0.4, r + 0.4, PM.fogo4);
+  elipse(cam, cx + 0.5, cy + 0.5, r * 0.6, r * 0.6, n > 0.5 ? PM.fogo6 : PM.fogo5);
+  if (n > 0.7) cam.set(cx, cy, PM.branco);
+}
 
 /* ---------- fogo, fumaça, poeira, estrelas ---------- */
 // labaredas saindo da base (bx, by) na direção ang (graus de tela: 0 = direita, 270 = cima)
@@ -169,6 +182,37 @@ function chipSaltandoPx(cam, x0, y0, u, t, dir = 1) {
   const yc = Math.min(y, CHAO_PX - 4);
   chipPx(cam, x, yc, t, false);
   if (u < 0.4) faiscasPx(cam, x0, y0, u / 0.4, 8, 5);
+}
+// raio elétrico: linha quebrada saindo de um ponto, com a base mais clara (ang em radianos)
+function raioPx(cam, x0, y0, ang, comp, semente, cor = '#FF3A2A', luz = '#FFE0D4') {
+  let p = pt(x0, y0);
+  for (let i = 1; i <= 4; i++) {
+    const a = ang + (hash(semente * 7 + i * 13) - 0.5) * 1.8;
+    const q = pt(p.x + Math.cos(a) * comp / 4, p.y + Math.sin(a) * comp / 4);
+    for (let u = 0; u <= 1; u += 0.25) { const r = lerp(p, q, u); cam.set(r.x, r.y, i === 1 ? luz : cor); }
+    p = q;
+  }
+}
+// chip em sobrecarga (troca de fase): o LED estoura de luz a cada dois quadros (12 fps),
+// com anel vermelho, raios e faíscas. k = intensidade 0..1
+function chipSobrecargaPx(cam, cx, cy, s, k, semente = 0) {
+  if (k < 0.05) return;
+  const x = Math.round(cx), y = Math.round(cy), q = Math.round(s * 12), forte = q % 2 === 0;
+  if (forte) cam.disco(x + 0.5, y + 0.5, 2.4 + k * 0.6, '#FF6A4A');
+  cam.disco(x + 0.5, y + 0.5, forte ? 1.6 : 1.1, forte ? '#FFE0D4' : '#FF3A2A');
+  if (forte) { const r = 4.5 + 3 * k; for (let i = 1; i < 24; i += 2) { const a = i / 24 * TAU; cam.set(x + 0.5 + Math.cos(a) * r, y + 0.5 + Math.sin(a) * r, '#FF3A2A'); } }
+  const nr = Math.round(1 + 3 * k);
+  for (let i = 0; i < nr; i++) raioPx(cam, x + 0.5, y + 0.5, hash(q * 5 + i + semente) * TAU, 7 + 9 * k * hash(q * 3 + i + semente), q * 11 + i + semente);
+  faiscasPx(cam, x, y, (s * 3) % 1, Math.round(2 + 5 * k), Math.floor(s * 3) + semente);
+}
+// estalo do chip quando o chefe leva um golpe (u = 0..1 da animação de dano)
+function chipEstaloPx(cam, cx, cy, u, semente = 0) {
+  const x = Math.round(cx), y = Math.round(cy);
+  if (u < 0.3) {
+    cam.disco(x + 0.5, y + 0.5, 1.6, '#FFE0D4');
+    for (const [dx, dy] of [[-4, 0], [4, 0], [0, -4], [0, 4], [-3, -3], [3, 3], [3, -3], [-3, 3]]) cam.set(x + dx, y + dy, '#FF3A2A');
+  }
+  faiscasPx(cam, x, y, Math.min(0.95, 0.08 + u * 0.9), 5, 9 + semente);
 }
 
 /* =====================================================================
@@ -275,6 +319,35 @@ function galope(g, amplo = 9, altura = 8) {
   return r;
 }
 
+// aviso da investida (s): agacha, raspa a pata da frente duas vezes e fica pronta (= aviso_investida)
+const INVESTIDA_AVISO = 1.1, INVESTIDA_RASPADAS = [0.22, 0.58], INVESTIDA_RASPADA = 0.34;
+// pata da frente (fn) numa raspada, u 0..1: sobe e vai à frente (e segura um instante lá no alto,
+// para aparecer num quadro inteiro), finca, arrasta para trás, volta
+function pataRaspando(u) {
+  if (u < 0.32) { const a = suave(u / 0.14); return pt(mix(-15, -27, a), -11 * a); }
+  if (u < 0.42) { const a = entra((u - 0.32) / 0.1); return pt(-27 + 2 * a, mix(-11, 0, a)); }
+  if (u < 0.8) return pt(mix(-25, -6, suave((u - 0.42) / 0.38)), 0);
+  const a = suave((u - 0.8) / 0.2); return pt(mix(-6, -15, a), -3 * Math.sin(a * Math.PI));
+}
+// terra que a pata joga para trás ao arrastar, e um pouco de poeira; d = tempo desde o início da
+// raspada. Fica entre as patas, embaixo da barriga (não aumenta a caixa do desenho).
+const CORES_TERRA = { torrao: '#7A5238', torraoO: '#24100E', poeira: '#8A6A50', poeiraL: '#A88868' };
+function terraRaspadaPx(cam, R, d, semente) {
+  const X = R.X + R.x, sx = R.sx, finca = INVESTIDA_RASPADA * 0.42, arrasto = INVESTIDA_RASPADA * 0.38;
+  const dp = d - finca;
+  if (dp > 0 && dp < 0.45) poeiraPx(cam, X + sx * (-22 + 10 * suave(dp / arrasto)), CHAO_PX - 1, dp / 0.45, CORES_TERRA.poeira, CORES_TERRA.poeiraL);
+  for (let i = 0; i < 5; i++) {
+    const te = finca + arrasto * (0.1 + 0.8 * i / 4), a = d - te;
+    if (a <= 0) continue;
+    const vx = 30 + 30 * hash(i * 7 + semente * 13), vy = 50 + 30 * hash(i * 3 + semente * 29);
+    const x = mix(-24, -8, i / 4) + vx * a, y = -vy * a + 200 * a * a;
+    if (y > -2) continue;  // caiu no chão
+    const b = nova();
+    b.disco(X + sx * x, CHAO_PX + y, 0.9 + (i % 2) * 0.6, CORES_TERRA.torrao);
+    cam.colar(b.contornar(CORES_TERRA.torraoO));
+  }
+}
+
 const MULA_ESTADOS = {
   idle: {
     dur: 2.4, nome: 'Parada, respirando',
@@ -356,18 +429,29 @@ const MULA_ESTADOS = {
     }
   },
   investida: {
-    dur: 3.9, nome: 'Investida', fase: 2, dica: 'dash',
-    desc: 'Raspa o casco duas vezes, abaixa o fogo como chifre e atravessa a arena até bater na parede. Fica tonta: é a hora de bater nela.',
+    dur: 4.1, nome: 'Investida', fase: 2, dica: 'dash',
+    desc: 'Agacha e raspa a pata da frente na terra duas vezes, como cavalo antes de correr, abaixa o fogo como chifre e atravessa a arena até bater na parede. Fica tonta: é a hora de bater nela.',
     quadro(s, t) {
       const R = mulaBase(t);
       const W = -(R.X - 58);
-      let poeiras = [], tonta = 0;
-      if (s < 0.9) {
-        const k = suave(trecho(s, 0, 0.25));
-        R.pesc = -34 * k; R.inc = -6 * k; R.y += 3 * k;
-        R.fogo.sobe = 0; R.fogo.tom = 1; R.fogo.vel = 16; R.fogo.alt = 1.15;
-        for (const t0 of [0.25, 0.55]) { const u = trecho(s, t0, t0 + 0.22); if (u > 0 && u < 1) R.pes.bn = pt(27 + 10 * Math.sin(u * Math.PI), -3 * Math.sin(u * Math.PI)); if (s > t0 + 0.1) poeiras.push([R.X + 40, (s - t0 - 0.1) / 0.5]); }
-      } else if (s < 1.5) {
+      let poeiras = [], tonta = 0, raspadas = [];
+      if (s < INVESTIDA_AVISO) {
+        // agacha: o peito desce, o fogo aponta para a frente e as patas de trás firmam abertas
+        const k = suave(trecho(s, 0, 0.22)), pronto = suave(trecho(s, 0.92, 1.05));
+        R.y += 5 * k + 2 * pronto; R.inc = -6 * k - 2 * pronto; R.pesc = -32 * k - 6 * pronto;
+        R.pes.bl = pt(19 + 3 * k, 0); R.pes.bn = pt(27 + 5 * k, 0); R.pes.fl = pt(-24 - 2 * k, 0);
+        R.rabo += 4 * Math.sin(t * 9) * k;
+        R.fogo.sobe = 0.55 * (1 - k); R.fogo.alt = 1 + 0.1 * k + 0.25 * pronto;
+        R.fogo.vel = 9 + 4 * k + 6 * pronto; R.fogo.tom = pronto > 0.4 ? 1 : 0;
+        // duas raspadas da pata da frente: ergue e leva à frente, finca e arrasta para trás
+        for (const t0 of INVESTIDA_RASPADAS) {
+          const u = trecho(s, t0, t0 + INVESTIDA_RASPADA);
+          if (u > 0.42) raspadas.push(t0);
+          if (u <= 0 || u >= 1) continue;
+          R.pes.fn = pataRaspando(u);
+          if (u > 0.42 && u < 0.8) R.inc -= 1.5 * Math.sin((u - 0.42) / 0.38 * Math.PI);
+        }
+      } else if ((s = +(s - INVESTIDA_AVISO + 0.9).toFixed(6)) < 1.5) {  // daqui em diante, os tempos de antes do aviso novo
         const u = trecho(s, 0.9, 1.5);
         R.x = W * entra(u); R.pesc = -38; R.inc = -6; R.y += 2 - Math.abs(Math.sin(s * 28)) * 2;
         R.pes = galope(s * 4.5, 11, 9);
@@ -388,6 +472,7 @@ const MULA_ESTADOS = {
       } else { R.pes = { ...MULA.pes }; }
       return {
         R, depois(cam, info) {
+          for (const t0 of raspadas) terraRaspadaPx(cam, R, s - t0, t0);
           for (const [x, u] of poeiras) if (u < 1) poeiraPx(cam, x, CHAO_PX, u);
           if (s > 1.5 && s < 1.8) { faiscasPx(cam, info.frente.x - 8, info.frente.y, (s - 1.5) / 0.3, 9, 2); explosaoPx(cam, info.frente.x - 10, info.frente.y, (s - 1.5) / 0.18, 9, [PM.fogo6, PM.fogo5, PM.branco]); }
           if (tonta) estrelasTontas(cam, info.topo.x, info.topo.y - 14, t, 11);
@@ -397,7 +482,7 @@ const MULA_ESTADOS = {
   },
   meteoros: {
     dur: 3.2, nome: 'Chuva de meteoros', fase: 3, dica: 'andar para fora das sombras',
-    desc: 'Empina, o fogo vira uma coluna e lança três pedras em brasa para o alto. As sombras no chão mostram onde cada uma vai cair, uma depois da outra.',
+    desc: 'Empina, o fogo vira uma coluna e lança três pedras em brasa para o alto. Um brilho no alto, em cima de onde cada uma vai cair, fica mais forte até ela descer.',
     quadro(s, t) {
       const R = mulaBase(t);
       const k = kf(s, [[0, 0], [0.45, 1, sai], [1.1, 1], [1.5, 0.15], [3.2, 0]]);
@@ -411,6 +496,10 @@ const MULA_ESTADOS = {
           for (const [x, ts, tq] of alvos) {
             const sobe = s - ts;
             if (sobe > 0 && sobe < 0.5) desenharRocha(cam, info.pontaFogo.x - 2, info.pontaFogo.y - 600 * sobe * sobe - 80 * sobe, t + x, true);
+            if (s > ts + 0.25 && s < tq - 0.32) {
+              const u = trecho(s, ts + 0.25, tq - 0.32);
+              brilhoMeteoroPx(cam, x, 10, Math.ceil(u * 6) / 6, Math.floor(t * mix(8, 16, u)) % 2);
+            }
             if (s > ts + 0.25 && s < tq) {
               const u = trecho(s, ts + 0.25, tq);
               aviso(() => elipse(cam, x, CHAO_PX + 1, 2 + 9 * u, 1 + 1.5 * u, '#3A2324'));
@@ -426,6 +515,55 @@ const MULA_ESTADOS = {
         },
         treme: [1.75, 2.05, 2.35].some(tq => s > tq && s < tq + 0.15) ? 1 : 0
       };
+    }
+  },
+  transicao: {
+    dur: 2.0, nome: 'Troca de fase',
+    desc: 'O chip sobrecarrega piscando em vermelho e soltando faíscas. Ela empina bem alto, o fogo cresce e esquenta, e desce com tudo levantando poeira.',
+    quadro(s, t) {
+      const R = mulaBase(t);
+      // tranco do choque antes de empinar
+      const choque = s < 0.3 ? Math.sin(s * 90) * 1.5 * (1 - s / 0.3) : 0;
+      const inc = kf(s, [[0, 0], [0.3, -3], [0.75, 36, sai], [1.2, 38], [1.38, -6, entra], [1.6, 2], [2.0, 0]]);
+      R.inc = inc + (s > 0.75 && s < 1.2 ? Math.sin(t * 50) * 1.5 : 0) + choque;
+      R.x = Math.round(choque);
+      R.y += s > 1.36 && s < 1.55 ? 2 : 0;
+      R.pesc = kf(s, [[0, 0], [0.3, -8], [0.75, 20], [1.2, 20], [1.4, -14], [2.0, 0]]);
+      const ar = clamp(inc / 36, 0, 1);
+      // patas da frente pedalando no ar, como no pisoteio
+      for (const q of ['fn', 'fl']) {
+        const quad = mulaCorpo(MULA.quadris[q], R.inc);
+        const noAr = pt(quad.x - 8 + Math.sin(t * 16 + (q === 'fn' ? 0 : 2)) * 4, quad.y + 30 - R.y);
+        R.pes[q] = lerp(pt(MULA.pes[q].x - (s > 1.35 && s < 1.8 ? 4 : 0) - R.x, 0), noAr, ar);
+      }
+      R.pes.bn = pt(27 + 4 * ar - R.x, 0); R.pes.bl = pt(19 + 4 * ar - R.x, 0);
+      // o fogo cresce e esquenta (mais claro), estoura na pancada e volta ao normal
+      const quente = kf(s, [[0, 0], [0.3, 0.3], [0.75, 1], [1.4, 1], [2.0, 0]]);
+      R.fogo.sobe = 0.55 + 0.45 * Math.max(ar, quente * 0.6);
+      R.fogo.alt = 1 + 0.72 * quente + (s > 1.38 && s < 1.6 ? 0.3 : 0) + (s < 0.3 && Math.round(s * 12) % 2 ? -0.3 : 0);
+      R.fogo.tom = quente > 0.5 ? 1 : 0; R.fogo.vel = 9 + 7 * quente;
+      R.rabo = s > 0.3 && s < 1.4 ? Math.sin(t * 18) * 6 : R.rabo;
+      R.treme = s > 1.38 && s < 1.65 ? 2 : s > 0.75 && s < 1.2 ? 1 : 0;
+      const k = kf(s, [[0, 0.6], [0.15, 1], [1.5, 1], [2.0, 0]]);
+      return {
+        R, depois(cam, info) {
+          chipSobrecargaPx(cam, info.corpo.x, info.corpo.y, s, k, 1);
+          const d = s - 1.38;
+          if (d >= 0 && d < 0.5) for (const dx of [-8, 3, 14]) poeiraPx(cam, info.frente.x + dx, CHAO_PX, d / 0.5);
+        }
+      };
+    }
+  },
+  dano: {
+    dur: 0.33, nome: 'Levando golpe',
+    desc: 'Encolhe para trás com o golpe: o pescoço joga para trás, o fogo baixa um instante e o chip dá um estalo.',
+    quadro(s, t) {
+      const R = mulaBase(t);
+      const d = kf(s, [[0, 4], [0.1, 6, sai], [0.33, 0]]), k = kf(s, [[0, 0.8], [0.1, 1], [0.33, 0]]);
+      R.x = Math.round(d); R.inc = mix(R.inc, 5, k); R.y += 2 * k; R.pesc = mix(R.pesc, 16, k);
+      for (const q in R.pes) R.pes[q] = pt(MULA.pes[q].x - R.x * (q[0] === 'f' ? 0.4 : 1), 0);
+      R.fogo.alt = mix(1, 0.6, k); R.fogo.tom = k > 0.6 ? -1 : 0; R.fogo.sobe = mix(0.55, 0.9, k); R.rabo = mix(R.rabo, 7, k);
+      return { R, depois(cam, info) { chipEstaloPx(cam, info.corpo.x, info.corpo.y, s / 0.33, 2); } };
     }
   },
   derrota: {
@@ -637,7 +775,7 @@ function cucaPx(cam, R, t, sombraCor) {
   c = nova();
   [[9, -78, 5], [11, -71, 4.2], [4, -85, 3.4], [8, -86, 3.6], [13, -82, 3.8]].forEach(([x, y, r], k) => { const p = LH(pt(x + bal * (0.2 + 0.1 * k), y)); cachoPx(c, p.x, p.y, r); });
   cam.colar(c.contornar(PCU.cabO));
-  chapeuCucaPx(cam, LH, sx, t, bal, R.chip);
+  const luz = chapeuCucaPx(cam, LH, sx, t, bal, R.chip);
   olhoCucaPx(cam, ol.x, ol.y + 0.5, R.olho, R.iris, t, sx);
   braco(CUCA.ombroP, R.maos[0], false);
   // chip cravado na gola, com as veias de circuito correndo pela roupa
@@ -650,7 +788,7 @@ function cucaPx(cam, R, t, sombraCor) {
     }
     chipCravadoPx(cam, chip.x, chip.y, t);
   }
-  return { mao: R.maos.map(m => L(m)), boca: LH(pt(-22, -69)), cabeca: hc, corpo: chip };
+  return { mao: R.maos.map(m => L(m)), boca: LH(pt(-22, -69)), cabeca: hc, corpo: chip, luz };
 }
 // chip escuro com a luz vermelha piscando e um brilho em volta
 function chipCravadoPx(cam, cx, cy, t, ligado = true) {
@@ -676,6 +814,7 @@ function chapeuCucaPx(cam, LH, sx, t, bal, ligado = true) {
   cam.colar(a.contornar(PCU.chapeuO));
   const p = Q(-1, -3);
   cam.carimbo(['oRo', 'RLR', 'oRo'], Math.round(p.x) - 1, Math.round(p.y) - 1, { o: PCU.metalO, R: ligado && Math.floor(t * 4) % 2 ? PCU.veia : PCU.veiaD, L: ligado ? PCU.brilho : PCU.veiaD });
+  return p;
 }
 // olhão amendoado com cílios para trás; a pálpebra é da cor da pele (sem maquiagem)
 function olhoCucaPx(cam, cx, cy, tipo, iris, t, sx) {
@@ -684,6 +823,8 @@ function olhoCucaPx(cam, cx, cy, tipo, iris, t, sx) {
   const S = (linhas, ox, oy) => carimboSx(b, linhas, ox, oy, M, sx, X0);
   if (tipo === 'feliz') S(['.........', '..ooooo..', '.o.....o.', 'o.......o'], x, y);
   else if (tipo === 'piscando') S(['.........', '.........', 'ooooooooo', '.o.o.o.o.'], x, y);
+  // apertado de dor (levando golpe)
+  else if (tipo === 'dor') S(['....ooooo', '.ooooo...', 'ooo......', '.ooooo...', '....ooooo'], x, y - 1);
   else {
     S(['..sssss..', '.ooooooo.', 'oIIIWWWWo', 'IIBPIWWWo', 'IIIPIWWWo', 'oIIIWWWWo', '.oWWWWWo.', '..ooooo..'], x, y - 2);
     if (tipo === 'bravo') S(['ooooo....', 'ggoo.....'], x, y - 1);
@@ -832,6 +973,55 @@ const CUCA_ESTADOS = {
       };
     }
   },
+  transicao: {
+    dur: 2.0, nome: 'Troca de fase',
+    desc: 'O chip sobrecarrega e a luz do chapéu acende forte. Ela ergue as duas garras, gargalha tremendo e três bolas verdes giram em volta dela.',
+    quadro(s, t) {
+      const R = cucaBase(t);
+      const sobe = suave(trecho(s, 0.2, 0.5)), desce = suave(trecho(s, 1.6, 1.95)), ri = sobe * (1 - desce);
+      const choque = s < 0.25 ? Math.sin(s * 90) * (1 - s / 0.25) : 0, treme = Math.sin(t * 40) * ri;
+      R.maos = [lerp(R.maos[0], pt(-30 + treme * 2, -100 + Math.sin(t * 30) * 2), ri), lerp(R.maos[1], pt(24 - treme * 2, -98 + Math.cos(t * 30) * 2), ri)];
+      R.inc = 3 - 9 * ri + choque * 2; R.x = Math.round(treme + choque);
+      R.pes = R.pes.map(p => pt(p.x - R.x, p.y));
+      R.cab = -12 * ri + choque * 3;
+      const gargalha = s > 0.45 && s < 1.7;
+      R.mand = s < 0.2 ? 8 : gargalha ? 6 + Math.abs(Math.sin(t * 22)) * 10 : 4 + 6 * ri;
+      if (gargalha) R.corpoY -= Math.abs(Math.sin(t * 22)) * 1.5;
+      R.olho = gargalha && Math.floor(t * 6) % 3 ? 'feliz' : 'bravo';
+      const k = kf(s, [[0, 0.6], [0.15, 1], [1.6, 1], [2.0, 0]]);
+      return {
+        R, depois(cam, info) {
+          chipSobrecargaPx(cam, info.corpo.x, info.corpo.y, s, k, 3);
+          // luz do chapéu acesa forte (sem piscar), com brilho em volta
+          if (k > 0.3) {
+            const x = Math.round(info.luz.x), y = Math.round(info.luz.y);
+            cam.carimbo(['oRo', 'RLR', 'oRo'], x - 1, y - 1, { o: PCU.metalO, R: PCU.veia, L: '#FFE0D4' });
+            const raios = Math.round(s * 12) % 2 ? [[-3, 0], [3, 0], [0, -3], [0, 3]] : [[-2, -2], [2, -2], [-2, 2], [2, 2]];
+            for (const [dx, dy] of raios) { cam.set(x + dx, y + dy, PCU.veia); cam.set(x + dx * 1.4, y + dy * 1.4, PCU.brilho); }
+          }
+          // três bolas verdes girando em volta dela (as de trás menores)
+          const g = suave(trecho(s, 0.35, 0.7)) * (1 - suave(trecho(s, 1.55, 1.9)));
+          if (g > 0.05) for (let i = 0; i < 3; i++) {
+            const a = s * 7 + i * TAU / 3, frente = Math.sin(a);
+            orbePx(cam, info.corpo.x + Math.cos(a) * 30, info.corpo.y - 4 + frente * 9, g * (frente > 0 ? 3.6 : 2.4), t + i);
+          }
+        }
+      };
+    }
+  },
+  dano: {
+    dur: 0.33, nome: 'Levando golpe',
+    desc: 'Joga a cabeça e o tronco para trás com os olhos apertados, as garras abrem e o chip dá um estalo.',
+    quadro(s, t) {
+      const R = cucaBase(t);
+      const d = kf(s, [[0, 3], [0.1, 5, sai], [0.33, 0]]), k = kf(s, [[0, 0.8], [0.1, 1], [0.33, 0]]);
+      R.x = Math.round(d); R.pes = R.pes.map(p => pt(p.x - R.x, p.y));
+      R.inc = mix(R.inc, -10, k); R.cab = mix(R.cab, -12, k); R.corpoY += 1.5 * k;
+      R.maos = [lerp(R.maos[0], pt(-26, -80), k), lerp(R.maos[1], pt(14, -62), k)];
+      R.mand = 4 + 8 * k; R.olho = k > 0.3 ? 'dor' : R.olho;
+      return { R, depois(cam, info) { chipEstaloPx(cam, info.corpo.x, info.corpo.y, s / 0.33, 4); } };
+    }
+  },
   derrota: {
     dur: 3.6, nome: 'Derrota',
     quadro(s, t) {
@@ -897,6 +1087,7 @@ function botoPx(cam, R, t) {
   const oc = L(B(pt(-11, -65)));
   if (R.olho === 'feliz') { cam.set(oc.x - 1, oc.y, PBO.rosaO); cam.set(oc.x, oc.y - 1, PBO.rosaO); cam.set(oc.x + 1, oc.y, PBO.rosaO); }
   else if (R.olho === 'tonto') { cam.carimbo(['o.o', '.o.', 'o.o'], Math.round(oc.x) - 1, Math.round(oc.y) - 1, { o: PBO.rosaO }); }
+  else if (R.olho === 'dor') { cam.carimbo(['..oo', 'oo..', '..oo'], Math.round(oc.x) - 2, Math.round(oc.y) - 1, { o: PBO.rosaO }); }
   else {
     cam.carimbo(['.WW.', 'WIIW', 'WIPW', '.WW.'], Math.round(oc.x) - 2, Math.round(oc.y) - 2, { W: PM.branco, I: R.iris, P: PM.olhoO });
     // pálpebra de galã (meio fechada, sobrancelha arqueada)
@@ -941,9 +1132,115 @@ function coracaoPx(cam, cx, cy, t, estoura = 0) {
   cam.colar(b.contornar(PBO.coracaoO));
 }
 function gotaPx(cam, cx, cy) { cam.carimbo(['.a.', 'aLa', 'aaa', '.A.'], Math.round(cx) - 1, Math.round(cy) - 2, { a: PBO.agua, L: PBO.aguaL, A: PBO.aguaD }); }
+// respingo grande (troca de fase do Boto): coroa d'água dos dois lados e gotas altas; g = tamanho
+function respingoGrandePx(cam, x, y, u, g = 1) {
+  const h = 15 * g * Math.sin(Math.PI * Math.min(1, u * 1.25));
+  if (h > 1) for (const lado of [-1, 1]) {
+    const b = nova();
+    for (let i = 0; i < 3; i++) { const bx = x + lado * (9 + i * 5 + 5 * u), hh = h * (1 - i * 0.28); b.traco([pt(bx, y), pt(bx + lado * (2 + 3 * u), y - hh)], 3.2 - i * 0.7, PBO.agua); }
+    sombraB(b, PBO.agua, PBO.aguaD, PBO.aguaL, 1);
+    cam.colar(b.contornar(PBO.aguaO));
+  }
+  for (let i = 0; i < 10; i++) {
+    const a = rad(236 + i * 7.6), v = (50 + hash(i + 3) * 35) * g, px = x + Math.cos(a) * v * u, py = y + Math.sin(a) * v * u + 60 * u * u;
+    if (py < y + 1) gotaPx(cam, px, py);
+  }
+}
 function respingoPx(cam, x, y, u) {
   for (let i = 0; i < 7; i++) { const a = rad(200 + i * 23), v = 22 + hash(i) * 10; const px = x + Math.cos(a) * v * u, py = y + Math.sin(a) * v * u + 40 * u * u; if (u < 0.9) gotaPx(cam, px, py); }
 }
+/* Água em volta do Boto: efeito à parte, que o código põe na linha d'água seguindo o Boto em x
+   (ele afunda e sobe para o jato; a água fica). Duas camadas: a de trás (metade de lá dos anéis
+   e as cristas atrás do corpo) e a da frente (metade de cá, espuma colada no corpo e gotinhas).
+   Duas paletas, porque a margem da esquerda é azul e a da direita, barrenta (iguais à arena). */
+const AGUA_BOTO_PALETAS = {
+  azul: { espuma: '#FFFFFF', espumaS: '#D4EEFA', claro: '#8CD0EE', medio: '#5C9ED2', escuro: '#1C4A7C' },
+  barro: { espuma: '#F6EAD0', espumaS: '#E6D2A8', claro: '#C9A070', medio: '#A8784A', escuro: '#4E3018' }
+};
+const AGUA_BOTO_QUADROS = 12;  // laço de 1 s a 12 fps
+// u = fase do laço (0..1); camada = 'atras' ou 'frente'; P = paleta
+function aguaBotoPx(cam, cx, cy, u, P, camada) {
+  const frente = camada === 'frente', k = Math.round(u * AGUA_BOTO_QUADROS);
+  // anéis abrindo: elipses achatadas que crescem e se desfazem em pontinhos
+  for (let i = 0; i < 2; i++) {
+    const v = (u + i / 2) % 1, r = 11 + 25 * v, ry = 1.5 + 3 * v;
+    const cor = v < 0.3 ? P.espumaS : v < 0.6 ? P.claro : P.medio;
+    for (let a = 0; a < TAU; a += 0.5 / r) {
+      const s = Math.sin(a), x = Math.round(cx + Math.cos(a) * r), y = Math.round(cy + s * ry);
+      if ((s > 0) !== frente) continue;
+      if (v > 0.6 && (x + y + i) % 2) continue;                     // no fim, pontilhado
+      if (Math.floor((a * r) / 5 + i * 2) % 5 === 0) continue;       // falhas: parece onda, não fio
+      cam.set(x, y, cor);
+    }
+  }
+  if (!frente) {
+    // cristas da água atrás do corpo, subindo e descendo
+    for (const lado of [-1, 1]) for (let j = 0; j < 3; j++) {
+      const x = cx + lado * (9 + j * 3), h = Math.round(Math.sin(u * TAU * 2 + j * 1.7 + lado) * 0.8 + 0.6);
+      cam.set(x, cy - 1 - h, P.claro); cam.set(x + lado, cy - 1 - h, P.claro);
+      if (h > 0) cam.set(x, cy - 1, P.medio);
+    }
+    return;
+  }
+  // espuma colada no corpo: faixa irregular de 1 a 2 px que borbulha
+  for (let x = -14; x <= 14; x++) {
+    const borda = Math.abs(x) > 10;
+    const h = hash(x * 7 + k * 13) > (borda ? 0.75 : 0.45) ? 2 : 1;
+    const ond = Math.round(Math.sin(x * 0.8 + u * TAU * 2) * 0.6);
+    for (let d = 0; d < h; d++) cam.set(cx + x, cy + ond - d, d === 0 && hash(x + k * 5) > 0.3 ? P.espuma : P.espumaS);
+    if (hash(x * 3 + k * 11) > 0.82) cam.set(cx + x, cy + ond + 1, P.claro);
+  }
+  // pedaços de espuma soltos, se afastando do corpo
+  for (let j = 0; j < 4; j++) {
+    const lado = j % 2 ? 1 : -1, v = (u + j / 4) % 1, x = Math.round(cx + lado * (15 + 12 * v)), y = cy + 1 + (j >> 1);
+    if (v < 0.8) { cam.set(x, y, P.espumaS); if (v < 0.4) cam.set(x + lado, y, P.espuma); }
+  }
+  // gotinhas pulando da espuma, alternando os lados
+  for (let j = 0; j < 4; j++) {
+    const lado = j % 2 ? 1 : -1, p = ((u * 2 + j / 4) % 1) / 0.55;
+    if (p >= 1) continue;
+    const x = Math.round(cx + lado * (6 + j * 2 + 7 * p)), y = Math.round(cy - 2 - (7 + 4 * hash(j + 1)) * 4 * p * (1 - p));
+    cam.set(x, y, P.espuma); cam.set(x, y + 1, P.claro);
+  }
+}
+// respingo na linha d'água quando o Boto afunda, sobe ou salta: coroa dos dois lados e gotas
+function aguaRespingoPx(cam, x, y, u, P) {
+  const h = 13 * Math.sin(Math.PI * Math.min(1, u * 1.3));
+  if (h > 1) for (const lado of [-1, 1]) {
+    const b = nova();
+    for (let i = 0; i < 3; i++) { const bx = x + lado * (8 + i * 4 + 5 * u), hh = h * (1 - i * 0.3); b.traco([pt(bx, y), pt(bx + lado * (1 + 3 * u), y - hh)], 2.6 - i * 0.6, P.claro); }
+    sombraB(b, P.claro, P.medio, P.espuma, 1);
+    cam.colar(b.contornar(P.escuro));
+  }
+  for (let i = 0; i < 9; i++) {
+    const a = rad(232 + i * 9.5), v = 34 + hash(i + 7) * 22, px = x + Math.cos(a) * v * u, py = y + Math.sin(a) * v * u + 48 * u * u;
+    if (py < y && u < 0.95) { cam.set(px, py, P.espuma); cam.set(px, py + 1, P.claro); }
+  }
+  // espuma abrindo na base
+  const r = 8 + 14 * u;
+  for (let a = 0; a < TAU; a += 0.6 / r) { const xx = Math.round(x + Math.cos(a) * r), yy = Math.round(y + Math.sin(a) * 1.6); if (u < 0.7 || (xx + yy) % 2) cam.set(xx, yy, u < 0.5 ? P.espuma : P.espumaS); }
+}
+// aviso do jato: a água começa a sair do bico, curta e fina, e vai engrossando e crescendo até
+// virar o jato. n = 0..1 (quanto cresceu); o desenho aponta para a esquerda, como o Boto, com o
+// centro no bico. variante = 0/1, para a ponta pulsar.
+function jatoCrescendoPx(cam, x, y, n, variante) {
+  const L = Math.round(9 + 25 * n), meia = n < 0.34 ? 0 : 1, gross = n >= 0.67 ? 1 : 0;
+  const b = nova();
+  for (let i = 0; i <= L; i++) {
+    const xx = x - i;
+    for (let d = -meia; d <= meia + gross; d++) b.set(xx, y + d, d > 0 && d === meia + gross ? PBO.aguaD : PBO.agua);
+    if (meia > 0 && (i + variante * 3) % 6 < 2) b.set(xx, y - meia, PBO.aguaL);
+  }
+  // a ponta é uma gota maior que pulsa
+  b.disco(x - L, y + gross * 0.5, 1.2 + meia * 0.8 + gross * 0.4 + variante * 0.6, PBO.agua);
+  cam.colar(b.contornar(PBO.aguaO));
+  // borrifos saindo da ponta
+  for (let j = 0; j < 2 + meia; j++) {
+    const p = (variante * 0.5 + j / (2 + meia)) % 1;
+    cam.set(x - L - 2 - p * 5, y - 2 - p * 4 + p * p * 7 + j, j % 2 ? PBO.aguaL : PBO.agua);
+  }
+}
+const JATO_CRESCENDO_NIVEIS = 8;
 const X_CURUPIRA_BOTO = 160;
 const BOTO_ESTADOS = {
   idle: {
@@ -1059,6 +1356,43 @@ const BOTO_ESTADOS = {
       };
     }
   },
+  transicao: {
+    dur: 2.0, nome: 'Troca de fase',
+    desc: 'O chip sobrecarrega soltando faíscas. Ele afunda, sobe girando para fora da água num respingo enorme e cai de volta, bravo.',
+    quadro(s, t) {
+      const R = botoBase(t);
+      const choque = s < 0.25 ? Math.sin(s * 90) * 1.5 * (1 - s / 0.25) : 0;
+      R.x = Math.round(choque); R.olho = 'bravo';
+      R.y = kf(s, [[0, 0], [0.25, 0], [0.4, 8, entra], [0.6, -6, sai], [1.4, -6], [1.6, 6, entra], [1.8, -1], [2.0, 0]]);
+      R.giro = -360 * suave(trecho(s, 0.5, 1.45));
+      const ergue = suave(trecho(s, 0.4, 0.55)) * (1 - suave(trecho(s, 1.45, 1.7)));
+      R.finP = lerp(R.finP, pt(-22, -64), ergue); R.finL = lerp(R.finL, pt(24, -60), ergue);
+      R.incha = s > 0.25 && s < 0.45 ? 0.6 : 0; R.boca = s > 0.55 && s < 1.45 ? 1 : 0;
+      const k = kf(s, [[0, 0.6], [0.15, 1], [1.6, 1], [2.0, 0]]);
+      return {
+        R, depois(cam, info) {
+          chipSobrecargaPx(cam, info.corpo.x, info.corpo.y, s, k, 5);
+          // respingo grande na saída (dois, um para cada lado) e outro na volta
+          for (const [t0, dx, g] of [[0.48, 0, 1], [1.58, 0, 0.7]]) { const u = trecho(s, t0, t0 + 0.5); if (u > 0 && u < 1) respingoGrandePx(cam, R.X + R.x + dx, AGUA_Y, u, g); }
+          // anel de espuma na linha d'água enquanto ele gira fora dela
+          const e = trecho(s, 0.5, 1.5);
+          if (e > 0 && e < 1) for (let i = 0; i < 9; i++) { const a = i / 9 * TAU + s * 4, r = 14 + 6 * e; cam.set(R.X + R.x + Math.cos(a) * r, AGUA_Y - 1 + Math.sin(a) * 1.5, i % 2 ? PBO.aguaL : PBO.agua); }
+        }
+      };
+    }
+  },
+  dano: {
+    dur: 0.33, nome: 'Levando golpe',
+    desc: 'Encolhe para trás com os olhos apertados, a nadadeira sacode, o chapéu pula na cabeça e o chip dá um estalo.',
+    quadro(s, t) {
+      const R = botoBase(t);
+      const d = kf(s, [[0, 3], [0.1, 4, sai], [0.33, 0]]), k = kf(s, [[0, 0.8], [0.1, 1], [0.33, 0]]);
+      R.x = Math.round(d); R.inc = mix(R.inc, 12, k); R.y += 2 * k; R.incha = s < 0.15 ? 0.5 : 0.2 * k;
+      R.finP = lerp(R.finP, pt(-22, -58), k); R.olho = k > 0.3 ? 'dor' : R.olho;
+      R.chapeu.dy = -3 * k; R.chapeu.ang = -8 - 10 * k;
+      return { R, depois(cam, info) { chipEstaloPx(cam, info.corpo.x, info.corpo.y, s / 0.33, 6); } };
+    }
+  },
   derrota: {
     dur: 3.6, nome: 'Derrota',
     quadro(s, t) {
@@ -1109,8 +1443,10 @@ function maquinaPx(cam, R, t) {
   cam.colar(parte.contornar(PMQ.contorno));
   // cabos soltos embaixo
   parte = nova();
+  const pontasCabo = [];
   [[-10, 18, 1], [0, 24, -1], [9, 15, 1]].forEach(([x, comp, l], k) => {
     const a = A(pt(x, 14)), b = soma(a, pt(Math.sin(t * 2 + k) * 4 * l + R.cabos * 2, comp));
+    pontasCabo.push(b);
     parte.traco(curvaQ(a, soma(lerp(a, b, 0.5), pt(5 * l, 0)), b, 8), 1.6, PMQ.metal);
     parte.carimbo(['mm', 'MM'], Math.round(b.x) - 1, Math.round(b.y), { m: PMQ.metalL, M: PMQ.amarelo });
   });
@@ -1164,7 +1500,7 @@ function maquinaPx(cam, R, t) {
   cam.colar(parte.contornar(PMQ.contorno));
   // brilho do carregamento em volta da lente
   if (R.brilho > 0.1 && Math.floor(t * 20) % 2) for (let i = 0; i < 10; i++) { const a = i / 10 * TAU + t * 3, r = (11 + 3 * R.brilho) * E; cam.set(O.x + Math.cos(a) * r, O.y + Math.sin(a) * r, PMQ.laserL); }
-  return { olho: O, lente: L0, corpo: A(pt(8, -10)), topo: A(pt(-4, -20)) };
+  return { olho: O, lente: L0, corpo: A(pt(8, -10)), topo: A(pt(-4, -20)), pontasCabo };
 }
 // laser: núcleo claro e bordas vermelhas, com tremidinha
 function laserPx(cam, a, b, larg, t) {
@@ -1314,6 +1650,50 @@ const MAQ_ESTADOS = {
       };
     }
   },
+  transicao: {
+    dur: 2.0, nome: 'Troca de fase',
+    desc: 'Sobrecarga: o Núcleo treme inteiro, as abas abrem até o fim, a lente brilha forte e os cabos soltam faíscas.',
+    quadro(s, t) {
+      const R = maqBase(t);
+      const k = kf(s, [[0, 0.5], [0.3, 1], [1.6, 1], [2.0, 0]]), sac = k * (1 - suave(trecho(s, 1.6, 1.9)));
+      // tremida puxada para trás (direita): o brilho em volta da lente não passa da borda da folha
+      R.cx += (1 + Math.sin(t * 60)) * 1.3 * sac; R.cy += Math.cos(t * 47) * 1.2 * sac; R.ang += Math.sin(t * 38) * 6 * sac;
+      R.abas = kf(s, [[0, 0], [0.4, 1.5, sai], [1.6, 1.5], [2.0, 0]]) + (s > 0.4 && s < 1.6 ? Math.sin(t * 30) * 0.15 : 0);
+      R.brilho = kf(s, [[0, 0], [0.4, 1], [1.6, 1], [2.0, 0]]);
+      R.bravo = true; R.abre = s < 0.3 && Math.round(s * 12) % 2 ? 0.25 : 1;
+      R.cabos = Math.sin(t * 25) * 2 * sac;
+      return {
+        R, depois(cam, info) {
+          chipSobrecargaPx(cam, info.corpo.x, info.corpo.y, s, k, 7);
+          // lente estourando de brilho: miolo branco e raios em cruz, alternando + e x
+          if (R.brilho > 0.3) {
+            const x = Math.round(info.lente.x), y = Math.round(info.lente.y), q = Math.round(s * 12);
+            cam.disco(x - 0.5, y - 0.5, 2.4, PMQ.laserL); cam.disco(x - 0.5, y - 0.5, 1.3, PM.branco);
+            for (const [dx, dy] of q % 2 ? [[1, 0], [-1, 0], [0, 1], [0, -1]] : [[0.7, 0.7], [-0.7, 0.7], [0.7, -0.7], [-0.7, -0.7]]) for (let d = 14; d <= 17; d++) cam.set(x + dx * d, y + dy * d, d < 16 ? PMQ.laserL : PMQ.laser);
+          }
+          // faíscas e raios saindo das pontas dos cabos
+          info.pontasCabo.forEach((p, i) => {
+            if (k < 0.3) return;
+            const q = Math.round(s * 12);
+            for (let j = 0; j < 4; j++) { const a = hash(i * 5 + j + q) * TAU, d = 2 + 7 * ((s * 4 + i / 3 + j * 0.13) % 1); cam.set(p.x + Math.cos(a) * d, p.y + Math.sin(a) * d + d * 0.3, j % 2 ? PM.fogo6 : PMQ.amarelo); }
+            if ((Math.round(s * 12) + i) % 3 === 0) raioPx(cam, p.x, p.y, rad(60 + 60 * hash(i + Math.round(s * 12))), 8, i * 31 + Math.round(s * 12), PMQ.amarelo, PM.branco);
+          });
+        },
+        treme: s < 1.6 ? 1 : 0
+      };
+    }
+  },
+  dano: {
+    dur: 0.33, nome: 'Levando golpe',
+    desc: 'Balança para trás no braço, a lente aperta e o chip dá um estalo.',
+    quadro(s, t) {
+      const R = maqBase(t);
+      const k = kf(s, [[0, 0.8], [0.1, 1, sai], [0.33, 0]]);
+      R.cx += 6 * k; R.cy -= 2 * k; R.ang += 12 * k + (s < 0.2 ? Math.sin(t * 70) * 2 : 0);
+      R.abre = 1 - 0.6 * k; R.bravo = true; R.abas = 0.4 * k; R.cabos = 3 * k;
+      return { R, depois(cam, info) { chipEstaloPx(cam, info.corpo.x, info.corpo.y, s / 0.33, 8); } };
+    }
+  },
   derrota: {
     dur: 3.8, nome: 'Derrota',
     quadro(s, t) {
@@ -1340,7 +1720,8 @@ const MAQ_ESTADOS = {
 // efeitos que não machucam
 anelAviso = inofensivo(anelAviso); linhaMira = inofensivo(linhaMira); fumacaPx = inofensivo(fumacaPx); poeiraPx = inofensivo(poeiraPx);
 estrelasTontas = inofensivo(estrelasTontas); faiscasPx = inofensivo(faiscasPx); chipSaltandoPx = inofensivo(chipSaltandoPx);
-respingoPx = inofensivo(respingoPx); alcapaoPx = inofensivo(alcapaoPx);
+respingoPx = inofensivo(respingoPx); alcapaoPx = inofensivo(alcapaoPx); respingoGrandePx = inofensivo(respingoGrandePx);
+raioPx = inofensivo(raioPx); chipSobrecargaPx = inofensivo(chipSobrecargaPx); chipEstaloPx = inofensivo(chipEstaloPx);
 
 const CHEFES_PX = [
   {

@@ -47,34 +47,79 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     coração tremendo ao levar golpe, o retrato mudando de cara e a onça acendendo com o
     especial cheio;
   - os tiros dos chefes saindo do lugar certo: bola da boca da Mula, feitiço da garra da Cuca, jato do bico do Boto, laser da lente da Máquina;
-  - a fase 2 (com 2/3 da vida) e a fase 3 (com 1/3) trazendo o ataque novo logo em seguida;
+  - a dificuldade: trocar Normal/Expert na seleção (←/→) e conferir as fases. Normal: Mula, Cuca e
+    Boto sem troca de fase, Máquina com uma troca na metade. Expert: uma troca na metade (Máquina:
+    em 2/3 e 1/3). A barra do chefe mostra os entalhes certos;
+  - a transição: o chefe termina o ataque, a tela treme e clareia, os tiros dele somem, ele faz
+    a animação de 2 s (continua levando dano) e volta com um combo que tem o ataque novo;
+  - a ordem dos ataques variando (não alterna mais A/B) e os combos (dois ataques emendados);
+  - o golpe no chefe: pisca branco, faísca onde o tiro bateu, um tranquinho e, parado entre
+    ataques, a pose de susto. No Curupira: pisca branco, tela treme e pose de dano;
+  - Mula e Cuca: depois da investida e do bote, ficam do outro lado (não voltam de costas) e os
+    ataques seguintes saem espelhados. Na transição, a Mula empina e a caixa dela cresce;
+    conferir se encostar nela ali é justo;
+  - Boto: o jato ora alto (abaixar), ora baixo (pular); o chapéu ora baixo→alto, ora
+    alto→baixo;
+  - **os avisos dos ataques** (pedido do Eduardo: "não dá pra saber onde vai cair", e depois
+    "o quadradão deixa muito fácil"). Saíram as faixas listradas; o aviso é a pose do chefe.
+    Conferir em cada luta:
+    - Mula, investida: ela agacha e raspa a pata da frente na terra duas vezes, jogando terra
+      para trás, e só então corre. Ver se dá para reconhecer a pose a tempo de pular ou dar dash;
+    - Mula, meteoros: um brilho pequeno no alto da tela, em cima de onde cada pedra vai cair,
+      que cresce e pisca mais rápido, e a pedra saindo dele. Ver se dá para enxergar o brilho
+      no fundo de fogo e se ele não fica atrás da barra de vida do chefe;
+    - Cuca, Canção de ninar: melodia de 6 notas soltas, grave (laranja, pular) ou aguda (azul,
+      abaixar). A antiga não dava para desviar;
+    - Boto, jato (pedido do Eduardo: "o jato sai torto" e "não faz sair aquela linha"): sem
+      linha. Ele afunda na água até o bico ficar na altura do jato (o baixo deixa só a cabeça
+      de fora), a água sai do bico fina e vai crescendo, e o jato sai reto. Ver se dá para ler
+      alto/baixo pela altura dele a tempo, e se ele volta para a linha d'água no fim;
+    - Boto, chapéu: a linha fina na altura da ida (o Eduardo não falou dela; tirar também?);
+    - Máquina: a linha do laser seguindo e travando, e a da varredura;
+    - os outros ataques sem marca nenhuma: se a pose de aviso de cada um basta;
+    - se os avisos mais longos deixaram as lutas fáceis demais. Os valores antigos estão no
+      TDD 8.3.
+  - a água em volta do Boto (pedido do Eduardo: "não ficar uma água estática"): anéis abrindo,
+    espuma no corpo e gotinhas, azul na margem esquerda e barrenta na direita; respingo quando
+    ele afunda, sobe e na saída e chegada do salto. Ver se os anéis aparecem na faixa clara da
+    linha d'água e se a espuma não fica estranha quando ele sai da água na transição;
+  - se pular por cima dos ataques rasteiros e correr por baixo do salto do Boto é confortável
+    no controle. O `verificar_desvio.gd` achou desvio sem dash para todos os ataques sozinhos,
+    mas ele joga como um robô;
   - os ataques ganhos: com `LIBERAR_TUDO_PARA_TESTE` (`game_state.gd`) todos já aparecem
     na seleção, e a Máquina também. Pôr `false` para testar a progressão de verdade.
 
 ## Decisões em aberto
 
 - **Valores "provisório".** Os ataques novos (pisoteio, investida, bote, ninar, beijos,
-  chapéu, pistões, varredura) e os limiares das fases (0,667 e 0,333) estão marcados
-  "provisório" nos `*_data.gd`. Fechar no GDD (Q16) depois de testar.
+  chapéu, pistões, varredura, jato baixo, chapéu invertido) estão marcados "provisório" nos
+  `*_data.gd`. Os avisos subiram a pedido do Eduardo (TDD 8.3): os que o GDD fixa mudaram lá
+  também; os outros (pisoteio, investida, bote, ninar, beijos, chapéu, salto, pistões, placa,
+  varredura) são provisórios. As fases e os combos (chance, atraso, pausa, limiares) ficam no
+  `.tres` de cada chefe, com a tabela no TDD 8.2. Fechar no GDD (Q16) depois de testar. Depois de mudar um
+  combo, rodar `game/testes/verificar_desvio.gd` (TDD 15.3) para ver se ainda dá para desviar.
+- **Vitória no Expert.** O Claude assumiu: vencer no Normal já dá os ataques e libera a
+  Máquina; o Expert só marca "(derrotada · Expert)" na seleção. Confirmar ou mudar.
 - **Trava de mira no controle.** A trava ficou só no Shift, a pedido do Eduardo. No controle
   ela não tem botão (era RB). Escolher um botão (GDD, Q15).
 - **Coração do Boto carrega o especial.** Estourar um coração com tiro conta como acerto,
   porque a hurtbox dele está na layer `enemy`. Decidir se é desejado.
 - **Regras desatualizadas.** O resumo de regras do `CLAUDE.md` e do `AGENTS.md` ainda diz
-  "estado único", "atira para onde está olhando", que W/S não fazem nada e que a vida do
-  chefe não aparece (agora há barra, a pedido do Eduardo). O GDD e o TDD já estão
-  atualizados. A dupla decide quando atualizar.
-- **Pulo × tamanho.** O Curupira tem ~204 px de altura e o pulo do GDD, ~215 px. Testar se
-  dá para pular por cima dos ataques rasteiros; mudar `velocidade_pulo` é valor de combate e
-  tem que sair do GDD.
-- **Boto.** O arco do salto (520 px, `boto_data.gd`) foi pensado para o Curupira antigo.
-  Testar se ainda passa por cima dele.
-- **Durações de pose** (`DURACAO_POSE_ATAQUE` 0,3 s e `DURACAO_POSE_DANO` 0,2 s) estão
-  fixas em `curupira.gd`. O `CLAUDE.md` pede valores de ajuste num `.tres`. Mover para o
-  `MovimentoData` (`curupira_movimento.tres`)?
+  "estado único" (agora são fases por dificuldade, com combos), "atira para onde está olhando",
+  que W/S não fazem nada e que a vida do chefe não aparece (agora há barra, a pedido do
+  Eduardo). O GDD e o TDD já estão atualizados. A dupla decide quando atualizar.
+- **Duração da pose de tiro** (`DURACAO_POSE_ATAQUE` 0,3 s) está fixa em `curupira.gd`. O
+  `CLAUDE.md` pede valores de ajuste num `.tres`. Mover para o `MovimentoData`
+  (`curupira_movimento.tres`)? A pose de dano agora dura o tempo da animação `dano` (0,33 s);
+  `DURACAO_POSE_DANO` só vale se ela faltar.
 
 ## Arte
 
+- **Animações sem uso.** `trote` (Mula) e `andar` (Cuca) saíram do código, porque os dois não
+  voltam mais para o lugar. Continuam na folha. Apagar do gerador ou guardar para depois.
+- **Animações novas** (gerador): `dano` (susto, 4 quadros) e `transicao` (24 quadros, 2 s) nos
+  quatro chefes, `dano` novo do Curupira (5 quadros) e a faísca de acerto
+  (`curupira/efeitos/acerto_1..6.png`).
 - **Bola de Fogo do jogador.** Usa a bola da Mula, que só tem o desenho de lado: na
   diagonal e para cima ela voa de lado. Desenhar no gerador, com uma imagem por direção,
   como a folha.

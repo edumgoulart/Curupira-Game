@@ -66,5 +66,68 @@
   "centro": [20, 6],
   "nota": "na linha da água",
   "quadros": 6
+ },
+ "agua_atras_azul": {
+  "nome": "agua_atras_azul",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [69, 5],
+  "centro": [34, 4],
+  "nota": "centro na linha d'água, no x do Boto",
+  "quadros": 12
+ },
+ "agua_frente_azul": {
+  "nome": "agua_frente_azul",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [69, 17],
+  "centro": [34, 12],
+  "nota": "centro na linha d'água, no x do Boto",
+  "quadros": 12
+ },
+ "agua_respingo_azul": {
+  "nome": "agua_respingo_azul",
+  "fps": 16,
+  "loop": false,
+  "tamanho": [50, 18],
+  "centro": [25, 15],
+  "nota": "centro na linha d'água",
+  "quadros": 8
+ },
+ "agua_atras_barro": {
+  "nome": "agua_atras_barro",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [69, 5],
+  "centro": [34, 4],
+  "nota": "centro na linha d'água, no x do Boto",
+  "quadros": 12
+ },
+ "agua_frente_barro": {
+  "nome": "agua_frente_barro",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [69, 17],
+  "centro": [34, 12],
+  "nota": "centro na linha d'água, no x do Boto",
+  "quadros": 12
+ },
+ "agua_respingo_barro": {
+  "nome": "agua_respingo_barro",
+  "fps": 16,
+  "loop": false,
+  "tamanho": [50, 18],
+  "centro": [25, 15],
+  "nota": "centro na linha d'água",
+  "quadros": 8
+ },
+ "jato_crescendo": {
+  "nome": "jato_crescendo",
+  "fps": 12,
+  "loop": false,
+  "tamanho": [43, 8],
+  "centro": [41, 4],
+  "nota": "centro no bico; aponta para a esquerda; o código escolhe o quadro pelo tempo do aviso",
+  "quadros": 16
  }
 }

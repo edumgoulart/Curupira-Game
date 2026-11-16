@@ -531,22 +531,25 @@
   {
    "nome": "dano",
    "linha": 23,
-   "quadros": 2,
-   "fps": 12,
+   "quadros": 5,
+   "fps": 15,
    "loop": false,
    "caixa": [
-    -23,
-    -49,
+    -20,
+    -50,
     13,
-    0
+    2
    ],
    "pontos": {
     "mao": [
-     [9, -28],
-     [10, -31]
+     [5, -19],
+     [5, -20],
+     [5, -17],
+     [6, -15],
+     [3, -13]
     ]
    },
-   "nota": "o código pisca o sprite durante a invencibilidade"
+   "nota": "tranco para trás e volta (0,33 s); o código pisca o sprite durante a invencibilidade"
   },
   {
    "nome": "derrota",

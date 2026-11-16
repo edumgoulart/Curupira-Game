@@ -7,7 +7,7 @@ extends Control
 ## Detalhes visuais:
 ## - na entrada a barra enche do zero (mostra quanto o chefe aguenta);
 ## - o golpe deixa um rastro claro que desce até a vida nova depois de um instante;
-## - dois entalhes marcam onde a luta muda de fase (vida_fase_2 e vida_fase_3 do .tres);
+## - entalhes marcam onde a luta muda de fase (Chefe.limiares_fase(), pela dificuldade);
 ## - o LED do chip pisca e se apaga quando o chefe é libertado, e a barra some.
 ## A moldura vem do gerador de pixel art (hud_px.js), já ampliada 4×. Cores e tempos são
 ## só visuais.
