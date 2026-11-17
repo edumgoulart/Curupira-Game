@@ -1,18 +1,96 @@
 [gd_resource type="Resource" script_class="BotoData" format=3 uid="uid://dm0un5sefuihm"]
 
-[ext_resource type="Script" uid="uid://dkm278cg1uisc" path="res://scripts/boto_data.gd" id="1_dados"]
-[ext_resource type="PackedScene" uid="uid://cll1vicvhq8pg" path="res://scenes/jato_boto.tscn" id="2_jato"]
-[ext_resource type="PackedScene" uid="uid://bav8rm38w8y0u" path="res://scenes/bolha_boto.tscn" id="3_bolha"]
-[ext_resource type="PackedScene" uid="uid://dx6y8p5eb5l8t" path="res://scenes/succao_boto.tscn" id="4_succao"]
+[ext_resource type="Script" path="res://scripts/boto_data.gd" id="1_dados"]
+[ext_resource type="PackedScene" path="res://scenes/jato_boto.tscn" id="2_jato"]
+[ext_resource type="PackedScene" path="res://scenes/bolha_boto.tscn" id="3_bolha"]
+[ext_resource type="PackedScene" path="res://scenes/coracao_boto.tscn" id="4_coracao"]
+[ext_resource type="PackedScene" path="res://scenes/chapeu_boto.tscn" id="5_chapeu"]
+[ext_resource type="Script" path="res://scripts/fase_chefe.gd" id="fase_chefe"]
+[ext_resource type="Script" path="res://scripts/combo_chefe.gd" id="combo_chefe"]
+
+[sub_resource type="Resource" id="Combo_normal1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"beijos"
+segundo = &"jato"
+atraso = 0.6
+
+[sub_resource type="Resource" id="Combo_normal1_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"salto"
+segundo = &"jato"
+atraso = 0.6
+
+[sub_resource type="Resource" id="Fase_normal1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"jato", &"beijos", &"chapeu", &"salto"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_normal1_1"), SubResource("Combo_normal1_2")])
+chance_combo = 0.2
+fator_pausa = 1.0
+
+[sub_resource type="Resource" id="Combo_expert1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"beijos"
+segundo = &"jato"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Combo_expert1_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"jato"
+segundo = &"beijos"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Fase_expert1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"jato", &"beijos", &"chapeu"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert1_1"), SubResource("Combo_expert1_2")])
+chance_combo = 0.3
+fator_pausa = 0.9
+
+[sub_resource type="Resource" id="Combo_expert2_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"salto"
+segundo = &"jato"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"salto"
+segundo = &"beijos"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_3"]
+script = ExtResource("combo_chefe")
+primeiro = &"beijos"
+segundo = &"chapeu"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Combo_expert2_4"]
+script = ExtResource("combo_chefe")
+primeiro = &"beijos"
+segundo = &"jato"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Fase_expert2"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 0.5
+ataques = Array[StringName]([&"jato", &"beijos", &"chapeu", &"salto"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert2_1"), SubResource("Combo_expert2_2"), SubResource("Combo_expert2_3"), SubResource("Combo_expert2_4")])
+chance_combo = 0.5
+fator_pausa = 0.8
 
 [resource]
 script = ExtResource("1_dados")
-cena_jato = ExtResource("2_jato")
-cena_succao = ExtResource("4_succao")
-cena_bolha = ExtResource("3_bolha")
 nome = "Boto cor-de-rosa"
 artigo = "o"
 id_progresso = "fase3"
 recompensa = "Bolha d'Água e Bolha Abissal"
 vida = 2000
 pausa_entre_ataques = 2.0
+fases_normal = Array[ExtResource("fase_chefe")]([SubResource("Fase_normal1")])
+fases_expert = Array[ExtResource("fase_chefe")]([SubResource("Fase_expert1"), SubResource("Fase_expert2")])
+cena_jato = ExtResource("2_jato")
+cena_coracao = ExtResource("4_coracao")
+cena_chapeu = ExtResource("5_chapeu")
+cena_bolha = ExtResource("3_bolha")

@@ -1,0 +1,62 @@
+{
+ "laser_meio": {
+  "nome": "laser_meio",
+  "fps": 20,
+  "loop": true,
+  "tamanho": [16, 7],
+  "centro": [8, 4],
+  "nota": "emendar lado a lado (16 px)",
+  "quadros": 4
+ },
+ "laser_impacto": {
+  "nome": "laser_impacto",
+  "fps": 16,
+  "loop": true,
+  "tamanho": [32, 43],
+  "centro": [24, 12],
+  "quadros": 4
+ },
+ "bomba": {
+  "nome": "bomba",
+  "fps": 8,
+  "loop": true,
+  "tamanho": [12, 14],
+  "centro": [6, 8],
+  "nota": "em fps 8 pisca devagar; no fim do aviso subir para 16",
+  "quadros": 4
+ },
+ "explosao": {
+  "nome": "explosao",
+  "fps": 24,
+  "loop": false,
+  "tamanho": [40, 36],
+  "centro": [20, 17],
+  "quadros": 8
+ },
+ "alcapao": {
+  "nome": "alcapao",
+  "fps": 12,
+  "loop": false,
+  "tamanho": [19, 10],
+  "centro": [9, 2],
+  "nota": "abrindo; o centro fica na linha do teto",
+  "quadros": 4
+ },
+ "placa": {
+  "nome": "placa",
+  "fps": 20,
+  "loop": false,
+  "tamanho": [17, 17],
+  "centro": [8, 16],
+  "nota": "sobe e desce; centro na linha do chão",
+  "quadros": 6
+ },
+ "faiscas": {
+  "nome": "faiscas",
+  "fps": 15,
+  "loop": false,
+  "tamanho": [27, 37],
+  "centro": [20, 14],
+  "quadros": 6
+ }
+}

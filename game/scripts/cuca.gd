@@ -1,98 +1,66 @@
 extends Chefe
-## Cuca — segundo chefe. Fica parada; alterna entre dois ataques:
-##   - feitiço: três bolas de magia em leque, o do meio mirado no Curupira
-##     (aviso 0,5 s, 1 golpe cada);
-##   - poção: arremessada em arco onde o Curupira está; vira uma poça de veneno ou de
-##     lentidão por 5 s (no máximo duas na arena). Depois dela fica parada 1,5 s.
-## Estado único (sem fases dentro da luta) e leva dano o tempo todo (regras do GDD).
-## Vida, dano recebido, contato e derrota vêm da classe base Chefe (chefe.gd).
+## Cuca — segundo chefe. Ataques, fases e combos por dificuldade no cuca.tres.
+## Leva dano o tempo todo. Vida, fases, sorteio, combos e derrota vêm da classe base Chefe.
 ##
-## Ciclo da máquina de estados:
-##   ESPERANDO --sorteio--> AVISO_FEITICO --(lança o leque)--> ESPERANDO
-##                     \--> AVISO_POCAO --(joga a poção)--> PARADA --(sem pausa extra)--> sorteio
+## Cada ataque, na ordem em que acontece (o aviso é a animação aviso_*):
+##   leque  — ergue as garras com bolas verdes (aviso) e empurra: N feitiços em leque, o do meio
+##            mirado no Curupira;
+##   pocao  — tira a poção do cinto e chacoalha (aviso) e joga em arco até onde o Curupira está;
+##            vira poça de veneno ou de lentidão. Depois fica parada;
+##   bote   — agacha com a boca aberta (aviso), desliza de barriga abocanhando até a parede do lado
+##            do Curupira e levanta. Fica lá: não volta de costas para o lugar (isso prendia o
+##            Curupira). Os ataques seguintes saem de onde ela está, espelhados;
+##   ninar  — canta uma melodia: as notas vêm uma de cada vez, graves (rente ao chão; pula-se) ou
+##            agudas (na altura do peito; abaixa-se), cada tipo de uma cor.
+##            Antes eram duas fileiras com uma brecha menor que o Curupira: não dava para passar.
+## Os tiros saem dos pontos "garra" e "boca" do desenho, quadro a quadro.
+## Encadeado (primeiro de um combo): a poção pula a parada do fim e o bote pula o "levantar".
 ##
-## Animações usadas (criar no SpriteFrames do AnimatedSprite2D com estes nomes exatos):
-##   idle           — esperando entre ataques
-##   aviso_feitico  — preparando o feitiço (0,5 s)
-##   aviso_pocao    — preparando a poção (0,6 s)
-##   parada         — parada depois da poção (1,5 s)
-##   derrota        — derrotada (sem loop)
-## Se uma animação ainda não existir, o código só não troca para ela (não dá erro).
-
-enum Estado { ESPERANDO, AVISO_FEITICO, AVISO_POCAO, PARADA, DERROTADA }
-enum Ataque { NENHUM, FEITICO, POCAO }
+## Animações usadas (cuca_frames.tres):
+##   idle, aviso_feitico, feitico, fim_feitico, aviso_pocao, pocao, fim_pocao, aviso_bote,
+##   bote, levantar, aviso_ninar, ninar, fim_ninar, derrota,
+##   dano e transicao (usadas pela base Chefe)
 
 ## Brilho de aviso da Cuca: verde de magia (o da Mula é laranja). Só visual.
 const COR_AVISO_CUCA: Color = Color(0.85, 1.6, 0.85)
+## Cor das notas: grave (pula-se) quente, aguda (abaixa-se) fria. Só visual.
+const COR_NOTA_GRAVE: Color = Color(1.0, 0.75, 0.35)
+const COR_NOTA_AGUDA: Color = Color(0.55, 0.9, 1.0)
 
-var estado: Estado = Estado.ESPERANDO
-var _tempo: float = 0.0
-var _ultimo_ataque: Ataque = Ataque.NENHUM
-var _sorteio := RandomNumberGenerator.new()
-
-## Os dados com o tipo da Cuca (o campo "dados" da base é do tipo genérico ChefeData).
 @onready var _d: CucaData = dados as CucaData
-## De onde saem o feitiço e a poção (as mãos).
-@onready var mao: Marker2D = $Mao
-## Altura do chão (pés da Cuca): onde a poção cai.
-@onready var pe: Marker2D = $Pe
 
 
-func _ready() -> void:
-	super._ready()
-	_sorteio.randomize()
-	# Começa esperando: dá um respiro ao jogador antes do primeiro ataque.
-	_entrar(Estado.ESPERANDO, _d.pausa_entre_ataques)
+func _executar(nome: StringName, encadeado: bool = false) -> void:
+	# Todo ataque começa de frente para o Curupira (ela pode estar em qualquer lado).
+	_virar_para_alvo()
+	match nome:
+		&"leque":
+			await _leque()
+		&"pocao":
+			await _pocao(encadeado)
+		&"bote":
+			await _bote(encadeado)
+		&"ninar":
+			await _ninar()
 
 
-func _physics_process(delta: float) -> void:
-	delta *= fator_tempo()  # Bolha Abissal: o relógio do chefe anda mais devagar
-	if estado == Estado.DERROTADA:
+func _leque() -> void:
+	avisar(true, COR_AVISO_CUCA)
+	reiniciar(&"aviso_feitico")
+	if not await esperar(_d.aviso_feitico):
 		return
-	_tempo -= delta
-	if _tempo > 0.0 and not is_zero_approx(_tempo):
+	avisar(false)
+	reiniciar(&"feitico")
+	_lancar_feiticos()
+	if not await esperar(FolhaSprites.duracao(sprite, &"feitico")):
 		return
-
-	# O tempo do estado atual acabou: decide o próximo.
-	match estado:
-		Estado.ESPERANDO:
-			_escolher_ataque()
-		Estado.AVISO_FEITICO:
-			_lancar_feiticos()
-			_entrar(Estado.ESPERANDO, _d.pausa_entre_ataques)
-		Estado.AVISO_POCAO:
-			_jogar_pocao()
-			_entrar(Estado.PARADA, _d.parada_apos_pocao)
-		Estado.PARADA:
-			# A parada já é a pausa depois da poção: sorteia o próximo direto.
-			_escolher_ataque()
-
-
-## Sorteia o próximo ataque; nunca duas poções seguidas.
-func _escolher_ataque() -> void:
-	var ataque: Ataque = Ataque.FEITICO
-	if _ultimo_ataque != Ataque.POCAO and _sorteio.randi_range(0, 1) == 1:
-		ataque = Ataque.POCAO
-	_ultimo_ataque = ataque
-	match ataque:
-		Ataque.FEITICO:
-			_entrar(Estado.AVISO_FEITICO, _d.aviso_feitico)
-		Ataque.POCAO:
-			_entrar(Estado.AVISO_POCAO, _d.aviso_pocao)
-
-
-func _entrar(novo_estado: Estado, duracao: float) -> void:
-	estado = novo_estado
-	_tempo = duracao
-	avisar(estado == Estado.AVISO_FEITICO or estado == Estado.AVISO_POCAO, COR_AVISO_CUCA)
-	_atualizar_animacao()
+	await tocar_e_esperar(&"fim_feitico")
 
 
 ## Leque: o do meio vai na direção do Curupira; os outros abrem "abertura" graus para cada lado.
 func _lancar_feiticos() -> void:
-	var origem: Vector2 = mao.global_position
-	var alvo_pos: Vector2 = alvo.global_position if alvo else origem + Vector2.LEFT * 600.0
-	var direcao_meio: Vector2 = (alvo_pos - origem).normalized()
+	var origem: Vector2 = ponto("garra")
+	var direcao_meio: Vector2 = (pos_do_alvo() - origem).normalized()
 	var n: int = _d.quantidade_feiticos
 	for i in n:
 		# i = 0..n-1  ->  deslocamento -1..+1 (para 3: -1, 0, +1)
@@ -105,29 +73,84 @@ func _lancar_feiticos() -> void:
 		lancar_na_cena(feitico)
 
 
+func _pocao(encadeado: bool) -> void:
+	avisar(true, COR_AVISO_CUCA)
+	reiniciar(&"aviso_pocao")
+	if not await esperar(_d.aviso_pocao):
+		return
+	avisar(false)
+	reiniciar(&"pocao")
+	_jogar_pocao()
+	if not await tocar_e_esperar(&"fim_pocao"):
+		return
+	if encadeado:
+		return
+	# Parada depois da poção: é a janela para atacar.
+	tocar(&"idle")
+	await esperar(maxf(_d.parada_apos_pocao - FolhaSprites.duracao(sprite, &"fim_pocao"), 0.0))
+
+
 func _jogar_pocao() -> void:
 	var tipo: PocaCuca.Tipo = PocaCuca.Tipo.VENENO if _sorteio.randi_range(0, 1) == 0 else PocaCuca.Tipo.LENTIDAO
 	var pocao: PocaoCuca = _d.cena_pocao.instantiate()
-	pocao.global_position = mao.global_position
-	# Cai no chão embaixo do Curupira no momento do arremesso.
-	pocao.lancar(Vector2(x_do_alvo(), pe.global_position.y), tipo, _d)
+	pocao.global_position = ponto("garra")
+	# Cai no chão embaixo do Curupira no momento do arremesso (a origem da Cuca fica nos pés).
+	pocao.lancar(Vector2(x_do_alvo(), global_position.y), tipo, _d)
 	lancar_na_cena(pocao)
 
 
+func _bote(encadeado: bool) -> void:
+	var lado: float = lado_do_alvo()
+	# Vai até a parede do lado do Curupira: para passar, tem que pular por cima ou dar dash.
+	var destino: float = lado * (ARENA_MEIA_LARGURA - _d.margem_parede_bote)
+	avisar(true, COR_AVISO_CUCA)
+	virar(lado > 0.0)
+	reiniciar(&"aviso_bote")
+	if not await esperar(_d.aviso_bote):
+		return
+	avisar(false)
+	contato.dano = _d.golpes_bote
+	tocar(&"bote")
+	if not await andar_ate(destino, _d.velocidade_bote):
+		return
+	contato.dano = dados.golpes_contato
+	if encadeado:
+		# Levanta já virando para o próximo ataque do combo.
+		_virar_para_alvo()
+		return
+	if not await tocar_e_esperar(&"levantar"):
+		return
+	# Fica nesta parede e só se vira para o Curupira.
+	_virar_para_alvo()
+
+
+func _ninar() -> void:
+	var lado: float = lado_do_alvo()
+	avisar(true, COR_AVISO_CUCA)
+	if not await tocar_e_esperar(&"aviso_ninar"):
+		return
+	if not await esperar(maxf(_d.aviso_ninar - FolhaSprites.duracao(sprite, &"aviso_ninar"), 0.0)):
+		return
+	avisar(false)
+	tocar(&"ninar")
+	for i in _d.quantidade_notas:
+		var aguda: bool = _sorteio.randf() < _d.chance_nota_aguda
+		_soltar_nota(aguda, lado)
+		if not await esperar(_d.intervalo_notas):
+			return
+	await tocar_e_esperar(&"fim_ninar")
+
+
+## Grave: rente ao chão (pula-se). Aguda: na altura do peito (abaixa-se).
+func _soltar_nota(aguda: bool, lado: float) -> void:
+	var nota: ProjetilChefe = _d.cena_nota.instantiate()
+	nota.dano = _d.golpes_nota
+	nota.modulate = COR_NOTA_AGUDA if aguda else COR_NOTA_GRAVE
+	var altura: float = _d.altura_nota_aguda if aguda else _d.altura_nota_grave
+	nota.global_position = Vector2(ponto("boca").x, global_position.y - altura)
+	nota.lancar(Vector2(lado * _d.velocidade_notas, 0.0))
+	lancar_na_cena(nota)
+
+
 func _ao_ser_derrotado() -> void:
-	estado = Estado.DERROTADA
-	_atualizar_animacao()
-
-
-func _atualizar_animacao() -> void:
-	match estado:
-		Estado.ESPERANDO:
-			tocar(&"idle")
-		Estado.AVISO_FEITICO:
-			tocar(&"aviso_feitico")
-		Estado.AVISO_POCAO:
-			tocar(&"aviso_pocao")
-		Estado.PARADA:
-			tocar(&"parada")
-		Estado.DERROTADA:
-			tocar(&"derrota")
+	contato.dano = dados.golpes_contato

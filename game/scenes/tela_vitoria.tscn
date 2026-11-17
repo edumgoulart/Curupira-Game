@@ -17,6 +17,7 @@ grow_vertical = 2
 color = Color(0.02, 0.05, 0.02, 0.72)
 
 [node name="Painel" type="PanelContainer" parent="."]
+texture_filter = 1
 custom_minimum_size = Vector2(760, 0)
 anchors_preset = 8
 anchor_left = 0.5
@@ -34,14 +35,14 @@ theme_override_constants/separation = 18
 [node name="Titulo" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
-theme_override_font_sizes/font_size = 80
+theme_override_font_sizes/font_size = 72
 text = "Vitória!"
 horizontal_alignment = 1
 
 [node name="Subtitulo" type="Label" parent="Painel/Caixa"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_font_sizes/font_size = 36
 text = "Você libertou o chefe do chip da máquina!"
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -50,7 +51,7 @@ autowrap_mode = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.8, 0.34, 1)
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 36
 text = "Novos ataques: ..."
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -58,7 +59,7 @@ autowrap_mode = 3
 [node name="Salvo" type="Label" parent="Painel/Caixa"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.77, 0.66, 1)
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = "Progresso salvo"
 horizontal_alignment = 1
 

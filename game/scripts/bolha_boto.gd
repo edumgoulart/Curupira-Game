@@ -1,13 +1,13 @@
 class_name BolhaBoto
 extends Hitbox
-## Bolha lenta do Boto (GDD): solta durante o pulo, desce devagar balançando e estoura
+## Bolha do Boto (GDD): solta durante o salto por cima, desce balançando e estoura
 ## ao tocar o chão ou o Curupira. Layer enemy_hitbox; mask player + world.
 
-## Balanço de um lado para o outro enquanto desce. Só visual/movimento leve.
-const BALANCO_PX: float = 30.0
-const BALANCO_HZ: float = 1.2
-
-var velocidade: float = 120.0
+## Quem solta (o Boto) preenche com os valores do boto.tres antes de pôr na cena.
+var velocidade: float = 200.0
+## Balanço de um lado para o outro enquanto desce: largura (px) e idas e voltas por segundo.
+var balanco: float = 48.0
+var frequencia: float = 1.6
 var _x_inicial: float = 0.0
 var _tempo: float = 0.0
 
@@ -23,5 +23,5 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_tempo += delta
 	global_position = Vector2(
-		_x_inicial + BALANCO_PX * sin(_tempo * TAU * BALANCO_HZ),
+		_x_inicial + balanco * sin(_tempo * TAU * frequencia),
 		global_position.y + velocidade * delta)

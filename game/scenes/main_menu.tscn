@@ -3,8 +3,8 @@
 [ext_resource type="Script" uid="uid://b17bdgg2g31q1" path="res://scripts/main_menu.gd" id="1_l6cm7"]
 [ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
 [ext_resource type="PackedScene" uid="uid://bylaptpr0006w" path="res://scenes/fundo_menu.tscn" id="t_fundo"]
-[ext_resource type="Texture2D" uid="uid://3cvibx4pvx86" path="res://assets/curupira.png" id="t_curupira"]
-[ext_resource type="Texture2D" uid="uid://ttjptodqhb7u" path="res://assets/titulo.png" id="t_titulo"]
+[ext_resource type="SpriteFrames" path="res://assets/pixel/curupira/curupira_frames.tres" id="t_curupira"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/titulo.png" id="t_titulo"]
 
 [node name="Main Menu" type="Control" unique_id=754559773]
 layout_mode = 3
@@ -13,26 +13,19 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+texture_filter = 1
 theme = ExtResource("t_tema")
 script = ExtResource("1_l6cm7")
 
 [node name="Fundo" parent="." instance=ExtResource("t_fundo")]
 layout_mode = 1
 
-[node name="Curupira" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_left = 60.0
-offset_top = -860.0
-offset_right = 860.0
-offset_bottom = -40.0
-grow_vertical = 0
-mouse_filter = 2
-texture = ExtResource("t_curupira")
-expand_mode = 1
-stretch_mode = 5
+[node name="Curupira" type="AnimatedSprite2D" parent="."]
+position = Vector2(440, 880)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("t_curupira")
+animation = &"idle"
+autoplay = "idle"
 
 [node name="Coluna" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -51,12 +44,10 @@ theme_override_constants/separation = 10
 alignment = 1
 
 [node name="Titulo" type="TextureRect" parent="Coluna"]
-custom_minimum_size = Vector2(0, 380)
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("t_titulo")
-expand_mode = 1
-stretch_mode = 5
+stretch_mode = 3
 
 [node name="Espaco" type="Control" parent="Coluna"]
 custom_minimum_size = Vector2(0, 30)

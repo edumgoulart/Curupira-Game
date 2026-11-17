@@ -1,8 +1,10 @@
 extends Control
+## Tela principal. O Curupira parado na floresta usa a animação "idle" do curupira_frames.tres.
 
 
-# Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	# Âncora da folha (os pés) na posição do node, como nas fases.
+	FolhaSprites.preparar($Curupira)
 	# Desabilita o botao continuar se nao tem save
 	%Continuar.disabled = not GameState.tem_save()
 	# Foco no primeiro botão para dar para navegar com o controle.

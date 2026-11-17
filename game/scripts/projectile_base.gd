@@ -14,11 +14,17 @@ signal acertou(alvo: Area2D)
 
 ## Efeito criado no ponto de impacto (ex.: pequena explosão da Bola de Fogo). Opcional, só visual.
 @export var cena_impacto: PackedScene
+## Desenhos por direção (pixel art não gira). O desenho do node "Visual" é o de lado.
+## Para baixo usa os de cima espelhados na vertical. Vazio = só espelha o de lado.
+@export var quadros_cima: Array[Texture2D] = []
+@export var quadros_diagonal: Array[Texture2D] = []
 
 var dano: int = 1
 var velocidade: float = 1000.0
 ## 1 = direita, -1 = esquerda.
 var direcao: float = 1.0
+## Mira em graus: 0 = para a frente, -45 = diagonal para cima, -90 = cima, 45 e 90 para baixo.
+var angulo_mira: float = 0.0
 ## Graus por segundo que consegue virar atrás do chefe. 0 = reto.
 var curva: float = 0.0
 ## Tempo máximo no ar (s). 0 = até sair da tela.
@@ -34,22 +40,33 @@ var _velocidade: Vector2 = Vector2.ZERO
 var _tempo: float = 0.0
 
 
-func configurar(novo_dano: int, nova_velocidade: float, nova_direcao: float) -> void:
+func configurar(novo_dano: int, nova_velocidade: float, nova_direcao: float, novo_angulo: float = 0.0) -> void:
 	dano = novo_dano
 	velocidade = nova_velocidade
 	direcao = nova_direcao
+	angulo_mira = novo_angulo
 
 
 func _ready() -> void:
-	_velocidade = Vector2(direcao * velocidade, 0.0)
+	var a: float = deg_to_rad(angulo_mira)
+	_velocidade = Vector2(direcao * cos(a), sin(a)) * velocidade
 	if curva > 0.0:
 		# O perseguidor gira inteiro na direção do voo (o desenho aponta para a direita).
 		rotation = _velocidade.angle()
 		return
-	# Reto: espelha só o visual; a forma de colisão é simétrica.
+	# Reto: escolhe o desenho da direção e espelha; a forma de colisão é simétrica.
+	var visual := get_node_or_null("Visual") as AnimacaoQuadros
+	var vertical: float = absf(angulo_mira)
+	if visual and vertical > 67.0 and not quadros_cima.is_empty():
+		visual.trocar_quadros(quadros_cima)
+	elif visual and vertical > 22.0 and not quadros_diagonal.is_empty():
+		visual.trocar_quadros(quadros_diagonal)
 	for filho in get_children():
 		if filho is Sprite2D or filho is Polygon2D:
 			filho.scale.x = absf(filho.scale.x) * direcao
+			# Para baixo: o desenho de cima (ou da diagonal) virado de cabeça para baixo.
+			if filho == visual and angulo_mira > 22.0 and vertical > 22.0:
+				filho.scale.y = -absf(filho.scale.y)
 
 
 func _physics_process(delta: float) -> void:

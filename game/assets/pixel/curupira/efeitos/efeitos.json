@@ -1,0 +1,132 @@
+{
+ "folha_cima": {
+  "nome": "folha_cima",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [6, 13],
+  "centro": [3, 6],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_diag_cima": {
+  "nome": "folha_diag_cima",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [15, 15],
+  "centro": [7, 7],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_lado": {
+  "nome": "folha_lado",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [13, 6],
+  "centro": [6, 3],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_diag_baixo": {
+  "nome": "folha_diag_baixo",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [15, 15],
+  "centro": [7, 7],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "folha_baixo": {
+  "nome": "folha_baixo",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [6, 13],
+  "centro": [3, 6],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "onca": {
+  "nome": "onca",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [21, 18],
+  "centro": [10, 10],
+  "quadros": 2
+ },
+ "acerto": {
+  "nome": "acerto",
+  "fps": 20,
+  "loop": false,
+  "tamanho": [20, 20],
+  "centro": [10, 9],
+  "nota": "onde o tiro bate no chefe; simétrico, não gira",
+  "quadros": 6
+ },
+ "feitico": {
+  "nome": "feitico",
+  "fps": 16,
+  "loop": true,
+  "tamanho": [17, 10],
+  "centro": [12, 5],
+  "nota": "aponta para a direita; o jogo gira na direção do voo",
+  "quadros": 4
+ },
+ "bolha_agua": {
+  "nome": "bolha_agua",
+  "fps": 10,
+  "loop": true,
+  "tamanho": [14, 14],
+  "centro": [7, 7],
+  "quadros": 4
+ },
+ "bolha_abissal": {
+  "nome": "bolha_abissal",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [25, 22],
+  "centro": [12, 11],
+  "quadros": 6
+ },
+ "pocao_maldita": {
+  "nome": "pocao_maldita",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [19, 19],
+  "centro": [9, 9],
+  "nota": "girando no voo",
+  "quadros": 4
+ },
+ "feixe_meio": {
+  "nome": "feixe_meio",
+  "fps": 16,
+  "loop": true,
+  "tamanho": [16, 19],
+  "centro": [0, 9],
+  "nota": "emendar lado a lado (16 px); o lado esquerdo é a emenda",
+  "quadros": 4
+ },
+ "feixe_boca": {
+  "nome": "feixe_boca",
+  "fps": 16,
+  "loop": true,
+  "tamanho": [28, 26],
+  "centro": [14, 12],
+  "nota": "na saída do feixe, na mão",
+  "quadros": 4
+ },
+ "respingo_agua": {
+  "nome": "respingo_agua",
+  "fps": 18,
+  "loop": false,
+  "tamanho": [27, 28],
+  "centro": [13, 10],
+  "quadros": 6
+ },
+ "respingo_veneno": {
+  "nome": "respingo_veneno",
+  "fps": 18,
+  "loop": false,
+  "tamanho": [26, 22],
+  "centro": [13, 10],
+  "quadros": 6
+ }
+}

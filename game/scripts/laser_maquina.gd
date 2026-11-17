@@ -21,6 +21,8 @@ func _ready() -> void:
 	super._ready()
 	add_to_group("ataques_chefe")
 	forma.disabled = true
+	# Cada laser com a própria forma: definir_comprimento muda o tamanho dela.
+	forma.shape = forma.shape.duplicate()
 	forma.position.x = COMPRIMENTO / 2.0
 	linha.points = PackedVector2Array([Vector2.ZERO, Vector2(COMPRIMENTO, 0.0)])
 	raio.visible = false
@@ -36,6 +38,20 @@ func _process(_delta: float) -> void:
 func mirar(ponto: Vector2) -> void:
 	if not _travado:
 		rotation = (ponto - global_position).angle()
+
+
+## Aponta mesmo travado ou disparando (a varredura arrasta o laser pelo chão).
+func apontar(ponto: Vector2) -> void:
+	rotation = (ponto - global_position).angle()
+
+
+## Corta o laser num comprimento (px), para ele terminar no chão em vez de atravessar.
+func definir_comprimento(comprimento: float) -> void:
+	linha.points = PackedVector2Array([Vector2.ZERO, Vector2(comprimento, 0.0)])
+	raio.scale.x = comprimento / COMPRIMENTO
+	var r := forma.shape as RectangleShape2D
+	r.size.x = comprimento
+	forma.position.x = comprimento / 2.0
 
 
 func travar() -> void:

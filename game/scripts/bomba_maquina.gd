@@ -10,6 +10,9 @@ signal explodiu
 ## Quanto tempo a área da explosão machuca (s). Só o instante da explosão.
 const DURACAO_EXPLOSAO: float = 0.15
 
+## Explosão em pixel art criada no lugar. Só visual.
+@export var cena_explosao: PackedScene
+
 var _velocidade: float = 900.0
 var _espera: float = 1.5
 var _raio: float = 180.0
@@ -22,7 +25,6 @@ var _explodiu: bool = false
 @onready var area_aviso: Polygon2D = $AreaAviso
 @onready var explosao: Hitbox = $Explosao
 @onready var forma: CollisionShape2D = $Explosao/CollisionShape2D
-@onready var fogo: Polygon2D = $Fogo
 
 
 func configurar(dados: MaquinaData) -> void:
@@ -37,11 +39,9 @@ func _ready() -> void:
 	explosao.dano = _golpes
 	(forma.shape as CircleShape2D).radius = _raio
 	forma.disabled = true
-	# Área de aviso e fogo desenhados com raio 100 na cena; escala para o raio real.
+	# Área de aviso desenhada com raio 100 na cena; escala para o raio real.
 	area_aviso.scale = Vector2.ONE * _raio / 100.0
-	fogo.scale = Vector2.ONE * _raio / 100.0
 	area_aviso.visible = false
-	fogo.visible = false
 
 
 func _physics_process(delta: float) -> void:
@@ -67,7 +67,10 @@ func _explodir() -> void:
 	_explodiu = true
 	corpo.visible = false
 	area_aviso.visible = false
-	fogo.visible = true
+	if cena_explosao:
+		var efeito: Node2D = cena_explosao.instantiate()
+		efeito.global_position = global_position + Vector2(0.0, -60.0)
+		get_parent().add_child.call_deferred(efeito)
 	# Ligar a forma (e não monitorable) faz detectar quem já está na área.
 	forma.set_deferred("disabled", false)
 	explodiu.emit()

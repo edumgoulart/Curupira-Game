@@ -1,29 +1,33 @@
 [gd_scene format=3 uid="uid://cnnh7jq8ty8lm"]
 
-[ext_resource type="Script" uid="uid://q1nay574ylyo" path="res://scripts/projetil_chefe.gd" id="1_proj"]
+[ext_resource type="Script" path="res://scripts/projetil_chefe.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/pixel/cuca/efeitos/feitico_1.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/pixel/cuca/efeitos/feitico_2.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/cuca/efeitos/feitico_3.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/pixel/cuca/efeitos/feitico_4.png" id="5"]
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="6"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_feitico"]
-radius = 20.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 22.0
 
 [node name="FeiticoCuca" type="Area2D"]
 collision_layer = 16
 collision_mask = 3
-script = ExtResource("1_proj")
+script = ExtResource("1")
+girar = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_feitico")
+shape = SubResource("CircleShape2D_1")
 
-[node name="VisualProvisorio" type="Polygon2D" parent="."]
-color = Color(0.55, 0.25, 0.85, 0.55)
-polygon = PackedVector2Array(-46, 0, -16, -18, 10, -20, 24, 0, 10, 20, -16, 18)
-
-[node name="Orbe" type="Polygon2D" parent="VisualProvisorio"]
-color = Color(0.6, 0.3, 0.95, 1)
-polygon = PackedVector2Array(22, 0, 20.6, 6.9, 16.7, 12.7, 10.9, 16.6, 4, 18, -2.9, 16.6, -8.7, 12.7, -12.6, 6.9, -14, 0, -12.6, -6.9, -8.7, -12.7, -2.9, -16.6, 4, -18, 10.9, -16.6, 16.7, -12.7, 20.6, -6.9)
-
-[node name="Miolo" type="Polygon2D" parent="VisualProvisorio"]
-color = Color(0.6, 1, 0.45, 1)
-polygon = PackedVector2Array(15, 0, 13.8, 4.5, 10.5, 7.8, 6, 9, 1.5, 7.8, -1.8, 4.5, -3, 0, -1.8, -4.5, 1.5, -7.8, 6, -9, 10.5, -7.8, 13.8, -4.5)
+[node name="Visual" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("2")
+centered = false
+offset = Vector2(-10, -10)
+script = ExtResource("6")
+quadros = Array[Texture2D]([ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5")])
+fps = 12.0
+loop = true
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
-rect = Rect2(-48, -24, 74, 48)

@@ -2,10 +2,10 @@ class_name BolaDeFogoMula
 extends Hitbox
 ## Bola de fogo da Mula: reta na horizontal, velocidade constante.
 ## Layer enemy_hitbox; mask player (acerta a hurtbox do Curupira) + world (some na parede).
-## O desenho (Fogo) é a bola de fogo animada, com a cabeça na origem e o rastro para trás.
+## O desenho (Fogo) é a bola de fogo animada em pixel art, voando para a esquerda.
 
 ## Efeito que fica no lugar quando a bola some (acertou ou bateu na parede). Só visual.
-const CENA_ESTOURO: PackedScene = preload("res://scenes/explosao.tscn")
+const CENA_ESTOURO: PackedScene = preload("res://scenes/explosao_mula.tscn")
 
 var velocidade: Vector2 = Vector2.ZERO
 
@@ -20,8 +20,8 @@ func lancar(direcao: float, nova_velocidade: float) -> void:
 func _ready() -> void:
 	super._ready()
 	add_to_group("ataques_chefe")
-	# O PNG voa para a direita: espelha quando vai para a esquerda.
-	if velocidade.x < 0.0:
+	# O desenho voa para a esquerda: espelha quando vai para a direita.
+	if velocidade.x > 0.0:
 		fogo.scale.x = -absf(fogo.scale.x)
 	acertou.connect(func(_alvo: Area2D) -> void: _estourar())
 	body_entered.connect(func(_corpo: Node2D) -> void: _estourar())
