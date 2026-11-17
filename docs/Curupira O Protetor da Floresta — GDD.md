@@ -152,7 +152,7 @@ Laço externo (entre fases):
 3. Jogar a fase.
 4. Vencer e ganhar o ataque básico e o especial do chefe.
 
-Ao levar o quarto golpe, o jogador perde a fase e vai para a tela de derrota, onde pode tentar de novo ou voltar para a seleção. Os chefes já derrotados continuam derrotados. O progresso é salvo a cada chefe derrotado e permanece depois de fechar o jogo.
+Ao levar o quarto golpe, o jogador perde a fase e vai para a tela de derrota, onde pode tentar de novo ou voltar para o mapa. Os chefes já derrotados continuam derrotados. O progresso é salvo a cada chefe derrotado e permanece depois de fechar o jogo.
 
 ## Mundo do jogo
 
@@ -228,12 +228,12 @@ O jogo tem nove tipos de tela:
 
 - **Cenas de abertura.** Cenas estáticas no início do jogo, que explicam a história.
 - **Menu inicial.** Mostra também os botões de cada ação; é assim que o jogador aprende os controles.
-- **Seleção de fase e de ataques.** O jogador escolhe o chefe, a dificuldade (Normal ou Expert) e, na mesma tela, o ataque básico e o especial.
+- **Mapa do mundo.** Como o tabuleiro do Cuphead: o Curupira anda pelo mapa, visto de cima em diagonal, e escolhe o chefe indo até a área dele. A Mula fica entre árvores pegando fogo, a Cuca numa mata fechada com névoa e a luz verde das poções, o Boto numa prainha e a Máquina no prédio da empresa, atrás de um portão que só abre depois dos três. Na entrada de cada área abre um painel com a dificuldade (Normal ou Expert), o ataque básico e o especial.
 - **Arena.** Uma por chefe, quatro no total.
 - **Pausa.**
-- **Opções.** Volume, alternância entre tela cheia e janela e, quando aberta no meio de uma fase, a opção de voltar para a seleção de fase.
-- **Derrota.** O jogador pode tentar a fase de novo ou voltar para a seleção.
-- **Vitória.** Depois dela o jogador volta para a seleção de fase.
+- **Opções.** Volume, alternância entre tela cheia e janela e, quando aberta no meio de uma fase, a opção de voltar para o mapa.
+- **Derrota.** O jogador pode tentar a fase de novo ou voltar para o mapa.
+- **Vitória.** Depois dela o jogador volta para o mapa, na frente da área do chefe vencido, onde aparece uma bandeira.
 - **Créditos.** Aparecem logo depois que o chefe final é derrotado.
 
 ### Elementos na tela durante a luta

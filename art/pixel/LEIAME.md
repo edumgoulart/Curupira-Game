@@ -14,3 +14,5 @@ Passo a passo em `docs/tdd.md`, seção 4.1. Cada personagem tem o próprio arqu
 | `poses_px.js` | Poses e mira |
 | `chefes_px.js` | Os quatro chefes e os ataques |
 | `arenas_px.js` | Cenários |
+| `mapa_px.js` | Mapa do mundo (terreno, áreas dos chefes, objetos, máscara do chão) |
+| `mapa_curupira_px.js` | Curupira visto de cima, em 5 direções |

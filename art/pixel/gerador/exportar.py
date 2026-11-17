@@ -45,6 +45,16 @@ for nome, a in dados['arenas'].items():
         for i, q in enumerate(a['frente'], 1):
             gravar(f'{destino}/arenas/{nome}/frente_{i}.png', q)
     gravar_json(f'{destino}/arenas/{nome}/arena.json', {'fps': a['fps'], 'quadros': len(a['fundo']), 'tem_frente': bool(a['frente']), 'chao_y': a['chao_y'], 'curupira_x': a['curupira_x'], 'tamanho': [480, 270]})
+# mapa do mundo: fundo e frente animados, máscara de onde dá para andar, atlas dos objetos e os dados
+# (dados.json e não mapa.json: o gerar_spriteframes.gd trata <pasta>/<pasta>.json como folha de personagem)
+m = dados.get('mapa')
+if m:
+    for i, (f, fr) in enumerate(zip(m['fundo'], m['frente']), 1):
+        gravar(f'{destino}/mapa/fundo_{i}.png', f)
+        gravar(f'{destino}/mapa/frente_{i}.png', fr)
+    gravar(f'{destino}/mapa/andavel.png', m['andavel'])
+    gravar(f'{destino}/mapa/objetos.png', m['objetos'])
+    gravar_json(f'{destino}/mapa/dados.json', m['dados'])
 # fonte em BMFont (texto): o Godot importa o .fnt como FontFile
 for nome, f in dados.get('fontes', {}).items():
     gravar(f'{destino}/ui/fonte_{nome}.png', f['png'])

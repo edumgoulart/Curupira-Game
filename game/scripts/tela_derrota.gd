@@ -1,9 +1,10 @@
 extends CanvasLayer
 ## Tela de derrota: aparece quando o Curupira leva o último golpe (GDD: tentar de novo
-## ou voltar para a seleção). Escuta o sinal "derrotado" do Curupira da arena.
+## ou voltar para o mapa). Escuta o sinal "derrotado" do Curupira da arena.
 ## Mesmo esquema da pausa: congela a luta e fica com process_mode "sempre".
 
-const CENA_SELECAO: String = "res://scenes/level_select.tscn"
+## Fora da luta, o jogo volta para o mapa do mundo (antes era a tela de seleção de fase).
+const CENA_SELECAO: String = "res://scenes/mapa.tscn"
 ## Espera antes de mostrar a tela, para o jogador ver o Curupira derrotado (s). Só visual.
 const ATRASO: float = 1.0
 
