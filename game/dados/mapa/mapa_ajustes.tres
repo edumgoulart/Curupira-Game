@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_mapa")
-velocidade = 64.0
+velocidade = 84.0
 raio_pes = 3.0
 suavidade_camera = 6.0

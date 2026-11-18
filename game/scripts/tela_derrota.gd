@@ -13,6 +13,8 @@ const CENA_SELECAO: String = "res://scenes/mapa.tscn"
 const ATRASO: float = 1.0
 ## A carta desce de cima até o lugar (s). Só visual.
 const DURACAO_ENTRADA: float = 0.35
+## Acima desse número de letras, a frase usa a letra menor para caber na carta.
+const FRASE_LONGA: int = 66
 
 ## O Curupira da arena. Apontar no inspetor da cena da arena.
 @export var curupira: Node
@@ -57,6 +59,9 @@ func _preencher() -> void:
 	retrato.texture = dados.retrato_derrota
 	if not dados.frases_derrota.is_empty():
 		frase.text = "\"%s\"" % dados.frases_derrota.pick_random()
+		# frase comprida passa de 3 linhas na letra grande: usa a pequena
+		if frase.text.length() > FRASE_LONGA:
+			frase.add_theme_font_size_override("font_size", 24)
 
 
 ## Fração da vida do chefe que o jogador tirou, contando todas as fases.

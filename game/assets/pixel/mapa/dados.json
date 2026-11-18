@@ -1,1550 +1,1867 @@
 {
- "tamanho": [960, 540],
+ "tamanho": [1440, 810],
  "fps": 8,
  "quadros": 16,
  "escala_no_jogo": 4,
- "inicio": [480, 374],
+ "inicio": [720, 560],
  "entradas": {
   "mula": {
-   "centro": [184, 464],
-   "raio": 16,
-   "volta": [246, 442]
+   "centro": [276, 696],
+   "raio": 20,
+   "volta": [369, 663]
   },
   "cuca": {
-   "centro": [250, 186],
-   "raio": 16,
-   "volta": [312, 240]
+   "centro": [375, 279],
+   "raio": 20,
+   "volta": [468, 360]
   },
   "boto": {
-   "centro": [728, 465],
-   "raio": 15,
-   "volta": [652, 455]
+   "centro": [1192, 606],
+   "raio": 16,
+   "volta": [1104, 638]
   },
   "maquina": {
-   "centro": [833, 154],
-   "raio": 15,
-   "volta": [800, 170]
+   "centro": [1250, 231],
+   "raio": 20,
+   "volta": [1200, 255]
   }
  },
  "portao": {
   "retangulo": [
-   752,
-   182,
-   778,
-   193
+   1128,
+   277,
+   1168,
+   288
   ],
-  "aviso": [765, 206],
-  "raio": 26
+  "aviso": [1148, 309],
+  "raio": 36
+ },
+ "conversas": {
+  "mula": {
+   "centro": [296, 640],
+   "raio": 30,
+   "mostrar": "concluiu:fase1"
+  },
+  "cuca": {
+   "centro": [506, 352],
+   "raio": 30,
+   "mostrar": "concluiu:fase2"
+  },
+  "boto": {
+   "centro": [1178, 654],
+   "raio": 24,
+   "mostrar": "concluiu:fase3"
+  }
  },
  "objetos": [
   {
    "nome": "samauma",
-   "pos": [480, 336],
-   "deslocamento": [-65, -119],
-   "tamanho": [129, 121],
+   "pos": [720, 500],
+   "deslocamento": [-97, -178],
+   "tamanho": [193, 180],
    "quadros": [
-    [0, 0]
-   ]
+    [339, 2684]
+   ],
+   "transparente": true
   },
   {
    "nome": "placa",
-   "pos": [506, 390],
+   "pos": [760, 586],
    "deslocamento": [-12, -19],
    "tamanho": [27, 21],
    "quadros": [
-    [1889, 291]
+    [930, 4652]
    ]
   },
   {
    "nome": "cerca",
-   "pos": [818, 190],
-   "deslocamento": [-103, -9],
-   "tamanho": [207, 10],
+   "pos": [1226, 285],
+   "deslocamento": [-154, -11],
+   "tamanho": [309, 12],
    "quadros": [
-    [0, 318]
+    [1044, 4652]
    ]
   },
   {
    "nome": "portao_fechado",
-   "pos": [765, 190],
-   "deslocamento": [-14, -11],
-   "tamanho": [29, 13],
+   "pos": [1148, 285],
+   "deslocamento": [-21, -13],
+   "tamanho": [43, 15],
    "quadros": [
-    [1945, 291]
+    [1000, 4652]
    ],
    "mostrar": "trancado"
   },
   {
    "nome": "portao_aberto",
-   "pos": [765, 189],
-   "deslocamento": [-13, -15],
-   "tamanho": [27, 17],
+   "pos": [1148, 284],
+   "deslocamento": [-20, -19],
+   "tamanho": [41, 21],
    "quadros": [
-    [1917, 291]
+    [958, 4652]
    ],
    "mostrar": "aberto"
   },
   {
-   "nome": "arvore_fogo",
-   "pos": [194, 437],
-   "deslocamento": [-17, -52],
-   "tamanho": [35, 54],
+   "nome": "castanheira_fogo",
+   "pos": [291, 650],
+   "deslocamento": [-37, -94],
+   "tamanho": [76, 96],
    "quadros": [
-    [130, 0],
-    [166, 0],
-    [202, 0],
-    [238, 0],
-    [274, 0],
-    [310, 0],
-    [346, 0],
-    [382, 0],
-    [418, 0],
-    [454, 0],
-    [490, 0],
-    [526, 0],
-    [562, 0],
-    [598, 0],
-    [634, 0],
-    [670, 0]
-   ]
+    [1259, 3206],
+    [1336, 3206],
+    [1413, 3206],
+    [1490, 3206],
+    [1567, 3206],
+    [1644, 3206],
+    [1721, 3206],
+    [1798, 3206],
+    [1875, 3206],
+    [1952, 3206],
+    [0, 3317],
+    [77, 3317],
+    [154, 3317],
+    [231, 3317],
+    [308, 3317],
+    [385, 3317]
+   ],
+   "mostrar": "nao_concluiu:fase1",
+   "transparente": true
   },
   {
-   "nome": "arvore_fogo",
-   "pos": [221, 490],
-   "deslocamento": [-17, -52],
-   "tamanho": [35, 54],
+   "nome": "castanheira_rebrota",
+   "pos": [291, 650],
+   "deslocamento": [-26, -69],
+   "tamanho": [51, 71],
    "quadros": [
-    [706, 0],
-    [742, 0],
-    [778, 0],
-    [814, 0],
-    [850, 0],
-    [886, 0],
-    [922, 0],
-    [958, 0],
-    [994, 0],
-    [1030, 0],
-    [1066, 0],
-    [1102, 0],
-    [1138, 0],
-    [1174, 0],
-    [1210, 0],
-    [1246, 0]
-   ]
+    [1778, 4354]
+   ],
+   "mostrar": "concluiu:fase1",
+   "transparente": true
   },
   {
-   "nome": "arvore_fogo",
-   "pos": [168, 452],
-   "deslocamento": [-17, -52],
-   "tamanho": [34, 54],
+   "nome": "castanheira_fogo",
+   "pos": [326, 738],
+   "deslocamento": [-37, -93],
+   "tamanho": [77, 95],
    "quadros": [
-    [1282, 0],
-    [1317, 0],
-    [1352, 0],
-    [1387, 0],
-    [1422, 0],
-    [1457, 0],
-    [1492, 0],
-    [1527, 0],
-    [1562, 0],
-    [1597, 0],
-    [1632, 0],
-    [1667, 0],
-    [1702, 0],
-    [1737, 0],
-    [1772, 0],
-    [1807, 0]
-   ]
+    [1264, 3414],
+    [1342, 3414],
+    [1420, 3414],
+    [1498, 3414],
+    [1576, 3414],
+    [1654, 3414],
+    [1732, 3414],
+    [1810, 3414],
+    [1888, 3414],
+    [1966, 3414],
+    [0, 3511],
+    [78, 3511],
+    [156, 3511],
+    [234, 3511],
+    [312, 3511],
+    [390, 3511]
+   ],
+   "mostrar": "nao_concluiu:fase1",
+   "transparente": true
   },
   {
-   "nome": "arvore_fogo",
-   "pos": [178, 506],
-   "deslocamento": [-17, -52],
-   "tamanho": [35, 54],
+   "nome": "castanheira_rebrota",
+   "pos": [326, 738],
+   "deslocamento": [-25, -69],
+   "tamanho": [51, 71],
    "quadros": [
-    [1842, 0],
-    [1878, 0],
-    [1914, 0],
-    [1950, 0],
-    [1986, 0],
-    [0, 122],
-    [36, 122],
-    [72, 122],
-    [108, 122],
-    [144, 122],
-    [180, 122],
-    [216, 122],
-    [252, 122],
-    [288, 122],
-    [324, 122],
-    [360, 122]
-   ]
+    [1830, 4354]
+   ],
+   "mostrar": "concluiu:fase1",
+   "transparente": true
+  },
+  {
+   "nome": "castanheira_fogo",
+   "pos": [246, 676],
+   "deslocamento": [-38, -94],
+   "tamanho": [78, 96],
+   "quadros": [
+    [462, 3317],
+    [541, 3317],
+    [620, 3317],
+    [699, 3317],
+    [778, 3317],
+    [857, 3317],
+    [936, 3317],
+    [1015, 3317],
+    [1094, 3317],
+    [1173, 3317],
+    [1252, 3317],
+    [1331, 3317],
+    [1410, 3317],
+    [1489, 3317],
+    [1568, 3317],
+    [1647, 3317]
+   ],
+   "mostrar": "nao_concluiu:fase1",
+   "transparente": true
+  },
+  {
+   "nome": "castanheira_rebrota",
+   "pos": [246, 676],
+   "deslocamento": [-25, -70],
+   "tamanho": [51, 72],
+   "quadros": [
+    [747, 4354]
+   ],
+   "mostrar": "concluiu:fase1",
+   "transparente": true
+  },
+  {
+   "nome": "castanheira_fogo",
+   "pos": [262, 762],
+   "deslocamento": [-37, -94],
+   "tamanho": [76, 96],
+   "quadros": [
+    [1726, 3317],
+    [1803, 3317],
+    [1880, 3317],
+    [1957, 3317],
+    [0, 3414],
+    [77, 3414],
+    [154, 3414],
+    [231, 3414],
+    [308, 3414],
+    [385, 3414],
+    [462, 3414],
+    [539, 3414],
+    [616, 3414],
+    [693, 3414],
+    [770, 3414],
+    [847, 3414]
+   ],
+   "mostrar": "nao_concluiu:fase1",
+   "transparente": true
+  },
+  {
+   "nome": "castanheira_rebrota",
+   "pos": [262, 762],
+   "deslocamento": [-25, -70],
+   "tamanho": [50, 72],
+   "quadros": [
+    [799, 4354]
+   ],
+   "mostrar": "concluiu:fase1",
+   "transparente": true
   },
   {
    "nome": "arvore_cuca",
-   "pos": [292, 196],
-   "deslocamento": [-14, -40],
-   "tamanho": [32, 42],
+   "pos": [438, 294],
+   "deslocamento": [-21, -61],
+   "tamanho": [47, 63],
    "quadros": [
-    [825, 177]
-   ]
+    [955, 4500]
+   ],
+   "transparente": true
   },
   {
    "nome": "arvore_cuca",
-   "pos": [249, 224],
-   "deslocamento": [-14, -41],
-   "tamanho": [30, 43],
+   "pos": [374, 336],
+   "deslocamento": [-21, -61],
+   "tamanho": [45, 63],
    "quadros": [
-    [794, 177]
-   ]
+    [1003, 4500]
+   ],
+   "transparente": true
   },
   {
-   "nome": "palmeira",
-   "pos": [612, 470],
-   "deslocamento": [-18, -47],
-   "tamanho": [37, 50],
+   "nome": "buriti",
+   "pos": [1000, 690],
+   "deslocamento": [-27, -68],
+   "tamanho": [57, 72],
    "quadros": [
-    [1020, 122],
-    [1058, 122],
-    [1096, 122],
-    [1134, 122],
-    [1172, 122],
-    [1210, 122],
-    [1248, 122],
-    [1286, 122],
-    [1324, 122],
-    [1362, 122],
-    [1400, 122],
-    [1438, 122],
-    [1476, 122],
-    [1514, 122],
-    [1552, 122],
-    [1590, 122]
-   ]
+    [850, 4354],
+    [908, 4354],
+    [966, 4354],
+    [1024, 4354],
+    [1082, 4354],
+    [1140, 4354],
+    [1198, 4354],
+    [1256, 4354],
+    [1314, 4354],
+    [1372, 4354],
+    [1430, 4354],
+    [1488, 4354],
+    [1546, 4354],
+    [1604, 4354],
+    [1662, 4354],
+    [1720, 4354]
+   ],
+   "transparente": true
   },
   {
-   "nome": "palmeira",
-   "pos": [632, 412],
-   "deslocamento": [-19, -45],
-   "tamanho": [38, 48],
+   "nome": "buriti",
+   "pos": [1030, 594],
+   "deslocamento": [-27, -66],
+   "tamanho": [56, 70],
    "quadros": [
-    [1628, 122],
-    [1667, 122],
-    [1706, 122],
-    [1745, 122],
-    [1784, 122],
-    [1823, 122],
-    [1862, 122],
-    [1901, 122],
-    [1940, 122],
-    [1979, 122],
-    [0, 177],
-    [39, 177],
-    [78, 177],
-    [117, 177],
-    [156, 177],
-    [195, 177]
-   ]
+    [68, 4428],
+    [125, 4428],
+    [182, 4428],
+    [239, 4428],
+    [296, 4428],
+    [353, 4428],
+    [410, 4428],
+    [467, 4428],
+    [524, 4428],
+    [581, 4428],
+    [638, 4428],
+    [695, 4428],
+    [752, 4428],
+    [809, 4428],
+    [866, 4428],
+    [923, 4428]
+   ],
+   "transparente": true
   },
   {
-   "nome": "palmeira",
-   "pos": [700, 392],
-   "deslocamento": [-21, -44],
-   "tamanho": [34, 47],
+   "nome": "buriti",
+   "pos": [968, 610],
+   "deslocamento": [-27, -64],
+   "tamanho": [55, 68],
    "quadros": [
-    [234, 177],
-    [269, 177],
-    [304, 177],
-    [339, 177],
-    [374, 177],
-    [409, 177],
-    [444, 177],
-    [479, 177],
-    [514, 177],
-    [549, 177],
-    [584, 177],
-    [619, 177],
-    [654, 177],
-    [689, 177],
-    [724, 177],
-    [759, 177]
-   ]
+    [1117, 4428],
+    [1173, 4428],
+    [1229, 4428],
+    [1285, 4428],
+    [1341, 4428],
+    [1397, 4428],
+    [1453, 4428],
+    [1509, 4428],
+    [1565, 4428],
+    [1621, 4428],
+    [1677, 4428],
+    [1733, 4428],
+    [1789, 4428],
+    [1845, 4428],
+    [1901, 4428],
+    [1957, 4428]
+   ],
+   "transparente": true
   },
   {
-   "nome": "palmeira",
-   "pos": [756, 372],
-   "deslocamento": [-16, -48],
-   "tamanho": [38, 51],
+   "nome": "buriti",
+   "pos": [1012, 740],
+   "deslocamento": [-20, -60],
+   "tamanho": [50, 64],
    "quadros": [
-    [396, 122],
-    [435, 122],
-    [474, 122],
-    [513, 122],
-    [552, 122],
-    [591, 122],
-    [630, 122],
-    [669, 122],
-    [708, 122],
-    [747, 122],
-    [786, 122],
-    [825, 122],
-    [864, 122],
-    [903, 122],
-    [942, 122],
-    [981, 122]
-   ]
+    [139, 4500],
+    [190, 4500],
+    [241, 4500],
+    [292, 4500],
+    [343, 4500],
+    [394, 4500],
+    [445, 4500],
+    [496, 4500],
+    [547, 4500],
+    [598, 4500],
+    [649, 4500],
+    [700, 4500],
+    [751, 4500],
+    [802, 4500],
+    [853, 4500],
+    [904, 4500]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [391, 53],
-   "deslocamento": [-16, -31],
-   "tamanho": [31, 33],
+   "nome": "buriti",
+   "pos": [1080, 580],
+   "deslocamento": [-26, -70],
+   "tamanho": [57, 74],
    "quadros": [
-    [1042, 226]
-   ]
+    [1611, 4051],
+    [1669, 4051],
+    [1727, 4051],
+    [1785, 4051],
+    [1843, 4051],
+    [1901, 4051],
+    [1959, 4051],
+    [0, 4130],
+    [58, 4130],
+    [116, 4130],
+    [174, 4130],
+    [232, 4130],
+    [290, 4130],
+    [348, 4130],
+    [406, 4130],
+    [464, 4130]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [428, 54],
-   "deslocamento": [-18, -36],
-   "tamanho": [38, 38],
+   "nome": "buriti",
+   "pos": [1180, 760],
+   "deslocamento": [-28, -69],
+   "tamanho": [58, 73],
    "quadros": [
-    [934, 177]
-   ]
+    [1112, 4205],
+    [1171, 4205],
+    [1230, 4205],
+    [1289, 4205],
+    [1348, 4205],
+    [1407, 4205],
+    [1466, 4205],
+    [1525, 4205],
+    [1584, 4205],
+    [1643, 4205],
+    [1702, 4205],
+    [1761, 4205],
+    [1820, 4205],
+    [1879, 4205],
+    [1938, 4205],
+    [0, 4280]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [465, 53],
-   "deslocamento": [-15, -32],
-   "tamanho": [31, 34],
+   "nome": "acai",
+   "pos": [561, 109],
+   "deslocamento": [-41, -69],
+   "tamanho": [76, 73],
    "quadros": [
-    [278, 226]
-   ]
+    [59, 4280],
+    [136, 4280],
+    [213, 4280],
+    [290, 4280],
+    [367, 4280],
+    [444, 4280],
+    [521, 4280],
+    [598, 4280],
+    [675, 4280],
+    [752, 4280],
+    [829, 4280],
+    [906, 4280],
+    [983, 4280],
+    [1060, 4280],
+    [1137, 4280],
+    [1214, 4280]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [485, 45],
-   "deslocamento": [-16, -32],
-   "tamanho": [32, 34],
+   "nome": "embauba",
+   "pos": [613, 75],
+   "deslocamento": [-34, -77],
+   "tamanho": [67, 80],
    "quadros": [
-    [310, 226]
-   ]
+    [1884, 3966]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [533, 50],
-   "deslocamento": [-15, -30],
-   "tamanho": [31, 32],
+   "nome": "embauba",
+   "pos": [693, 76],
+   "deslocamento": [-32, -72],
+   "tamanho": [68, 75],
    "quadros": [
-    [1387, 226]
-   ]
+    [1473, 4051]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [599, 59],
-   "deslocamento": [-14, -29],
-   "tamanho": [28, 31],
+   "nome": "castanheira",
+   "pos": [578, 143],
+   "deslocamento": [-47, -88],
+   "tamanho": [93, 90],
    "quadros": [
-    [1697, 226]
-   ]
+    [1565, 3607]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [376, 95],
-   "deslocamento": [-15, -30],
-   "tamanho": [30, 32],
+   "nome": "embauba",
+   "pos": [678, 135],
+   "deslocamento": [-33, -80],
+   "tamanho": [65, 83],
    "quadros": [
-    [1419, 226]
-   ]
+    [78, 3966]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [392, 79],
-   "deslocamento": [-17, -32],
-   "tamanho": [34, 34],
+   "nome": "embauba",
+   "pos": [754, 164],
+   "deslocamento": [-34, -78],
+   "tamanho": [68, 81],
    "quadros": [
-    [343, 226]
-   ]
+    [1746, 3966]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [444, 90],
-   "deslocamento": [-15, -33],
-   "tamanho": [33, 35],
+   "nome": "acai",
+   "pos": [556, 226],
+   "deslocamento": [-42, -82],
+   "tamanho": [84, 86],
    "quadros": [
-    [1843, 177]
-   ]
+    [990, 3790],
+    [1075, 3790],
+    [1160, 3790],
+    [1245, 3790],
+    [1330, 3790],
+    [1415, 3790],
+    [1500, 3790],
+    [1585, 3790],
+    [1670, 3790],
+    [1755, 3790],
+    [1840, 3790],
+    [1925, 3790],
+    [0, 3879],
+    [85, 3879],
+    [170, 3879],
+    [255, 3879]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [505, 76],
-   "deslocamento": [-16, -32],
-   "tamanho": [33, 34],
+   "nome": "embauba",
+   "pos": [681, 216],
+   "deslocamento": [-36, -79],
+   "tamanho": [65, 82],
    "quadros": [
-    [378, 226]
-   ]
+    [1680, 3966]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [547, 76],
-   "deslocamento": [-18, -34],
-   "tamanho": [35, 36],
+   "nome": "castanheira",
+   "pos": [755, 218],
+   "deslocamento": [-43, -94],
+   "tamanho": [88, 96],
    "quadros": [
-    [1345, 177]
-   ]
+    [924, 3414]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [583, 84],
-   "deslocamento": [-15, -29],
-   "tamanho": [30, 31],
+   "nome": "castanheira",
+   "pos": [443, 266],
+   "deslocamento": [-38, -94],
+   "tamanho": [79, 96],
    "quadros": [
-    [1726, 226]
-   ]
+    [1013, 3414]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [393, 129],
-   "deslocamento": [-19, -36],
-   "tamanho": [37, 38],
+   "nome": "castanheira",
+   "pos": [678, 266],
+   "deslocamento": [-40, -91],
+   "tamanho": [84, 93],
    "quadros": [
-    [973, 177]
-   ]
+    [546, 3511]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [410, 126],
-   "deslocamento": [-16, -32],
-   "tamanho": [31, 34],
+   "nome": "castanheira",
+   "pos": [738, 269],
+   "deslocamento": [-47, -104],
+   "tamanho": [95, 106],
    "quadros": [
-    [412, 226]
-   ]
+    [101, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [453, 123],
-   "deslocamento": [-17, -32],
-   "tamanho": [33, 34],
+   "nome": "acai",
+   "pos": [820, 275],
+   "deslocamento": [-41, -69],
+   "tamanho": [84, 73],
    "quadros": [
-    [444, 226]
-   ]
+    [1291, 4280],
+    [1376, 4280],
+    [1461, 4280],
+    [1546, 4280],
+    [1631, 4280],
+    [1716, 4280],
+    [1801, 4280],
+    [1886, 4280],
+    [0, 4354],
+    [85, 4354],
+    [170, 4354],
+    [255, 4354],
+    [340, 4354],
+    [425, 4354],
+    [510, 4354],
+    [595, 4354]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [489, 122],
-   "deslocamento": [-19, -37],
-   "tamanho": [38, 39],
+   "nome": "acai",
+   "pos": [368, 348],
+   "deslocamento": [-50, -88],
+   "tamanho": [105, 92],
    "quadros": [
-    [858, 177]
-   ]
+    [711, 3511],
+    [817, 3511],
+    [923, 3511],
+    [1029, 3511],
+    [1135, 3511],
+    [1241, 3511],
+    [1347, 3511],
+    [1453, 3511],
+    [1559, 3511],
+    [1665, 3511],
+    [1771, 3511],
+    [1877, 3511],
+    [0, 3607],
+    [106, 3607],
+    [212, 3607],
+    [318, 3607]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [530, 121],
-   "deslocamento": [-16, -32],
-   "tamanho": [32, 34],
+   "nome": "castanheira",
+   "pos": [634, 322],
+   "deslocamento": [-43, -98],
+   "tamanho": [87, 100],
    "quadros": [
-    [478, 226]
-   ]
+    [488, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [310, 161],
-   "deslocamento": [-16, -32],
-   "tamanho": [34, 34],
+   "nome": "embauba",
+   "pos": [705, 312],
+   "deslocamento": [-30, -74],
+   "tamanho": [66, 77],
    "quadros": [
-    [511, 226]
-   ]
+    [73, 4051]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [376, 167],
-   "deslocamento": [-15, -30],
-   "tamanho": [30, 32],
+   "nome": "embauba",
+   "pos": [747, 348],
+   "deslocamento": [-32, -68],
+   "tamanho": [68, 71],
    "quadros": [
-    [1450, 226]
-   ]
+    [1882, 4354]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [400, 157],
-   "deslocamento": [-15, -31],
-   "tamanho": [30, 33],
+   "nome": "castanheira",
+   "pos": [820, 347],
+   "deslocamento": [-39, -91],
+   "tamanho": [79, 93],
    "quadros": [
-    [1074, 226]
-   ]
+    [631, 3511]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [434, 156],
-   "deslocamento": [-16, -32],
-   "tamanho": [33, 34],
+   "nome": "acai",
+   "pos": [263, 399],
+   "deslocamento": [-41, -70],
+   "tamanho": [77, 74],
    "quadros": [
-    [546, 226]
-   ]
+    [522, 4130],
+    [600, 4130],
+    [678, 4130],
+    [756, 4130],
+    [834, 4130],
+    [912, 4130],
+    [990, 4130],
+    [1068, 4130],
+    [1146, 4130],
+    [1224, 4130],
+    [1302, 4130],
+    [1380, 4130],
+    [1458, 4130],
+    [1536, 4130],
+    [1614, 4130],
+    [1692, 4130]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [476, 162],
-   "deslocamento": [-15, -31],
-   "tamanho": [31, 33],
+   "nome": "castanheira",
+   "pos": [324, 398],
+   "deslocamento": [-34, -90],
+   "tamanho": [68, 92],
    "quadros": [
-    [1105, 226]
-   ]
+    [424, 3607]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [519, 151],
-   "deslocamento": [-16, -32],
-   "tamanho": [33, 34],
+   "nome": "acai",
+   "pos": [362, 386],
+   "deslocamento": [-49, -85],
+   "tamanho": [89, 89],
    "quadros": [
-    [580, 226]
-   ]
+    [1822, 3607],
+    [1912, 3607],
+    [0, 3700],
+    [90, 3700],
+    [180, 3700],
+    [270, 3700],
+    [360, 3700],
+    [450, 3700],
+    [540, 3700],
+    [630, 3700],
+    [720, 3700],
+    [810, 3700],
+    [900, 3700],
+    [990, 3700],
+    [1080, 3700],
+    [1170, 3700]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [558, 145],
-   "deslocamento": [-16, -33],
-   "tamanho": [36, 35],
+   "nome": "castanheira",
+   "pos": [666, 392],
+   "deslocamento": [-36, -97],
+   "tamanho": [72, 99],
    "quadros": [
-    [1877, 177]
-   ]
+    [576, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [316, 189],
-   "deslocamento": [-17, -34],
-   "tamanho": [33, 36],
+   "nome": "castanheira",
+   "pos": [812, 401],
+   "deslocamento": [-41, -94],
+   "tamanho": [83, 96],
    "quadros": [
-    [1381, 177]
-   ]
+    [1093, 3414]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [328, 190],
-   "deslocamento": [-17, -33],
-   "tamanho": [33, 35],
+   "nome": "castanheira",
+   "pos": [136, 449],
+   "deslocamento": [-47, -101],
+   "tamanho": [96, 103],
    "quadros": [
-    [1914, 177]
-   ]
+    [294, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [370, 202],
-   "deslocamento": [-17, -32],
-   "tamanho": [31, 34],
+   "nome": "acai",
+   "pos": [220, 469],
+   "deslocamento": [-41, -70],
+   "tamanho": [79, 74],
    "quadros": [
-    [614, 226]
-   ]
+    [1770, 4130],
+    [1850, 4130],
+    [1930, 4130],
+    [0, 4205],
+    [80, 4205],
+    [160, 4205],
+    [240, 4205],
+    [320, 4205],
+    [400, 4205],
+    [480, 4205],
+    [560, 4205],
+    [640, 4205],
+    [720, 4205],
+    [800, 4205],
+    [880, 4205],
+    [960, 4205]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [423, 191],
-   "deslocamento": [-19, -36],
-   "tamanho": [37, 38],
+   "nome": "castanheira",
+   "pos": [277, 443],
+   "deslocamento": [-42, -84],
+   "tamanho": [85, 86],
    "quadros": [
-    [1011, 177]
-   ]
+    [340, 3879]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [443, 193],
-   "deslocamento": [-15, -30],
-   "tamanho": [29, 32],
+   "nome": "castanheira",
+   "pos": [370, 454],
+   "deslocamento": [-40, -96],
+   "tamanho": [82, 98],
    "quadros": [
-    [1481, 226]
-   ]
+    [649, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [502, 197],
-   "deslocamento": [-17, -32],
-   "tamanho": [31, 34],
+   "nome": "castanheira",
+   "pos": [391, 464],
+   "deslocamento": [-47, -96],
+   "tamanho": [94, 98],
    "quadros": [
-    [646, 226]
-   ]
+    [732, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [528, 188],
-   "deslocamento": [-14, -28],
-   "tamanho": [28, 30],
+   "nome": "acai",
+   "pos": [506, 435],
+   "deslocamento": [-41, -73],
+   "tamanho": [78, 77],
    "quadros": [
-    [1989, 226]
-   ]
+    [140, 4051],
+    [219, 4051],
+    [298, 4051],
+    [377, 4051],
+    [456, 4051],
+    [535, 4051],
+    [614, 4051],
+    [693, 4051],
+    [772, 4051],
+    [851, 4051],
+    [930, 4051],
+    [1009, 4051],
+    [1088, 4051],
+    [1167, 4051],
+    [1246, 4051],
+    [1325, 4051]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [564, 201],
-   "deslocamento": [-14, -29],
-   "tamanho": [27, 31],
+   "nome": "castanheira",
+   "pos": [926, 435],
+   "deslocamento": [-37, -93],
+   "tamanho": [77, 95],
    "quadros": [
-    [1757, 226]
-   ]
+    [468, 3511]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [250, 234],
-   "deslocamento": [-15, -29],
-   "tamanho": [29, 31],
+   "nome": "castanheira",
+   "pos": [994, 466],
+   "deslocamento": [-46, -96],
+   "tamanho": [90, 98],
    "quadros": [
-    [1785, 226]
-   ]
+    [827, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [374, 215],
-   "deslocamento": [-17, -33],
-   "tamanho": [34, 35],
+   "nome": "embauba",
+   "pos": [1209, 448],
+   "deslocamento": [-37, -67],
+   "tamanho": [67, 70],
    "quadros": [
-    [1948, 177]
-   ]
+    [980, 4428]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [411, 233],
-   "deslocamento": [-16, -32],
-   "tamanho": [31, 34],
+   "nome": "embauba",
+   "pos": [1233, 450],
+   "deslocamento": [-35, -64],
+   "tamanho": [69, 67],
    "quadros": [
-    [678, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [442, 233],
-   "deslocamento": [-17, -32],
-   "tamanho": [34, 34],
-   "quadros": [
-    [710, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [529, 223],
-   "deslocamento": [-15, -30],
-   "tamanho": [30, 32],
-   "quadros": [
-    [1511, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [539, 224],
-   "deslocamento": [-14, -29],
-   "tamanho": [28, 31],
-   "quadros": [
-    [1815, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [200, 267],
-   "deslocamento": [-15, -31],
-   "tamanho": [29, 33],
-   "quadros": [
-    [1137, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [229, 266],
-   "deslocamento": [-18, -34],
-   "tamanho": [34, 36],
-   "quadros": [
-    [1415, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [280, 250],
-   "deslocamento": [-18, -35],
-   "tamanho": [35, 37],
-   "quadros": [
-    [1085, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [392, 251],
-   "deslocamento": [-18, -35],
-   "tamanho": [36, 37],
-   "quadros": [
-    [1121, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [414, 261],
-   "deslocamento": [-15, -32],
-   "tamanho": [32, 34],
-   "quadros": [
-    [745, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [540, 256],
-   "deslocamento": [-15, -29],
-   "tamanho": [29, 31],
-   "quadros": [
-    [1844, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [598, 248],
-   "deslocamento": [-13, -29],
-   "tamanho": [28, 31],
-   "quadros": [
-    [1874, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [62, 289],
-   "deslocamento": [-15, -32],
-   "tamanho": [32, 34],
-   "quadros": [
-    [778, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [93, 293],
-   "deslocamento": [-16, -34],
-   "tamanho": [33, 36],
-   "quadros": [
-    [1450, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [149, 283],
-   "deslocamento": [-18, -33],
-   "tamanho": [35, 35],
-   "quadros": [
-    [1983, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [160, 284],
-   "deslocamento": [-17, -34],
-   "tamanho": [37, 36],
-   "quadros": [
-    [1484, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [219, 295],
-   "deslocamento": [-17, -34],
-   "tamanho": [34, 36],
-   "quadros": [
-    [1522, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [247, 290],
-   "deslocamento": [-17, -35],
-   "tamanho": [34, 37],
-   "quadros": [
-    [1158, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [280, 293],
-   "deslocamento": [-14, -31],
-   "tamanho": [27, 33],
-   "quadros": [
-    [1167, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [327, 280],
-   "deslocamento": [-20, -37],
-   "tamanho": [36, 39],
-   "quadros": [
-    [897, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [356, 298],
-   "deslocamento": [-14, -29],
-   "tamanho": [27, 31],
-   "quadros": [
-    [1903, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [617, 302],
-   "deslocamento": [-16, -30],
-   "tamanho": [32, 32],
-   "quadros": [
-    [1542, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [673, 300],
-   "deslocamento": [-15, -30],
-   "tamanho": [29, 32],
-   "quadros": [
-    [1575, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [787, 287],
-   "deslocamento": [-14, -31],
-   "tamanho": [31, 33],
-   "quadros": [
-    [1195, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [830, 298],
-   "deslocamento": [-16, -33],
-   "tamanho": [35, 35],
-   "quadros": [
-    [0, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [866, 289],
-   "deslocamento": [-17, -33],
-   "tamanho": [35, 35],
-   "quadros": [
-    [36, 226]
-   ]
+    [0, 4500]
+   ],
+   "transparente": true
   },
   {
    "nome": "arvore_queimada",
-   "pos": [65, 316],
-   "deslocamento": [-7, -24],
-   "tamanho": [13, 26],
+   "pos": [113, 522],
+   "deslocamento": [-10, -38],
+   "tamanho": [21, 40],
    "quadros": [
-    [896, 262],
-    [910, 262],
-    [924, 262],
-    [938, 262],
-    [952, 262],
-    [966, 262],
-    [980, 262],
-    [994, 262],
-    [1008, 262],
-    [1022, 262],
-    [1036, 262],
-    [1050, 262],
-    [1064, 262],
-    [1078, 262],
-    [1092, 262],
-    [1106, 262]
-   ]
+    [232, 4568],
+    [254, 4568],
+    [276, 4568],
+    [298, 4568],
+    [320, 4568],
+    [342, 4568],
+    [364, 4568],
+    [386, 4568],
+    [408, 4568],
+    [430, 4568],
+    [452, 4568],
+    [474, 4568],
+    [496, 4568],
+    [518, 4568],
+    [540, 4568],
+    [562, 4568]
+   ],
+   "mostrar": "nao_concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [152, 316],
-   "deslocamento": [-16, -33],
-   "tamanho": [31, 35],
+   "nome": "arvore_rebrota",
+   "pos": [113, 522],
+   "deslocamento": [-13, -42],
+   "tamanho": [26, 44],
    "quadros": [
-    [72, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [182, 321],
-   "deslocamento": [-16, -32],
-   "tamanho": [33, 34],
-   "quadros": [
-    [811, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [231, 325],
-   "deslocamento": [-18, -35],
-   "tamanho": [37, 37],
-   "quadros": [
-    [1193, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [267, 333],
-   "deslocamento": [-16, -32],
-   "tamanho": [32, 34],
-   "quadros": [
-    [845, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [315, 325],
-   "deslocamento": [-18, -33],
-   "tamanho": [37, 35],
-   "quadros": [
-    [104, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [347, 331],
-   "deslocamento": [-18, -36],
-   "tamanho": [35, 38],
-   "quadros": [
-    [1049, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [389, 331],
-   "deslocamento": [-17, -34],
-   "tamanho": [35, 36],
-   "quadros": [
-    [1557, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [562, 332],
-   "deslocamento": [-13, -28],
-   "tamanho": [27, 30],
-   "quadros": [
-    [2018, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [599, 322],
-   "deslocamento": [-14, -29],
-   "tamanho": [30, 31],
-   "quadros": [
-    [1931, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [646, 334],
-   "deslocamento": [-17, -34],
-   "tamanho": [32, 36],
-   "quadros": [
-    [1593, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [690, 331],
-   "deslocamento": [-16, -31],
-   "tamanho": [32, 33],
-   "quadros": [
-    [1227, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [713, 322],
-   "deslocamento": [-15, -32],
-   "tamanho": [32, 34],
-   "quadros": [
-    [878, 226]
-   ]
+    [1625, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
   },
   {
    "nome": "arvore_queimada",
-   "pos": [109, 365],
-   "deslocamento": [-8, -24],
-   "tamanho": [14, 26],
+   "pos": [168, 516],
+   "deslocamento": [-12, -38],
+   "tamanho": [20, 40],
    "quadros": [
-    [1120, 262],
-    [1135, 262],
-    [1150, 262],
-    [1165, 262],
-    [1180, 262],
-    [1195, 262],
-    [1210, 262],
-    [1225, 262],
-    [1240, 262],
-    [1255, 262],
-    [1270, 262],
-    [1285, 262],
-    [1300, 262],
-    [1315, 262],
-    [1330, 262],
-    [1345, 262]
-   ]
+    [584, 4568],
+    [605, 4568],
+    [626, 4568],
+    [647, 4568],
+    [668, 4568],
+    [689, 4568],
+    [710, 4568],
+    [731, 4568],
+    [752, 4568],
+    [773, 4568],
+    [794, 4568],
+    [815, 4568],
+    [836, 4568],
+    [857, 4568],
+    [878, 4568],
+    [899, 4568]
+   ],
+   "mostrar": "nao_concluiu:fase1"
+  },
+  {
+   "nome": "arvore_rebrota",
+   "pos": [168, 516],
+   "deslocamento": [-15, -42],
+   "tamanho": [26, 44],
+   "quadros": [
+    [1652, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
+  },
+  {
+   "nome": "embauba",
+   "pos": [238, 494],
+   "deslocamento": [-38, -73],
+   "tamanho": [68, 76],
+   "quadros": [
+    [1404, 4051]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [314, 515],
+   "deslocamento": [-34, -85],
+   "tamanho": [71, 87],
+   "quadros": [
+    [918, 3790]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [390, 519],
+   "deslocamento": [-35, -76],
+   "tamanho": [72, 78],
+   "quadros": [
+    [0, 4051]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [469, 522],
+   "deslocamento": [-40, -82],
+   "tamanho": [82, 84],
+   "quadros": [
+    [1931, 3879]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [544, 502],
+   "deslocamento": [-41, -83],
+   "tamanho": [85, 85],
+   "quadros": [
+    [1845, 3879]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [588, 514],
+   "deslocamento": [-36, -88],
+   "tamanho": [72, 90],
+   "quadros": [
+    [1659, 3607]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [869, 523],
+   "deslocamento": [-40, -95],
+   "tamanho": [83, 97],
+   "quadros": [
+    [1101, 3206]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [961, 497],
+   "deslocamento": [-47, -104],
+   "tamanho": [96, 106],
+   "quadros": [
+    [197, 3206]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "embauba",
+   "pos": [991, 499],
+   "deslocamento": [-31, -70],
+   "tamanho": [66, 73],
+   "quadros": [
+    [680, 4354]
+   ],
+   "transparente": true
   },
   {
    "nome": "arvore_queimada",
-   "pos": [145, 351],
-   "deslocamento": [-7, -24],
-   "tamanho": [13, 26],
+   "pos": [117, 553],
+   "deslocamento": [-10, -38],
+   "tamanho": [21, 40],
    "quadros": [
-    [1360, 262],
-    [1374, 262],
-    [1388, 262],
-    [1402, 262],
-    [1416, 262],
-    [1430, 262],
-    [1444, 262],
-    [1458, 262],
-    [1472, 262],
-    [1486, 262],
-    [1500, 262],
-    [1514, 262],
-    [1528, 262],
-    [1542, 262],
-    [1556, 262],
-    [1570, 262]
-   ]
+    [920, 4568],
+    [942, 4568],
+    [964, 4568],
+    [986, 4568],
+    [1008, 4568],
+    [1030, 4568],
+    [1052, 4568],
+    [1074, 4568],
+    [1096, 4568],
+    [1118, 4568],
+    [1140, 4568],
+    [1162, 4568],
+    [1184, 4568],
+    [1206, 4568],
+    [1228, 4568],
+    [1250, 4568]
+   ],
+   "mostrar": "nao_concluiu:fase1"
+  },
+  {
+   "nome": "arvore_rebrota",
+   "pos": [117, 553],
+   "deslocamento": [-13, -42],
+   "tamanho": [27, 44],
+   "quadros": [
+    [1679, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
   },
   {
    "nome": "arvore_queimada",
-   "pos": [195, 356],
-   "deslocamento": [-8, -24],
-   "tamanho": [13, 26],
+   "pos": [185, 573],
+   "deslocamento": [-10, -38],
+   "tamanho": [20, 40],
    "quadros": [
-    [1584, 262],
-    [1598, 262],
-    [1612, 262],
-    [1626, 262],
-    [1640, 262],
-    [1654, 262],
-    [1668, 262],
-    [1682, 262],
-    [1696, 262],
-    [1710, 262],
-    [1724, 262],
-    [1738, 262],
-    [1752, 262],
-    [1766, 262],
-    [1780, 262],
-    [1794, 262]
-   ]
+    [1272, 4568],
+    [1293, 4568],
+    [1314, 4568],
+    [1335, 4568],
+    [1356, 4568],
+    [1377, 4568],
+    [1398, 4568],
+    [1419, 4568],
+    [1440, 4568],
+    [1461, 4568],
+    [1482, 4568],
+    [1503, 4568],
+    [1524, 4568],
+    [1545, 4568],
+    [1566, 4568],
+    [1587, 4568]
+   ],
+   "mostrar": "nao_concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [323, 362],
-   "deslocamento": [-16, -32],
-   "tamanho": [31, 34],
+   "nome": "arvore_rebrota",
+   "pos": [185, 573],
+   "deslocamento": [-13, -42],
+   "tamanho": [26, 44],
    "quadros": [
-    [911, 226]
-   ]
+    [1707, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [361, 371],
-   "deslocamento": [-18, -34],
-   "tamanho": [35, 36],
+   "nome": "embauba",
+   "pos": [423, 581],
+   "deslocamento": [-32, -68],
+   "tamanho": [67, 71],
    "quadros": [
-    [1626, 177]
-   ]
+    [1951, 4354]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [413, 359],
-   "deslocamento": [-17, -33],
-   "tamanho": [33, 35],
+   "nome": "castanheira",
+   "pos": [487, 573],
+   "deslocamento": [-35, -84],
+   "tamanho": [72, 86],
    "quadros": [
-    [142, 226]
-   ]
+    [426, 3879]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [554, 361],
-   "deslocamento": [-15, -33],
-   "tamanho": [32, 35],
+   "nome": "embauba",
+   "pos": [912, 565],
+   "deslocamento": [-32, -71],
+   "tamanho": [71, 74],
    "quadros": [
-    [176, 226]
-   ]
+    [1040, 4205]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [575, 350],
-   "deslocamento": [-14, -30],
-   "tamanho": [28, 32],
+   "nome": "acai",
+   "pos": [970, 571],
+   "deslocamento": [-49, -84],
+   "tamanho": [101, 88],
    "quadros": [
-    [1605, 226]
-   ]
+    [1260, 3700],
+    [1362, 3700],
+    [1464, 3700],
+    [1566, 3700],
+    [1668, 3700],
+    [1770, 3700],
+    [1872, 3700],
+    [0, 3790],
+    [102, 3790],
+    [204, 3790],
+    [306, 3790],
+    [408, 3790],
+    [510, 3790],
+    [612, 3790],
+    [714, 3790],
+    [816, 3790]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [616, 365],
-   "deslocamento": [-18, -34],
-   "tamanho": [35, 36],
+   "nome": "castanheira",
+   "pos": [1070, 556],
+   "deslocamento": [-36, -95],
+   "tamanho": [73, 97],
    "quadros": [
-    [1662, 177]
-   ]
+    [1185, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [660, 362],
-   "deslocamento": [-16, -31],
-   "tamanho": [31, 33],
+   "nome": "acai",
+   "pos": [1096, 557],
+   "deslocamento": [-41, -82],
+   "tamanho": [78, 86],
    "quadros": [
-    [1260, 226]
-   ]
-  },
-  {
-   "nome": "arvore_queimada",
-   "pos": [78, 386],
-   "deslocamento": [-8, -24],
-   "tamanho": [13, 26],
-   "quadros": [
-    [1808, 262],
-    [1822, 262],
-    [1836, 262],
-    [1850, 262],
-    [1864, 262],
-    [1878, 262],
-    [1892, 262],
-    [1906, 262],
-    [1920, 262],
-    [1934, 262],
-    [1948, 262],
-    [1962, 262],
-    [1976, 262],
-    [1990, 262],
-    [2004, 262],
-    [2018, 262]
-   ]
-  },
-  {
-   "nome": "arvore_queimada",
-   "pos": [103, 387],
-   "deslocamento": [-8, -26],
-   "tamanho": [17, 28],
-   "quadros": [
-    [0, 262],
-    [18, 262],
-    [36, 262],
-    [54, 262],
-    [72, 262],
-    [90, 262],
-    [108, 262],
-    [126, 262],
-    [144, 262],
-    [162, 262],
-    [180, 262],
-    [198, 262],
-    [216, 262],
-    [234, 262],
-    [252, 262],
-    [270, 262]
-   ]
+    [499, 3879],
+    [578, 3879],
+    [657, 3879],
+    [736, 3879],
+    [815, 3879],
+    [894, 3879],
+    [973, 3879],
+    [1052, 3879],
+    [1131, 3879],
+    [1210, 3879],
+    [1289, 3879],
+    [1368, 3879],
+    [1447, 3879],
+    [1526, 3879],
+    [1605, 3879],
+    [1684, 3879]
+   ],
+   "transparente": true
   },
   {
    "nome": "arvore_queimada",
-   "pos": [164, 393],
-   "deslocamento": [-7, -24],
-   "tamanho": [14, 26],
+   "pos": [376, 612],
+   "deslocamento": [-11, -38],
+   "tamanho": [20, 40],
    "quadros": [
-    [2032, 262],
-    [0, 291],
-    [15, 291],
-    [30, 291],
-    [45, 291],
-    [60, 291],
-    [75, 291],
-    [90, 291],
-    [105, 291],
-    [120, 291],
-    [135, 291],
-    [150, 291],
-    [165, 291],
-    [180, 291],
-    [195, 291],
-    [210, 291]
-   ]
+    [1608, 4568],
+    [1629, 4568],
+    [1650, 4568],
+    [1671, 4568],
+    [1692, 4568],
+    [1713, 4568],
+    [1734, 4568],
+    [1755, 4568],
+    [1776, 4568],
+    [1797, 4568],
+    [1818, 4568],
+    [1839, 4568],
+    [1860, 4568],
+    [1881, 4568],
+    [1902, 4568],
+    [1923, 4568]
+   ],
+   "mostrar": "nao_concluiu:fase1"
+  },
+  {
+   "nome": "arvore_rebrota",
+   "pos": [376, 612],
+   "deslocamento": [-11, -42],
+   "tamanho": [23, 44],
+   "quadros": [
+    [1734, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
+  },
+  {
+   "nome": "embauba",
+   "pos": [1070, 611],
+   "deslocamento": [-34, -64],
+   "tamanho": [68, 67],
+   "quadros": [
+    [70, 4500]
+   ],
+   "transparente": true
   },
   {
    "nome": "arvore_queimada",
-   "pos": [234, 394],
-   "deslocamento": [-6, -24],
-   "tamanho": [14, 26],
+   "pos": [506, 709],
+   "deslocamento": [-12, -38],
+   "tamanho": [20, 40],
    "quadros": [
-    [225, 291],
-    [240, 291],
-    [255, 291],
-    [270, 291],
-    [285, 291],
-    [300, 291],
-    [315, 291],
-    [330, 291],
-    [345, 291],
-    [360, 291],
-    [375, 291],
-    [390, 291],
-    [405, 291],
-    [420, 291],
-    [435, 291],
-    [450, 291]
-   ]
+    [1944, 4568],
+    [1965, 4568],
+    [1986, 4568],
+    [2007, 4568],
+    [2028, 4568],
+    [0, 4611],
+    [21, 4611],
+    [42, 4611],
+    [63, 4611],
+    [84, 4611],
+    [105, 4611],
+    [126, 4611],
+    [147, 4611],
+    [168, 4611],
+    [189, 4611],
+    [210, 4611]
+   ],
+   "mostrar": "nao_concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [268, 389],
-   "deslocamento": [-15, -30],
-   "tamanho": [30, 32],
+   "nome": "arvore_rebrota",
+   "pos": [506, 709],
+   "deslocamento": [-15, -42],
+   "tamanho": [26, 44],
    "quadros": [
-    [1634, 226]
-   ]
+    [1758, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [298, 387],
-   "deslocamento": [-17, -32],
-   "tamanho": [34, 34],
+   "nome": "acai",
+   "pos": [542, 700],
+   "deslocamento": [-48, -79],
+   "tamanho": [95, 83],
    "quadros": [
-    [943, 226]
-   ]
+    [144, 3966],
+    [240, 3966],
+    [336, 3966],
+    [432, 3966],
+    [528, 3966],
+    [624, 3966],
+    [720, 3966],
+    [816, 3966],
+    [912, 3966],
+    [1008, 3966],
+    [1104, 3966],
+    [1200, 3966],
+    [1296, 3966],
+    [1392, 3966],
+    [1488, 3966],
+    [1584, 3966]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [349, 403],
-   "deslocamento": [-16, -31],
-   "tamanho": [33, 33],
+   "nome": "castanheira",
+   "pos": [610, 700],
+   "deslocamento": [-38, -82],
+   "tamanho": [77, 84],
    "quadros": [
-    [1292, 226]
-   ]
+    [0, 3966]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [600, 405],
-   "deslocamento": [-16, -34],
-   "tamanho": [34, 36],
+   "nome": "castanheira",
+   "pos": [678, 683],
+   "deslocamento": [-39, -84],
+   "tamanho": [81, 86],
    "quadros": [
-    [1698, 177]
-   ]
+    [1763, 3879]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [652, 383],
-   "deslocamento": [-16, -32],
-   "tamanho": [31, 34],
+   "nome": "castanheira",
+   "pos": [764, 704],
+   "deslocamento": [-47, -100],
+   "tamanho": [96, 102],
    "quadros": [
-    [978, 226]
-   ]
+    [391, 3206]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore_queimada",
-   "pos": [178, 422],
-   "deslocamento": [-6, -26],
-   "tamanho": [18, 28],
+   "nome": "embauba",
+   "pos": [843, 698],
+   "deslocamento": [-37, -67],
+   "tamanho": [68, 70],
    "quadros": [
-    [288, 262],
-    [307, 262],
-    [326, 262],
-    [345, 262],
-    [364, 262],
-    [383, 262],
-    [402, 262],
-    [421, 262],
-    [440, 262],
-    [459, 262],
-    [478, 262],
-    [497, 262],
-    [516, 262],
-    [535, 262],
-    [554, 262],
-    [573, 262]
-   ]
+    [1048, 4428]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore_queimada",
-   "pos": [202, 416],
-   "deslocamento": [-7, -26],
-   "tamanho": [18, 28],
+   "nome": "embauba",
+   "pos": [888, 684],
+   "deslocamento": [-31, -72],
+   "tamanho": [68, 75],
    "quadros": [
-    [592, 262],
-    [611, 262],
-    [630, 262],
-    [649, 262],
-    [668, 262],
-    [687, 262],
-    [706, 262],
-    [725, 262],
-    [744, 262],
-    [763, 262],
-    [782, 262],
-    [801, 262],
-    [820, 262],
-    [839, 262],
-    [858, 262],
-    [877, 262]
-   ]
+    [1542, 4051]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [544, 423],
-   "deslocamento": [-16, -34],
-   "tamanho": [36, 36],
+   "nome": "embauba",
+   "pos": [1056, 700],
+   "deslocamento": [-35, -76],
+   "tamanho": [66, 79],
    "quadros": [
-    [1733, 177]
-   ]
+    [1952, 3966]
+   ],
+   "transparente": true
   },
   {
-   "nome": "arvore",
-   "pos": [349, 455],
-   "deslocamento": [-14, -31],
-   "tamanho": [29, 33],
+   "nome": "embauba",
+   "pos": [1124, 690],
+   "deslocamento": [-31, -78],
+   "tamanho": [68, 81],
    "quadros": [
-    [1326, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [378, 457],
-   "deslocamento": [-17, -35],
-   "tamanho": [34, 37],
-   "quadros": [
-    [1231, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [431, 461],
-   "deslocamento": [-14, -29],
-   "tamanho": [26, 31],
-   "quadros": [
-    [1962, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [450, 465],
-   "deslocamento": [-19, -35],
-   "tamanho": [38, 37],
-   "quadros": [
-    [1266, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [488, 465],
-   "deslocamento": [-18, -34],
-   "tamanho": [34, 36],
-   "quadros": [
-    [1770, 177]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [541, 458],
-   "deslocamento": [-17, -33],
-   "tamanho": [33, 35],
-   "quadros": [
-    [209, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [584, 466],
-   "deslocamento": [-14, -30],
-   "tamanho": [31, 32],
-   "quadros": [
-    [1665, 226]
-   ]
-  },
-  {
-   "nome": "arvore",
-   "pos": [619, 461],
-   "deslocamento": [-16, -32],
-   "tamanho": [31, 34],
-   "quadros": [
-    [1010, 226]
-   ]
+    [1815, 3966]
+   ],
+   "transparente": true
   },
   {
    "nome": "arvore_queimada",
-   "pos": [297, 498],
-   "deslocamento": [-7, -24],
-   "tamanho": [13, 26],
+   "pos": [215, 744],
+   "deslocamento": [-12, -38],
+   "tamanho": [19, 40],
    "quadros": [
-    [465, 291],
-    [479, 291],
-    [493, 291],
-    [507, 291],
-    [521, 291],
-    [535, 291],
-    [549, 291],
-    [563, 291],
-    [577, 291],
-    [591, 291],
-    [605, 291],
-    [619, 291],
-    [633, 291],
-    [647, 291],
-    [661, 291],
-    [675, 291]
-   ]
+    [231, 4611],
+    [251, 4611],
+    [271, 4611],
+    [291, 4611],
+    [311, 4611],
+    [331, 4611],
+    [351, 4611],
+    [371, 4611],
+    [391, 4611],
+    [411, 4611],
+    [431, 4611],
+    [451, 4611],
+    [471, 4611],
+    [491, 4611],
+    [511, 4611],
+    [531, 4611]
+   ],
+   "mostrar": "nao_concluiu:fase1"
+  },
+  {
+   "nome": "arvore_rebrota",
+   "pos": [215, 744],
+   "deslocamento": [-15, -42],
+   "tamanho": [25, 44],
+   "quadros": [
+    [1785, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
   },
   {
    "nome": "arvore_queimada",
-   "pos": [309, 497],
-   "deslocamento": [-8, -24],
-   "tamanho": [14, 26],
+   "pos": [324, 755],
+   "deslocamento": [-11, -40],
+   "tamanho": [25, 42],
    "quadros": [
-    [689, 291],
-    [704, 291],
-    [719, 291],
-    [734, 291],
-    [749, 291],
-    [764, 291],
-    [779, 291],
-    [794, 291],
-    [809, 291],
-    [824, 291],
-    [839, 291],
-    [854, 291],
-    [869, 291],
-    [884, 291],
-    [899, 291],
-    [914, 291]
-   ]
+    [1836, 4500],
+    [1862, 4500],
+    [1888, 4500],
+    [1914, 4500],
+    [1940, 4500],
+    [1966, 4500],
+    [1992, 4500],
+    [2018, 4500],
+    [0, 4568],
+    [26, 4568],
+    [52, 4568],
+    [78, 4568],
+    [104, 4568],
+    [130, 4568],
+    [156, 4568],
+    [182, 4568]
+   ],
+   "mostrar": "nao_concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [375, 503],
-   "deslocamento": [-19, -35],
-   "tamanho": [39, 37],
+   "nome": "arvore_rebrota",
+   "pos": [324, 755],
+   "deslocamento": [-14, -39],
+   "tamanho": [23, 41],
    "quadros": [
-    [1305, 177]
-   ]
+    [208, 4568]
+   ],
+   "mostrar": "concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [398, 503],
-   "deslocamento": [-15, -31],
-   "tamanho": [30, 33],
+   "nome": "arvore_queimada",
+   "pos": [395, 747],
+   "deslocamento": [-9, -38],
+   "tamanho": [21, 40],
    "quadros": [
-    [1356, 226]
-   ]
+    [551, 4611],
+    [573, 4611],
+    [595, 4611],
+    [617, 4611],
+    [639, 4611],
+    [661, 4611],
+    [683, 4611],
+    [705, 4611],
+    [727, 4611],
+    [749, 4611],
+    [771, 4611],
+    [793, 4611],
+    [815, 4611],
+    [837, 4611],
+    [859, 4611],
+    [881, 4611]
+   ],
+   "mostrar": "nao_concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [524, 494],
-   "deslocamento": [-18, -33],
-   "tamanho": [34, 35],
+   "nome": "arvore_rebrota",
+   "pos": [395, 747],
+   "deslocamento": [-9, -42],
+   "tamanho": [24, 44],
    "quadros": [
-    [243, 226]
-   ]
+    [1811, 4500]
+   ],
+   "mostrar": "concluiu:fase1"
   },
   {
-   "nome": "arvore",
-   "pos": [556, 496],
-   "deslocamento": [-18, -34],
-   "tamanho": [37, 36],
+   "nome": "castanheira",
+   "pos": [611, 748],
+   "deslocamento": [-44, -96],
+   "tamanho": [89, 98],
    "quadros": [
-    [1805, 177]
-   ]
+    [918, 3206]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "embauba",
+   "pos": [818, 731],
+   "deslocamento": [-36, -68],
+   "tamanho": [67, 71],
+   "quadros": [
+    [0, 4428]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [874, 751],
+   "deslocamento": [-42, -94],
+   "tamanho": [86, 96],
+   "quadros": [
+    [1177, 3414]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [915, 733],
+   "deslocamento": [-45, -88],
+   "tamanho": [89, 90],
+   "quadros": [
+    [1732, 3607]
+   ],
+   "transparente": true
+  },
+  {
+   "nome": "castanheira",
+   "pos": [1071, 753],
+   "deslocamento": [-47, -96],
+   "tamanho": [92, 98],
+   "quadros": [
+    [1008, 3206]
+   ],
+   "transparente": true
   },
   {
    "nome": "bandeira_mula",
-   "pos": [264, 426],
+   "pos": [395, 637],
    "deslocamento": [0, -23],
    "tamanho": [14, 24],
    "quadros": [
-    [929, 291],
-    [944, 291],
-    [959, 291],
-    [974, 291],
-    [989, 291],
-    [1004, 291],
-    [1019, 291],
-    [1034, 291],
-    [1049, 291],
-    [1064, 291],
-    [1079, 291],
-    [1094, 291],
-    [1109, 291],
-    [1124, 291],
-    [1139, 291],
-    [1154, 291]
+    [2007, 4611],
+    [2022, 4611],
+    [0, 4652],
+    [15, 4652],
+    [30, 4652],
+    [45, 4652],
+    [60, 4652],
+    [75, 4652],
+    [90, 4652],
+    [105, 4652],
+    [120, 4652],
+    [135, 4652],
+    [150, 4652],
+    [165, 4652],
+    [180, 4652],
+    [195, 4652]
    ],
    "mostrar": "concluiu:fase1"
   },
   {
    "nome": "bandeira_cuca",
-   "pos": [334, 246],
+   "pos": [500, 370],
    "deslocamento": [0, -23],
    "tamanho": [14, 24],
    "quadros": [
-    [1169, 291],
-    [1184, 291],
-    [1199, 291],
-    [1214, 291],
-    [1229, 291],
-    [1244, 291],
-    [1259, 291],
-    [1274, 291],
-    [1289, 291],
-    [1304, 291],
-    [1319, 291],
-    [1334, 291],
-    [1349, 291],
-    [1364, 291],
-    [1379, 291],
-    [1394, 291]
+    [210, 4652],
+    [225, 4652],
+    [240, 4652],
+    [255, 4652],
+    [270, 4652],
+    [285, 4652],
+    [300, 4652],
+    [315, 4652],
+    [330, 4652],
+    [345, 4652],
+    [360, 4652],
+    [375, 4652],
+    [390, 4652],
+    [405, 4652],
+    [420, 4652],
+    [435, 4652]
    ],
    "mostrar": "concluiu:fase2"
   },
   {
    "nome": "bandeira_boto",
-   "pos": [644, 429],
+   "pos": [1094, 614],
    "deslocamento": [0, -23],
    "tamanho": [14, 24],
    "quadros": [
-    [1409, 291],
-    [1424, 291],
-    [1439, 291],
-    [1454, 291],
-    [1469, 291],
-    [1484, 291],
-    [1499, 291],
-    [1514, 291],
-    [1529, 291],
-    [1544, 291],
-    [1559, 291],
-    [1574, 291],
-    [1589, 291],
-    [1604, 291],
-    [1619, 291],
-    [1634, 291]
+    [450, 4652],
+    [465, 4652],
+    [480, 4652],
+    [495, 4652],
+    [510, 4652],
+    [525, 4652],
+    [540, 4652],
+    [555, 4652],
+    [570, 4652],
+    [585, 4652],
+    [600, 4652],
+    [615, 4652],
+    [630, 4652],
+    [645, 4652],
+    [660, 4652],
+    [675, 4652]
    ],
    "mostrar": "concluiu:fase3"
   },
   {
    "nome": "bandeira_maquina",
-   "pos": [830, 166],
+   "pos": [1244, 249],
    "deslocamento": [0, -23],
    "tamanho": [14, 24],
    "quadros": [
-    [1649, 291],
-    [1664, 291],
-    [1679, 291],
-    [1694, 291],
-    [1709, 291],
-    [1724, 291],
-    [1739, 291],
-    [1754, 291],
-    [1769, 291],
-    [1784, 291],
-    [1799, 291],
-    [1814, 291],
-    [1829, 291],
-    [1844, 291],
-    [1859, 291],
-    [1874, 291]
+    [690, 4652],
+    [705, 4652],
+    [720, 4652],
+    [735, 4652],
+    [750, 4652],
+    [765, 4652],
+    [780, 4652],
+    [795, 4652],
+    [810, 4652],
+    [825, 4652],
+    [840, 4652],
+    [855, 4652],
+    [870, 4652],
+    [885, 4652],
+    [900, 4652],
+    [915, 4652]
    ],
    "mostrar": "concluiu:boss"
+  },
+  {
+   "nome": "mula_livre",
+   "pos": [250, 612],
+   "deslocamento": [-48, -107],
+   "tamanho": [100, 110],
+   "quadros": [
+    [504, 3092],
+    [605, 3092],
+    [706, 3092],
+    [807, 3092],
+    [908, 3092],
+    [1009, 3092],
+    [1110, 3092],
+    [1211, 3092],
+    [1312, 3092],
+    [1413, 3092],
+    [1514, 3092],
+    [1615, 3092],
+    [1716, 3092],
+    [1817, 3092],
+    [1918, 3092],
+    [0, 3206]
+   ],
+   "mostrar": "concluiu:fase1"
+  },
+  {
+   "nome": "cuca_livre",
+   "pos": [536, 318],
+   "deslocamento": [-26, -110],
+   "tamanho": [62, 113],
+   "quadros": [
+    [1488, 2914],
+    [1551, 2914],
+    [1614, 2914],
+    [1677, 2914],
+    [1740, 2914],
+    [1803, 2914],
+    [1866, 2914],
+    [1929, 2914],
+    [0, 3092],
+    [63, 3092],
+    [126, 3092],
+    [189, 3092],
+    [252, 3092],
+    [315, 3092],
+    [378, 3092],
+    [441, 3092]
+   ],
+   "mostrar": "concluiu:fase2"
+  },
+  {
+   "nome": "boto_livre",
+   "pos": [1230, 670],
+   "deslocamento": [-37, -81],
+   "tamanho": [66, 91],
+   "quadros": [
+    [493, 3607],
+    [560, 3607],
+    [627, 3607],
+    [694, 3607],
+    [761, 3607],
+    [828, 3607],
+    [895, 3607],
+    [962, 3607],
+    [1029, 3607],
+    [1096, 3607],
+    [1163, 3607],
+    [1230, 3607],
+    [1297, 3607],
+    [1364, 3607],
+    [1431, 3607],
+    [1498, 3607]
+   ],
+   "mostrar": "concluiu:fase3"
+  },
+  {
+   "nome": "fogo_mata",
+   "pos": [0, 565],
+   "deslocamento": [0, 16],
+   "tamanho": [338, 229],
+   "quadros": [
+    [786, 1974],
+    [1125, 1974],
+    [1464, 1974],
+    [0, 2224],
+    [339, 2224],
+    [678, 2224],
+    [1017, 2224],
+    [1356, 2224],
+    [1695, 2224],
+    [0, 2454],
+    [339, 2454],
+    [678, 2454],
+    [1017, 2454],
+    [1356, 2454],
+    [1695, 2454],
+    [0, 2684]
+   ],
+   "mostrar": "nao_concluiu:fase1",
+   "z": -9
+  },
+  {
+   "nome": "brasas",
+   "pos": [0, 450],
+   "deslocamento": [56, 19],
+   "tamanho": [475, 300],
+   "quadros": [
+    [1064, 748],
+    [1540, 748],
+    [0, 1122],
+    [476, 1122],
+    [952, 1122],
+    [1428, 1122],
+    [0, 1423],
+    [476, 1423]
+   ],
+   "mostrar": "nao_concluiu:fase1",
+   "z": -9
+  },
+  {
+   "nome": "fumaca_mata",
+   "pos": [0, 460],
+   "deslocamento": [0, 63],
+   "tamanho": [392, 249],
+   "quadros": [
+    [1427, 1423],
+    [0, 1724],
+    [393, 1724],
+    [786, 1724],
+    [1179, 1724],
+    [1572, 1724],
+    [0, 1974],
+    [393, 1974]
+   ],
+   "mostrar": "nao_concluiu:fase1",
+   "z": 9
+  },
+  {
+   "nome": "brotos",
+   "pos": [0, 450],
+   "deslocamento": [52, 20],
+   "tamanho": [474, 283],
+   "quadros": [
+    [952, 1423]
+   ],
+   "mostrar": "concluiu:fase1",
+   "z": -9
+  },
+  {
+   "nome": "luz_caldeirao",
+   "pos": [240, 144],
+   "deslocamento": [0, 4],
+   "tamanho": [185, 177],
+   "quadros": [
+    [533, 2684],
+    [719, 2684],
+    [905, 2684],
+    [1091, 2684],
+    [1277, 2684],
+    [1463, 2684],
+    [1649, 2684],
+    [1835, 2684],
+    [0, 2914],
+    [186, 2914],
+    [372, 2914],
+    [558, 2914],
+    [744, 2914],
+    [930, 2914],
+    [1116, 2914],
+    [1302, 2914]
+   ],
+   "mostrar": "nao_concluiu:fase2",
+   "z": -9
+  },
+  {
+   "nome": "nevoa",
+   "pos": [0, 0],
+   "deslocamento": [0, 8],
+   "tamanho": [531, 373],
+   "quadros": [
+    [0, 0],
+    [532, 0],
+    [1064, 0],
+    [0, 374],
+    [532, 374],
+    [1064, 374],
+    [0, 748],
+    [532, 748]
+   ],
+   "mostrar": "nao_concluiu:fase2",
+   "z": 9
+  },
+  {
+   "nome": "boto_possuido",
+   "pos": [1192, 616],
+   "deslocamento": [6, 8],
+   "tamanho": [68, 30],
+   "quadros": [
+    [903, 4611],
+    [972, 4611],
+    [1041, 4611],
+    [1110, 4611],
+    [1179, 4611],
+    [1248, 4611],
+    [1317, 4611],
+    [1386, 4611],
+    [1455, 4611],
+    [1524, 4611],
+    [1593, 4611],
+    [1662, 4611],
+    [1731, 4611],
+    [1800, 4611],
+    [1869, 4611],
+    [1938, 4611]
+   ],
+   "mostrar": "nao_concluiu:fase3",
+   "z": -9
+  },
+  {
+   "nome": "fumaca_chamine",
+   "pos": [1310, -40],
+   "deslocamento": [15, 13],
+   "tamanho": [35, 52],
+   "quadros": [
+    [1049, 4500],
+    [1085, 4500],
+    [1121, 4500],
+    [1157, 4500],
+    [1193, 4500],
+    [1229, 4500],
+    [1265, 4500],
+    [1301, 4500],
+    [1337, 4500],
+    [1373, 4500],
+    [1409, 4500],
+    [1445, 4500],
+    [1481, 4500],
+    [1517, 4500],
+    [1553, 4500],
+    [1589, 4500]
+   ],
+   "z": 9
   }
  ]
 }

@@ -2,6 +2,17 @@
 
 [ext_resource type="Script" uid="uid://ckxtddml047wj" path="res://scripts/tela_derrota.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/derrota_carta.png" id="2_carta"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/derrota_chip.png" id="3_chip"]
+[ext_resource type="Script" path="res://scripts/trilha_derrota.gd" id="4_trilha"]
+[ext_resource type="SpriteFrames" path="res://assets/pixel/curupira_mapa/curupira_mapa_frames.tres" id="5_quadros"]
+
+[sub_resource type="StyleBoxEmpty" id="estilo_vazio"]
+
+[sub_resource type="StyleBoxFlat" id="estilo_foco"]
+bg_color = Color(0.29, 0.21, 0.16, 0.16)
+border_width_bottom = 4
+border_color = Color(0.78, 0.12, 0.08, 1)
 
 [node name="TelaDerrota" type="CanvasLayer"]
 process_mode = 3
@@ -14,51 +25,121 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.05, 0.02, 0.72)
+color = Color(0.02, 0.05, 0.02, 0.84)
 
-[node name="Painel" type="PanelContainer" parent="."]
+[node name="Titulo" type="Label" parent="."]
 texture_filter = 1
-custom_minimum_size = Vector2(600, 0)
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 108.0
+offset_bottom = 180.0
+grow_horizontal = 2
+theme = ExtResource("t_tema")
+theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
+theme_override_font_sizes/font_size = 60
+text = "Você foi derrotado!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Carta" type="TextureRect" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -348.0
+offset_right = 300.0
+offset_bottom = 436.0
 grow_horizontal = 2
 grow_vertical = 2
 theme = ExtResource("t_tema")
+texture = ExtResource("2_carta")
 
-[node name="Caixa" type="VBoxContainer" parent="Painel"]
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="Titulo" type="Label" parent="Painel/Caixa"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.4, 0.16, 1)
-theme_override_font_sizes/font_size = 60
-text = "Você foi derrotado!"
-horizontal_alignment = 1
-
-[node name="Subtitulo" type="Label" parent="Painel/Caixa"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 36
-text = "A floresta ainda precisa de você."
-horizontal_alignment = 1
-
-[node name="Espaco" type="Control" parent="Painel/Caixa"]
-custom_minimum_size = Vector2(0, 6)
-layout_mode = 2
-
-[node name="TentarDeNovo" type="Button" parent="Painel/Caixa"]
+[node name="Retrato" type="TextureRect" parent="Carta"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 72)
+layout_mode = 0
+offset_left = 132.0
+offset_top = 36.0
+offset_right = 468.0
+offset_bottom = 372.0
+
+[node name="Frase" type="Label" parent="Carta"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 48.0
+offset_top = 376.0
+offset_right = 552.0
+offset_bottom = 504.0
+theme_override_colors/font_color = Color(0.29, 0.21, 0.16, 1)
+theme_override_font_sizes/font_size = 36
+text = "\"Frase de deboche do chefe.\""
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Trilha" type="Control" parent="Carta"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 60.0
+offset_top = 536.0
+offset_right = 540.0
+offset_bottom = 632.0
+script = ExtResource("4_trilha")
+
+[node name="Corredor" type="AnimatedSprite2D" parent="Carta/Trilha"]
+position = Vector2(0, 48)
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("5_quadros")
+animation = &"parado_lado"
+offset = Vector2(1, -17)
+
+[node name="Chip" type="TextureRect" parent="Carta/Trilha"]
+layout_mode = 0
+offset_left = 436.0
+offset_top = 26.0
+offset_right = 480.0
+offset_bottom = 70.0
+texture = ExtResource("3_chip")
+
+[node name="Botoes" type="VBoxContainer" parent="Carta"]
+layout_mode = 0
+offset_left = 108.0
+offset_top = 644.0
+offset_right = 492.0
+offset_bottom = 752.0
+theme_override_constants/separation = 4
+
+[node name="TentarDeNovo" type="Button" parent="Carta/Botoes"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.21, 0.16, 1)
+theme_override_colors/font_focus_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_colors/font_hover_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_styles/normal = SubResource("estilo_vazio")
+theme_override_styles/hover = SubResource("estilo_foco")
+theme_override_styles/pressed = SubResource("estilo_foco")
+theme_override_styles/focus = SubResource("estilo_foco")
 text = "Tentar de novo"
 
-[node name="Selecao" type="Button" parent="Painel/Caixa"]
-custom_minimum_size = Vector2(0, 72)
+[node name="Selecao" type="Button" parent="Carta/Botoes"]
+custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.29, 0.21, 0.16, 1)
+theme_override_colors/font_focus_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_colors/font_hover_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_colors/font_pressed_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.78, 0.12, 0.08, 1)
+theme_override_styles/normal = SubResource("estilo_vazio")
+theme_override_styles/hover = SubResource("estilo_foco")
+theme_override_styles/pressed = SubResource("estilo_foco")
+theme_override_styles/focus = SubResource("estilo_foco")
 text = "Voltar para o mapa"
 
-[connection signal="pressed" from="Painel/Caixa/TentarDeNovo" to="." method="_on_tentar_de_novo_pressed"]
-[connection signal="pressed" from="Painel/Caixa/Selecao" to="." method="_on_selecao_pressed"]
+[connection signal="pressed" from="Carta/Botoes/TentarDeNovo" to="." method="_on_tentar_de_novo_pressed"]
+[connection signal="pressed" from="Carta/Botoes/Selecao" to="." method="_on_selecao_pressed"]

@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ConversaData" format=3]
+
+[ext_resource type="Script" path="res://scripts/conversa_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Boto cor-de-rosa"
+falas = Array[String](["Boto cor-de-rosa: Que alívio! Eu já não sabia se era o Negro ou o Solimões que me puxava.", "Curupira: Aqui as duas águas se encontram e não se misturam, né?", "Boto cor-de-rosa: Igual a mim e aquela Máquina. Ela quer secar o rio para esfriar os computadores dela.", "Boto cor-de-rosa: Vai lá e desliga ela. Eu fico aqui de olho no rio. E no meu chapéu."])

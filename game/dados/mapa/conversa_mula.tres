@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ConversaData" format=3]
+
+[ext_resource type="Script" path="res://scripts/conversa_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Mula sem Cabeça"
+falas = Array[String](["Mula sem Cabeça: Ufa... Que dor de cabeça. Quer dizer, que dor de pescoço.", "Curupira: Tu tava botando fogo na mata inteira!", "Mula sem Cabeça: Era aquele chip. Eu só via vermelho. Agora o fogo voltou a ser só meu, e fica aqui no pescoço, prometo.", "Mula sem Cabeça: Vai lá tirar os chips dos outros. Eu fico cuidando para os brotos crescerem."])

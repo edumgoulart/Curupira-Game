@@ -1,0 +1,53 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogo_mapa.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
+
+[node name="DialogoMapa" type="CanvasLayer"]
+layer = 9
+script = ExtResource("1_script")
+
+[node name="Caixa" type="PanelContainer" parent="."]
+texture_filter = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 240.0
+offset_top = -276.0
+offset_right = -240.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("t_tema")
+
+[node name="Margem" type="MarginContainer" parent="Caixa"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 12
+
+[node name="Linhas" type="VBoxContainer" parent="Caixa/Margem"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Quem" type="Label" parent="Caixa/Margem/Linhas"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Quem fala"
+
+[node name="Texto" type="Label" parent="Caixa/Margem/Linhas"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+size_flags_vertical = 3
+text = "Texto da fala."
+autowrap_mode = 3
+
+[node name="Dica" type="Label" parent="Caixa/Margem/Linhas"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.92, 0.8, 0.6)
+theme_override_font_sizes/font_size = 24
+text = "A / Espaço: continuar"
+horizontal_alignment = 2

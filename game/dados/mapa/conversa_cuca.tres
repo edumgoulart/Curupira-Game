@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ConversaData" format=3]
+
+[ext_resource type="Script" path="res://scripts/conversa_data.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+nome = "Cuca"
+falas = Array[String](["Cuca: Ai, minha cabeça... Quem bagunçou o meu caldeirão?", "Curupira: Foi a Máquina, Cuca. Ela botou um chip em ti.", "Cuca: Um chip? Em mim? Em quinhentos anos ninguém nunca me enfeitiçou! Isso é coisa de amador.", "Cuca: Toma cuidado na empresa, Curupira. Aquilo lá não tem coração, só tomada."])
