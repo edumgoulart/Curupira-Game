@@ -1,10 +1,10 @@
 # Curupira: O Protetor da Floresta — GDD
 
-Oct 5, 2026 · @Arthur
+v1.0 · Nov 18, 2026 · @Arthur
 
 ## Status atual
 
-O design está em definição e a implementação ainda não começou.
+O jogo está jogável no Godot: as quatro lutas, o mapa do mundo, o HUD, os menus e o progresso salvo estão prontos, todos em pixel art. Este documento é a versão 1.0 do design; os números de combate são os que estão no jogo hoje.
 
 | Integrante | Foco principal |
 | --- | --- |
@@ -13,10 +13,9 @@ O design está em definição e a implementação ainda não começou.
 
 O trabalho é dividido de forma igualitária; a tabela indica só o foco de cada um.
 
-- **Definido:** história, elenco de chefes, direção de arte em pixel art, controles, telas, público e plataforma. Há sprites em pixel art do Curupira, dos quatro chefes e das quatro arenas, já exportados para o Godot.
-- **Em definição:** números dos ataques novos dos chefes e dos combos, botão de travar a mira e lista de áudio.
-- **Implementação:** não iniciada. A estrutura de cenas e o movimento do Curupira estão planejados em Documentação técnica.
-- **Bloqueios:** decisões listadas em Questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do documento apontam para essa lista.
+- **Pronto:** movimento, dash, vida, os quatro ataques básicos e os quatro especiais, os quatro chefes com quatro ataques cada, as fases por dificuldade (Normal e Expert), os combos e a transição de fase, o mapa do mundo, o HUD, as telas de pausa, derrota, vitória e créditos, e o save. A arte de tudo isso está em pixel art.
+- **Em testes:** o balanceamento das lutas, jogando no controle. Os valores podem mudar depois do teste; quando mudarem, este documento é atualizado.
+- **Falta fazer:** o áudio, as cenas de abertura, a tela de opções, os botões do controle no menu inicial, o texto dos créditos e a exportação para Linux e Windows. O design de cada um já está neste documento.
 
 ## Declaração de conceito
 
@@ -47,7 +46,7 @@ Diferenciais:
 - **Escolha antes da luta.** O ataque básico e o especial são definidos antes da fase e ficam travados até o fim dela.
 - **Especial carregado por acertos.** O especial carrega pelo número de golpes acertados, não pelo dano causado.
 
-Link do protótipo: ainda não há protótipo.
+Protótipo: o jogo roda no Godot a partir do repositório. Ainda não há build publicada.
 
 ## Experiência do jogador
 
@@ -55,12 +54,12 @@ O jogador é o Curupira, guardião da floresta, e a fantasia é a do título: pr
 
 A experiência se repete em quatro etapas por fase:
 
-1. Escolher qual chefe enfrentar.
-2. Escolher o ataque básico e o especial.
+1. Andar no mapa do mundo até a área do chefe.
+2. Escolher a dificuldade, o ataque básico e o especial.
 3. Lutar contra o chefe na arena.
 4. Vencer e receber o ataque básico e o especial do chefe.
 
-A história é apresentada em cenas estáticas no início do jogo. As emoções buscadas são medo e receio nos primeiros minutos, e satisfação e dever cumprido ao fim de cada luta. O jogo e as lutas não têm duração fixa: cada luta só termina quando o chefe ou o jogador é derrotado, e o tempo total depende do jogador.
+A história é apresentada em quatro cenas estáticas no início do jogo (ver Telas). As emoções buscadas são medo e receio nos primeiros minutos, e satisfação e dever cumprido ao fim de cada luta. O jogo e as lutas não têm duração fixa: cada luta só termina quando o chefe ou o jogador é derrotado, e o tempo total depende do jogador.
 
 ## Momentos-chave
 
@@ -91,7 +90,7 @@ As animações saem de um gerador escrito em código, guardado em `art/pixel/ger
 - **Chefes.** 12 quadros por segundo. Cada ataque é dividido em três animações: aviso, ação e fim. Assim o tempo do aviso pode ser ajustado no Godot sem refazer arte.
 - **Curupira.** 10 a 20 quadros por segundo, conforme o movimento: idle tem 12 quadros, corrida 6, tiro 4 por ciclo e especial 16.
 - **Projéteis e efeitos.** De 1 a 8 quadros cada, como arquivos PNG separados.
-- **Cenários.** 8 quadros a 4 por segundo para o fogo, a água e as luzes do fundo.
+- **Cenários.** As quatro arenas e o mapa do mundo têm 16 quadros a 8 por segundo, num laço de 2 s, para o fogo, a água, a névoa e as luzes. A arena do Boto, a da Cuca e a da Mula têm também uma camada da frente, por cima dos personagens (a água na frente do Boto, por exemplo). O fundo do menu inicial tem 8 quadros a 4 por segundo.
 
 ### Animações, som e lista de assets
 
@@ -106,9 +105,31 @@ As animações do Curupira são:
 
 As animações de cada chefe estão em Objetos do jogo.
 
-A música de fundo é simples e de estilo brasileiro, natural e sem exageros. Música e efeitos sonoros vêm de bibliotecas gratuitas. Não decidido (Q14): quais bibliotecas, faixas e efeitos serão usados.
+### Som e música
 
-Lista de assets: as folhas de sprites, os efeitos e os cenários estão em `game/assets/pixel/`. Cada personagem tem um arquivo `.json` com o tamanho da célula, a âncora, o fps de cada animação e os pontos de onde saem os tiros. A planilha com os assets de som ainda não existe.
+A música de fundo é simples e de estilo brasileiro, natural e sem exageros. Música e efeitos sonoros são feitos com o Google Flow (geração por IA) e com bibliotecas open source. Cada faixa e cada efeito entra no arquivo de créditos com a fonte e a licença.
+
+| Tela | Música |
+| --- | --- |
+| Cenas de abertura, menu inicial e créditos | Tema do Curupira: violão e flauta, calmo |
+| Mapa do mundo | Variação do tema do Curupira, mais animada, em laço |
+| Mula sem Cabeça | Percussão forte e rápida, com clima de urgência e fogo |
+| Cuca | Noturna e misteriosa, com uma caixinha de música que lembra a canção de ninar |
+| Boto cor-de-rosa | Ritmo de beira de rio, leve e sedutor, no estilo do carimbó |
+| Máquina controlada por IA | Eletrônica e fria, com o tema do Curupira aparecendo por cima |
+| Vitória e derrota | Vinhetas curtas, sem laço |
+
+Efeitos sonoros:
+
+- **Curupira:** pulo, pouso, dash, cada um dos quatro tiros básicos, cada um dos quatro especiais, golpe recebido, derrota e a onça acendendo quando o especial enche.
+- **Chefes:** o aviso de cada ataque, cada ataque, golpe recebido, a transição de fase e a derrota, com o chip saltando.
+- **Interface:** mover entre os botões, confirmar, voltar e o aviso de portão trancado no mapa.
+
+A música e os efeitos têm volumes separados, nas Opções.
+
+### Lista de assets
+
+As folhas de sprites, os efeitos e os cenários estão em `game/assets/pixel/`. Cada personagem tem um arquivo `.json` com o tamanho da célula, a âncora, o fps de cada animação e os pontos de onde saem os tiros. O áudio vai para `game/assets/audio/`, e a lista com fonte e licença de cada arquivo fica no `CREDITS.md`, na raiz do repositório.
 
 ## Plataforma-alvo
 
@@ -129,13 +150,13 @@ A equipe não considera outros jogos como concorrentes diretos.
 
 ## Monetização
 
-O jogo é vendido por R$ 5.
+O jogo é vendido por R$ 5,00.
 
 ## Objetivos e progressão do jogador
 
 O objetivo do jogador é derrotar os quatro chefes. Os três seres folclóricos (Mula sem Cabeça, Cuca e Boto cor-de-rosa) são enfrentados na ordem que o jogador escolher. A máquina controlada por IA é o chefe final e só é liberada depois dos três. A progressão vem dos ataques: cada ser folclórico derrotado concede um ataque básico e um especial, que ficam disponíveis na escolha feita antes das fases seguintes.
 
-O jogo abre com cenas estáticas que explicam a história; não há outras cenas de narrativa. Derrotar a máquina controlada por IA conclui o jogo.
+O jogo abre com quatro cenas estáticas que explicam a história; não há outras cenas de narrativa. Derrotar a máquina controlada por IA conclui o jogo.
 
 Laço principal (dentro de uma fase):
 
@@ -147,8 +168,8 @@ Laço principal (dentro de uma fase):
 
 Laço externo (entre fases):
 
-1. Escolher qual chefe enfrentar.
-2. Escolher o ataque básico e o especial.
+1. Andar no mapa até a área do chefe.
+2. Escolher a dificuldade, o ataque básico e o especial no painel da área.
 3. Jogar a fase.
 4. Vencer e ganhar o ataque básico e o especial do chefe.
 
@@ -214,27 +235,32 @@ O jogo é controlado por gamepad, com teclado como alternativa. As ações usam 
 | Ação | Controle (layout Xbox) | Teclado | Ação no Input Map |
 | --- | --- | --- | --- |
 | Andar | Direcional | A e D | `move_left`, `move_right` |
-| Mirar para cima | Direcional para cima | W | A definir (proposta: `aim_up`) |
-| Abaixar e mirar para baixo | Direcional para baixo | S | A definir (proposta: `crouch`) |
-| Travar a mira | A definir (Q15) | Shift | `aim_lock` |
+| Mirar para cima | Direcional para cima | W | `aim_up` |
+| Abaixar e mirar para baixo | Direcional para baixo | S | `crouch` |
+| Travar a mira | L2 | Shift | `aim_lock` |
 | Pular | A | Espaço | `jump` |
 | Ataque básico | X | J | `attack_basic` |
 | Especial | Y | K | `attack_special` |
 | Dash | B | L | `dash` |
+| Pausa | Start | Esc | `pause` |
 
 ### Telas
 
 O jogo tem nove tipos de tela:
 
-- **Cenas de abertura.** Cenas estáticas no início do jogo, que explicam a história.
+- **Cenas de abertura.** Quatro imagens em pixel art (480×270), cada uma com uma ou duas frases embaixo. Aparecem no Novo Jogo, antes do mapa; A avança e Start pula todas.
+  1. A floresta viva, com o Curupira cuidando dela.
+  2. A empresa e a IA: máquinas derrubando árvores para construir data centers.
+  3. A máquina coloca chips na Mula, na Cuca e no Boto, que ficam de olho vermelho.
+  4. Só o Curupira ficou livre. Ele parte para libertar as criaturas.
 - **Menu inicial.** Mostra também os botões de cada ação; é assim que o jogador aprende os controles.
 - **Mapa do mundo.** Como o tabuleiro do Cuphead: o Curupira anda pelo mapa, visto de cima em diagonal, e escolhe o chefe indo até a área dele. A Mula fica entre árvores pegando fogo, a Cuca numa mata fechada com névoa e a luz verde das poções, o Boto numa prainha e a Máquina no prédio da empresa, atrás de um portão que só abre depois dos três. Na entrada de cada área abre um painel com a dificuldade (Normal ou Expert), o ataque básico e o especial.
 - **Arena.** Uma por chefe, quatro no total.
 - **Pausa.**
-- **Opções.** Volume, alternância entre tela cheia e janela e, quando aberta no meio de uma fase, a opção de voltar para o mapa.
+- **Opções.** Volume da música, volume dos efeitos e tela cheia ou janela. As escolhas ficam salvas e o Novo Jogo não apaga elas. Aberta pela pausa, no meio de uma fase, também dá para voltar para o mapa.
 - **Derrota.** O jogador pode tentar a fase de novo ou voltar para o mapa.
 - **Vitória.** Depois dela o jogador volta para o mapa, na frente da área do chefe vencido, onde aparece uma bandeira.
-- **Créditos.** Aparecem logo depois que o chefe final é derrotado.
+- **Créditos.** Aparecem logo depois que o chefe final é derrotado: a equipe, as ferramentas, as músicas e os efeitos com autor e licença, e agradecimentos.
 
 ### Elementos na tela durante a luta
 
@@ -244,11 +270,11 @@ Durante a luta, cima e baixo servem para mirar e baixo também agacha. As regras
 
 ## Sistemas e funcionalidades (MVP)
 
-O MVP tem sete sistemas: movimento, dash, vida, ataque básico e especial, ataques concedidos pelos chefes, efeitos de estado e a escolha feita antes da fase. Nenhum deles está implementado ainda.
+O MVP tem sete sistemas: movimento, dash, vida, ataque básico e especial, ataques concedidos pelos chefes, efeitos de estado e a escolha feita antes da fase. Todos estão implementados.
 
 ### Movimento
 
-Os valores deste documento são os iniciais planejados e serão ajustados em protótipo. Os de movimento são dimensionados para a resolução base de 1920×1080: o Curupira cruza a tela em 3,2 s e o pulo sobe cerca de 215 px.
+Os valores deste documento são os da versão 1.0, os mesmos do jogo. Os de movimento são dimensionados para a resolução base de 1920×1080: o Curupira cruza a tela em 3,2 s e o pulo sobe cerca de 215 px.
 
 | Parâmetro | Valor |
 | --- | --- |
@@ -260,6 +286,8 @@ Os valores deste documento são os iniciais planejados e serão ajustados em pro
 - A gravidade é uma constante do próprio personagem, não a global do projeto. Isso permite ajustar o peso de cada personagem separadamente.
 - Com esquerda e direita pressionadas ao mesmo tempo, as direções se anulam.
 - O sprite espelha conforme a direção do movimento. Essa direção define depois o lado do ataque.
+- **Tolerância.** O pulo ainda sai até 0,1 s depois de sair da beira (coyote time) e fica guardado 0,1 s se for apertado antes de tocar o chão (jump buffer).
+- **Pulo variável.** Soltar o botão de pulo na subida corta a velocidade pela metade, e o pulo fica mais baixo.
 
 ### Dash
 
@@ -281,11 +309,11 @@ O Curupira atira em oito direções, com o projétil saindo da mão. Segurar o b
 
 - **De pé, parado ou andando:** para a frente, para a frente com cima na diagonal para cima e só cima reto para cima. Andando, ele atira para a frente ou na diagonal para cima.
 - **Agachado:** baixo no chão agacha. Agachado, o Curupira fica com cerca de 40% da altura, não anda e atira para a frente, rente ao chão. Agachar serve para desviar de ataques altos, como o jato do Boto e a primeira varredura da Máquina.
-- **Mira travada:** segurando o botão de travar a mira, ele fica parado no lugar e pode mirar em qualquer direção do chão, inclusive a diagonal para baixo. No teclado é o Shift; no controle o botão ainda não foi escolhido (Q15).
+- **Mira travada:** segurando o botão de travar a mira, ele fica parado no lugar e pode mirar em qualquer direção do chão, inclusive a diagonal para baixo. No teclado é o Shift; no controle, o L2.
 - **No ar:** atira em cinco direções, de cima até baixo: cima, diagonal para cima, frente, diagonal para baixo e baixo. Para baixo reto só existe no ar.
 - **Direção:** a frente é o lado para onde ele está olhando, e as diagonais são a 45°.
 
-A barra do especial tem 100 pontos. Cada acerto soma pontos conforme o ataque básico equipado, de modo que a barra enche em 20 a 25 s de acertos com qualquer um deles. Os valores de cada ataque estão em Objetos do jogo.
+A barra do especial tem 100 pontos. Cada acerto soma pontos conforme o ataque básico equipado, de modo que a barra enche em 20 a 25 s de acertos com qualquer um deles. Os valores de cada ataque estão em Objetos do jogo. Só acertos no chefe carregam a barra: estourar um coração do Boto com tiro não carrega.
 
 ### Ataques concedidos pelos chefes
 
@@ -301,18 +329,18 @@ O jogo tem três efeitos de estado:
 
 No chefe, os efeitos vêm dos especiais do Curupira. A Poção Maldita envenena por 8 s, com 20 de dano por segundo; reaplicar só renova o tempo. A Bolha Abissal deixa o chefe 40% mais lento por 6 s.
 
-No Curupira, os efeitos vêm das poças da Cuca e dos corações do Boto. A poça de veneno tira 1 golpe se ele ficar 1 s dentro dela. A poça de lentidão o deixa 40% mais lento enquanto ele estiver nela. O coração do Boto que encosta, além do golpe, encanta por 1 s, puxando a 300 px/s, como na lenda em que o Boto leva as pessoas para o rio (valores provisórios, Q16).
+No Curupira, os efeitos vêm das poças da Cuca e dos corações do Boto. A poça de veneno tira 1 golpe se ele ficar 1 s dentro dela. A poça de lentidão o deixa 40% mais lento enquanto ele estiver nela. O coração do Boto que encosta, além do golpe, encanta por 1 s, puxando a 300 px/s, como na lenda em que o Boto leva as pessoas para o rio.
 
 ### Escolha antes da fase
 
-O jogador escolhe o ataque básico e o especial antes de cada fase, na mesma tela em que escolhe o chefe. Durante a fase não há troca.
+O jogador escolhe o ataque básico e o especial antes de cada fase, no painel que abre na entrada da área do chefe, no mapa do mundo. Durante a fase não há troca.
 
-Na mesma tela ele escolhe a dificuldade da próxima luta (decisão do Eduardo):
+No mesmo painel ele escolhe a dificuldade da próxima luta (decisão do Eduardo):
 
 - **Normal.** Mula, Cuca e Boto lutam numa fase só; a máquina, em duas.
 - **Expert.** Os seres folclóricos lutam em duas fases; a máquina, em três. Os combos vêm mais vezes e mais colados.
 
-Vencer no Normal já concede os ataques e conta para liberar a máquina. A vitória no Expert fica marcada à parte na seleção ("derrotada · Expert"). A dificuldade escolhida fica salva.
+Vencer no Normal já concede os ataques e conta para liberar a máquina. A vitória no Expert só fica marcada no painel ("Derrotada · Expert") e não dá nada a mais. A dificuldade escolhida fica salva.
 
 ## Objetos do jogo
 
@@ -378,11 +406,12 @@ A ideia, como no Cuphead, é variar o ritmo e brincar com o jogador em vez de re
 - **Troca de fase.** O chefe termina o ataque em andamento, a tela treme, dá um clarão, todos os tiros do chefe somem e ele faz uma animação de transição (2 s). Ele continua levando dano nesse tempo. A primeira jogada da fase nova é um combo com o ataque novo.
 - **Lado.** A Mula (investida) e a Cuca (bote) atravessam a arena e ficam do outro lado; não voltam de costas. Os ataques seguintes saem de lá, espelhados.
 
-Os números das fases e dos combos (chance, atraso, pausa) são provisórios e ficam no `.tres` de cada chefe (Q16).
+Os números das fases e dos combos (chance, atraso, pausa) são os da versão 1.0 e ficam no `.tres` de cada chefe. A tabela completa está no TDD, seção 8.2.
 
-Três regras valem para todos os chefes:
+Quatro regras valem para todos os chefes:
 
 - O chefe pode levar dano o tempo todo.
+- Encostar no corpo do chefe tira 1 golpe do Curupira.
 - Todo ataque tem um aviso visual antes do golpe: o chefe brilha e faz a animação de aviso, e o jogador lê o ataque pela pose. Não há marca na tela cobrindo a área do golpe; o Eduardo achou que deixava fácil demais. As exceções são o que vem de fora da vista ou é mirado: o brilho no céu dos meteoros e a linha fina do laser. No jato e no chapéu, quem mostra a altura é o próprio Boto: ele afunda ou sobe na água até o bico (no jato) ou a nadadeira com o chapéu (no chapéu) ficar nela.
 - Depois do ataque mais forte, o chefe fica parado por um instante. É a janela para o jogador atacar.
 
@@ -395,26 +424,26 @@ Três regras valem para todos os chefes:
 
 A duração-alvo supõe que o jogador acerta o chefe em 60% do tempo. Uma partida sem derrotas soma cerca de 7 min 30 s.
 
-Ataques de cada chefe. Os avisos ficaram mais longos a pedido do Eduardo, para dar tempo de desviar (o valor antigo está entre parênteses). Os golpes dos ataques novos continuam "a definir" (Q16).
+Ataques de cada chefe. Os avisos ficaram mais longos a pedido do Eduardo, para dar tempo de desviar (o valor antigo está entre parênteses).
 
 | Chefe | Fase | Ataque | Aviso | Golpes | Como desviar |
 | --- | --- | --- | --- | --- | --- |
 | Mula sem Cabeça | 1 | Rajada rasteira: abaixa o peito até o chão e cospe três bolas de fogo em sequência, rente ao chão | 0,8 s (0,5) | 1 cada | Pular |
-| Mula sem Cabeça | 1 | Pisoteio: empina, segura no alto e bate as patas da frente; uma onda de fogo corre pelo chão | 1 s (0,8) | A definir | Pular |
-| Mula sem Cabeça | 2 | Investida: agacha e raspa a pata da frente na terra duas vezes, jogando terra para trás, como cavalo antes de correr. Depois atravessa a arena e bate na parede. Fica tonta e fica daquele lado | 1,1 s (0,9) | A definir | Pular por cima ou dash |
+| Mula sem Cabeça | 1 | Pisoteio: empina, segura no alto e bate as patas da frente; uma onda de fogo corre pelo chão | 1 s (0,8) | 1 | Pular |
+| Mula sem Cabeça | 2 | Investida: agacha e raspa a pata da frente na terra duas vezes, jogando terra para trás, como cavalo antes de correr. Depois atravessa a arena e bate na parede. Fica tonta e fica daquele lado | 1,1 s (0,9) | 1 | Pular por cima ou dash |
 | Mula sem Cabeça | 3 | Chuva de meteoros: cospe três meteoros para o céu (dá para ver cada um subir). Um brilho no alto da tela, bem em cima de onde cada um vai cair, fica mais forte e pisca mais rápido até a pedra descer; no chão, uma sombra cresce. Depois fica parada por 1,5 s | 1,3 s cada (1) | 2 cada | Sair de baixo dos brilhos |
 | Cuca | 1 | Feitiço em leque: três feitiços grandes e bem separados, o do meio mirado no Curupira | 0,8 s (0,5) | 1 cada | Passar entre eles |
 | Cuca | 1 | Poção que deixa uma poça de veneno ou de lentidão por 5 s. No máximo duas poças na arena | 0,8 s (0,6) | Ver Efeitos de estado | Sair da poça |
-| Cuca | 2 | Bote de jacaré: abre a boca, se joga de barriga e desliza até perto da outra parede abocanhando. Levanta e fica daquele lado | 0,9 s (0,6) | A definir | Pular |
-| Cuca | 3 | Canção de ninar: uma melodia de seis notas, uma de cada vez. A grave vem rente ao chão e a aguda na altura do peito, cada uma de uma cor | 0,9 s (0,4) | A definir | Pular a grave e abaixar na aguda |
+| Cuca | 2 | Bote de jacaré: abre a boca, se joga de barriga e desliza até perto da outra parede abocanhando. Levanta e fica daquele lado | 0,9 s (0,6) | 1 | Pular |
+| Cuca | 3 | Canção de ninar: uma melodia de seis notas, uma de cada vez. A grave vem rente ao chão e a aguda na altura do peito, cada uma de uma cor | 0,9 s (0,4) | 1 cada nota | Pular a grave e abaixar na aguda |
 | Boto cor-de-rosa | 1 | Jato de água saindo reto da boca até a outra margem, alto (na altura do peito) ou baixo (rente à areia), sorteado. No aviso, o Boto afunda na água até o bico ficar na altura do jato (no baixo, só a cabeça fica de fora), e a água começa a sair do bico, fina, e vai crescendo até virar o jato. Depois o Boto fica parado por 1,2 s | 0,9 s (0,7) | 1 | Abaixar (alto) ou pular (baixo) |
-| Boto cor-de-rosa | 1 | Beijos de bolha: quatro corações que perseguem o Curupira ondulando, virando devagar, e estouram com um tiro. O que encosta, além do golpe, encanta (ver Efeitos de estado) | 0,6 s | A definir | Atirar neles ou despistar correndo e pulando |
-| Boto cor-de-rosa | 2 | Chapéu bumerangue: o chapéu vai baixo e volta alto, ou vai alto e volta baixo (sorteado). No aviso, o Boto tira o chapéu da cabeça com a nadadeira, puxa o braço para trás e segura, e ao mesmo tempo afunda (ida baixa) ou fica quase todo fora da água (ida alta), até a nadadeira ficar na altura da ida. O chapéu sai reto da nadadeira | 0,8 s (0,6) | A definir | Pular o baixo e abaixar no alto |
-| Boto cor-de-rosa | 3 | Salto, de duas formas sorteadas. Por cima: afunda reto (o aviso) e troca de lado num arco alto, girando e soltando cinco bolhas que descem balançando. Rasante: deita para a frente e bate a cauda espirrando água (o aviso), e atravessa baixo e reto, deitado, na altura do peito do Curupira | 0,8 s (sem aviso) | 1 cada bolha; contato no rasante | Por cima: correr para baixo dele e passar entre as bolhas. Rasante: abaixar ou dash |
+| Boto cor-de-rosa | 1 | Beijos de bolha: quatro corações que perseguem o Curupira ondulando, virando devagar, e estouram com um tiro. O que encosta, além do golpe, encanta (ver Efeitos de estado) | 0,6 s | 1 e o encanto | Atirar neles ou despistar correndo e pulando |
+| Boto cor-de-rosa | 2 | Chapéu bumerangue: o chapéu vai baixo e volta alto, ou vai alto e volta baixo (sorteado). No aviso, o Boto tira o chapéu da cabeça com a nadadeira, puxa o braço para trás e segura, e ao mesmo tempo afunda (ida baixa) ou fica quase todo fora da água (ida alta), até a nadadeira ficar na altura da ida. O chapéu sai reto da nadadeira | 0,8 s (0,6) | 1 | Pular o baixo e abaixar no alto |
+| Boto cor-de-rosa | 3 | Salto, de duas formas sorteadas. Por cima: afunda reto (o aviso) e troca de lado num arco alto, girando e soltando cinco bolhas que descem balançando. Rasante: deita para a frente e bate a cauda espirrando água (o aviso), e atravessa baixo e reto, deitado, na altura do peito do Curupira | 0,8 s (sem aviso) | 1 cada bolha; 1 no rasante | Por cima: correr para baixo dele e passar entre as bolhas. Rasante: abaixar ou dash |
 | Máquina controlada por IA | 1 | Raio laser. Uma linha fina segue o Curupira, trava 0,3 s antes e dispara | 1 s (0,8) | 1 | Sair da linha |
 | Máquina controlada por IA | 1 | Bombas, que caem dos alçapões do teto e explodem 1,5 s depois de cair. Depois a Máquina fica parada por 1,2 s | 1,5 s | 2 | Sair da área |
-| Máquina controlada por IA | 2 | Piso traiçoeiro: as placas do chão saltam em sequência, em duas ondas vindo na direção do Curupira. Cada placa pisca 0,4 s (0,25) antes de saltar | 0,9 s (0,5) | A definir | Pular as placas |
-| Máquina controlada por IA | 3 | Varredura: desce até a altura do Curupira e varre a arena com o laser, primeiro reto na altura da cabeça e depois mirando o chão. Uma linha fina mostra cada passada antes | 0,8 s cada (0,5) | A definir | Abaixar e depois pular |
+| Máquina controlada por IA | 2 | Piso traiçoeiro: as placas do chão saltam em sequência, em duas ondas vindo na direção do Curupira. Cada placa pisca 0,4 s (0,25) antes de saltar | 0,9 s (0,5) | 1 cada placa | Pular as placas |
+| Máquina controlada por IA | 3 | Varredura: desce até a altura do Curupira e varre a arena com o laser, primeiro reto na altura da cabeça e depois mirando o chão. Uma linha fina mostra cada passada antes | 0,8 s cada (0,5) | 1 | Abaixar e depois pular |
 
 Animações dos chefes no Godot (nomes no `SpriteFrames`):
 
@@ -441,7 +470,7 @@ A máquina controlada por IA, o Núcleo, é uma casca branca de painéis pendura
 
 ### Planilha de dados
 
-Ainda não existe. Ela reunirá os atributos numéricos de cada objeto e ficará ligada a esta seção.
+Os números de cada objeto ficam em arquivos de dados do Godot (`.tres`), editáveis no inspetor: `game/dados/chefes/` (vida, pausa, fases, combos e os números de cada ataque), `game/dados/ataques/` (ataques básicos e especiais) e os dados do Curupira (movimento e vida). O TDD (seção 8.2) traz a tabela de fases e combos.
 
 ## Localização
 
@@ -462,65 +491,28 @@ O GDScript foi escolhido em vez de C# pela iteração mais rápida e pela quanti
 
 ## Documentação técnica
 
-O projeto usa Godot 4.x com GDScript. Nada foi implementado ainda. As estruturas abaixo são o plano para as duas primeiras cenas: o personagem (`curupira.tscn`) e a arena.
+A documentação técnica completa está no TDD (`docs/tdd.md`): estrutura de cenas e pastas, camadas de colisão, sistema de dano, sequenciador dos chefes, pipeline da pixel art, save e testes. Resumo:
 
-### Cena do Curupira
-
-```
-Curupira (CharacterBody2D)
-├── CollisionShape2D   (CapsuleShape2D)
-└── AnimatedSprite2D
-```
-
-- `CharacterBody2D` na raiz: o personagem é movido por código, com `velocity` e `move_and_slide()`, sem sofrer física externa.
-- `AnimatedSprite2D` desde o início, mesmo com um quadro só: o código que troca de animação já aponta para o nó definitivo.
-
-### Cena de arena
-
-```
-Arena (Node2D)
-├── Camera2D
-├── Chao (StaticBody2D)
-├── ParedeEsquerda (StaticBody2D)
-├── ParedeDireita (StaticBody2D)
-├── Curupira (instância de curupira.tscn)
-└── Chefe
-```
-
-- Chão e paredes são `StaticBody2D`, cada um com seu `CollisionShape2D`. É a geometria de que `is_on_floor()` e a colisão lateral dependem.
-- A `Camera2D` é filha da arena, não do Curupira, para ficar fixa. Os limites da câmera coincidem com as bordas da arena.
-- O Curupira entra na arena como instância da cena dele. Ajustes no personagem se propagam para todas as fases.
-- Enquanto a arte definitiva não existe, os visuais provisórios usam `Polygon2D`, não `ColorRect`, porque `ColorRect` é nó de interface.
-
-### Riscos e restrições
-
-- A arena inteira precisa caber na resolução base de 1920×1080.
-- O sistema de ataque depende de camadas e máscaras de colisão, ainda não definidas.
-- O projeto precisa exportar para Linux e para Windows.
-
-### Testes
-
-Cada arena pode ser executada isoladamente com F6, sem ser a cena principal do projeto. Cheats de teste: nenhum definido.
-
-A estrutura de pastas e a convenção de nomes de arquivos ainda não foram definidas.
+- **Motor:** Godot 4.7.1 com GDScript. Uma cena por personagem, chefe, projétil e arena.
+- **Dano:** áreas de dano (hitbox) e de golpe (hurtbox) separadas por camadas de colisão, sem `if` no código para saber quem é quem.
+- **Números:** todos em arquivos `.tres`, para ajustar sem mexer no código.
+- **Testes:** cada arena roda sozinha com F6. Três testes automáticos rodam sem tela: `teste_lutas.gd` (as quatro lutas nas duas dificuldades), `verificar_desvio.gd` (se dá para desviar de cada ataque e combo) e `teste_mapa.gd` (o mapa do mundo).
+- **Riscos:** a exportação precisa incluir os arquivos `.json` da pixel art, senão os pontos de onde saem os tiros somem no build.
 
 ## Ideias e expansões
 
 Ideias fora do MVP, ainda não adotadas:
 
-- Tolerância de pulo: coyote time, jump buffer e pulo de altura variável.
-- Impacto: hitstop, tremor de câmera e squash and stretch no sprite.
-- Partículas no dash.
-- Valores de ataque em `Resource` do Godot, editáveis no inspetor.
-- Exportação para Web e publicação no itch.io.
+- Impacto: hitstop (uma pausa curtíssima a cada golpe) e squash and stretch no sprite.
+- Versão para web e publicação no itch.io.
+- Desenho próprio da Bola de Fogo do jogador em cada direção (hoje ela voa de lado na diagonal e para cima).
+- Remapear os botões nas Opções.
+
+Já adotadas e no jogo: coyote time, jump buffer, pulo de altura variável, tremor de tela, partículas no dash e valores em `Resource`.
 
 ## Questões em aberto
 
-Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do documento apontam para esta lista.
-
-- [ ] **Q14. Áudio.** Bibliotecas, faixas e efeitos usados, com a fonte e a licença de cada um.
-- [ ] **Q15. Travar a mira no controle.** No teclado ficou o Shift (ação `aim_lock`). Falta o botão do controle.
-- [ ] **Q16. Fases, combos e ataques novos.** A estrutura está decidida (fases por dificuldade, trocando na metade ou a cada terço). Faltam, depois de testar: a chance e o atraso dos combos, a pausa de cada fase e o aviso, a duração, a velocidade e os golpes dos ataques marcados como "a definir". No Boto, também a perseguição e o encanto dos corações, o rasante e as bolhas mais rápidas. Valores provisórios no `.tres` de cada chefe.
+Não há questões em aberto na versão 1.0. Os números de combate podem mudar depois do teste no controle; quando mudarem, o `.tres` e este documento são atualizados juntos.
 
 ### Resolvidas
 
@@ -529,7 +521,7 @@ Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do docum
 | O jogo tem trechos com rolagem? | Não. Só arenas fixas de chefe | Gênero |
 | Qual é a ordem dos chefes? | O jogador escolhe a ordem dos três seres folclóricos. A máquina controlada por IA é o chefe final, liberada depois dos três | Objetivos e progressão |
 | O que cada chefe concede? | Cada ser folclórico concede um ataque básico e um especial. A máquina não concede nada | Objetos do jogo |
-| Como funciona a troca de ataques? | Escolha antes de cada fase, sem troca durante | Sistemas e funcionalidades |
+| Como funciona a troca de ataques? | Escolha antes de cada fase, no painel da área do chefe no mapa, sem troca durante | Sistemas e funcionalidades |
 | Os ataques básicos são projéteis? | Sim, todos. Variam em tipo de tiro, dano e velocidade de ataque | Sistemas e funcionalidades |
 | Para onde o Curupira atira? | Em oito direções: para cima, nas diagonais e para a frente; para baixo só no ar. Também atira agachado | Sistemas e funcionalidades |
 | O dash dá invencibilidade? | Sim | Sistemas e funcionalidades |
@@ -540,9 +532,17 @@ Há 3 questões em aberto. As marcações (Q14), (Q15) e (Q16) ao longo do docum
 | Qual é o design da máquina e da arena dela? | O Núcleo pendurado no teto, numa câmara de testes branca | Objetos do jogo e Mundo do jogo |
 | As arenas têm plataformas ou perigos próprios? | Não. Só chão e paredes | Mundo do jogo |
 | A vida do chefe aparece na tela? | Sim, numa barra no alto da tela com o nome do chefe (mudou a pedido do Eduardo; antes era escondida, estilo Cuphead) | Interface do usuário |
-| Como a história é contada? | Em cenas estáticas no início do jogo | Objetivos e progressão |
+| Como a história é contada? | Em quatro cenas estáticas no início do jogo, com texto; A avança e Start pula | Interface do usuário (Telas) |
 | Qual é a duração do jogo? | Não é fixa. Cada luta termina quando o chefe ou o jogador é derrotado | Experiência do jogador |
+| Áudio (Q14) | Música e efeitos feitos com o Google Flow e com bibliotecas open source; lista de faixas e efeitos definida | Arte, som e música |
+| Botão de travar a mira no controle (Q15) | L2 | Interface do usuário |
+| Fases, combos e ataques novos (Q16) | Os valores do jogo hoje viram os da versão 1.0. Os ataques novos tiram 1 golpe | Objetos do jogo |
+| Vencer no Expert dá algo a mais? | Não. Só fica marcado no painel | Sistemas e funcionalidades |
+| Estourar um coração do Boto carrega o especial? | Não. Só acertos no chefe carregam | Sistemas e funcionalidades |
+| Encostar no chefe machuca? | Sim, tira 1 golpe | Objetos do jogo |
+| Como o jogador escolhe o chefe? | Andando no mapa do mundo até a área dele | Interface do usuário |
+| O jogo abre em tela cheia? | Sim, alternável nas Opções | Plataforma-alvo |
 
 ## Protótipos
 
-Ainda não há protótipo. A implementação não começou.
+O jogo inteiro já roda no Godot, a partir do repositório (branch `main`): menu, mapa do mundo, as quatro lutas nas duas dificuldades, vitória, derrota e créditos. Ainda não há build exportada nem link público.

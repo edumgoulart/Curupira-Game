@@ -3,7 +3,7 @@ extends CanvasLayer
 ## Painel que abre quando o Curupira entra na área de um chefe no mapa do mundo: mostra o chefe,
 ## e ali se escolhe o ataque básico, o especial e a dificuldade antes de lutar (GDD: os ataques só
 ## trocam antes da fase, nunca durante a luta). Substitui a antiga tela de seleção de fase; a lógica
-## de escolha é a mesma do level_select.gd.
+## de escolha veio do antigo level_select (apagado).
 ## Só aparecem os ataques liberados: os iniciais + os dos chefes já derrotados
 ## (campo fase_que_libera de cada ataque no catálogo).
 ## Fica com process_mode "sempre" e pausa o mapa enquanto está aberto.

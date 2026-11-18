@@ -2,7 +2,8 @@ class_name CoracaoBoto
 extends Hitbox
 ## Beijo de bolha do Boto: coração que persegue o Curupira, ondulando. Vira devagar (curva
 ## larga), então dá para despistar correndo ou pulando, e estoura com um tiro: a Hurtbox
-## filha fica no layer enemy, então os tiros do Curupira enxergam ela.
+## filha fica no layer enemy, então os tiros do Curupira enxergam ela. Esse acerto não
+## carrega o especial (carrega_especial = false).
 ## Machuca ao encostar (layer enemy_hitbox, mask player) e encanta (lenda do Boto): chama
 ## aplicar_efeito(&"encanto") na hurtbox atingida, como o veneno dos projéteis, sem saber quem
 ## é o alvo. A intensidade é a velocidade do puxão, com sinal: negativa puxa para a esquerda,
@@ -41,6 +42,8 @@ func _ready() -> void:
 	add_to_group("ataques_chefe")
 	_caminho = global_position
 	_velocidade = Vector2(direcao * velocidade, 0.0)
+	# Estourar o coração com tiro não carrega o especial (decisão da dupla).
+	hurtbox.carrega_especial = false
 	hurtbox.golpe_recebido.connect(func(_quanto: int, _de: Node) -> void: estourar())
 	acertou.connect(_ao_acertar)
 	var aviso_tela := get_node_or_null("VisibleOnScreenNotifier2D") as VisibleOnScreenNotifier2D

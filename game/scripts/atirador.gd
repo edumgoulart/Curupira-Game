@@ -54,7 +54,9 @@ func tentar_atirar(direcao: int, multiplicador: float = 1.0, angulo: float = 0.0
 	_lancar(projetil)
 	# Só o básico carrega o especial: cada acerto soma a carga do ataque equipado.
 	var carga: int = ataque.carga_por_acerto
-	projetil.acertou.connect(func(_alvo: Area2D) -> void: acerto_basico.emit(carga))
+	projetil.acertou.connect(func(alvo: Area2D) -> void:
+		if not (alvo is Hurtbox) or (alvo as Hurtbox).carrega_especial:
+			acerto_basico.emit(carga))
 	disparou.emit()
 
 

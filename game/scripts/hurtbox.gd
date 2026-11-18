@@ -9,6 +9,10 @@ signal golpe_recebido(amount: int, from: Node)
 ## Efeito de estado (GDD: envenenamento, lentidão). O dono decide o que fazer com ele.
 signal efeito_recebido(efeito: StringName, intensidade: float, duracao: float)
 
+## false = acertar esta hurtbox não carrega o especial do Curupira (ex.: coração do Boto:
+## estourar o coração é desvio, não acerto no chefe).
+var carrega_especial: bool = true
+
 ## false = nenhuma hitbox enxerga esta hurtbox (ex.: Curupira invencível).
 ## Desliga as formas de colisão, e não o monitorable: testado no Godot 4.7, religar o
 ## monitorable NÃO faz a hitbox detectar de novo quem já estava encostado; religar a forma faz.
