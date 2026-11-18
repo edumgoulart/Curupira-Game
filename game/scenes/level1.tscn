@@ -63,7 +63,8 @@ chefe = NodePath("../Mula")
 
 [node name="MenuPausa" parent="." unique_id=1737279760 instance=ExtResource("7_pausa")]
 
-[node name="TelaDerrota" parent="." unique_id=1088725448 node_paths=PackedStringArray("curupira") instance=ExtResource("8_derrota")]
+[node name="TelaDerrota" parent="." unique_id=1088725448 node_paths=PackedStringArray("chefe", "curupira") instance=ExtResource("8_derrota")]
+chefe = NodePath("../Mula")
 curupira = NodePath("../Curupira")
 
 [node name="TelaVitoria" parent="." unique_id=1727411398 node_paths=PackedStringArray("chefe", "curupira") instance=ExtResource("9_vitoria")]

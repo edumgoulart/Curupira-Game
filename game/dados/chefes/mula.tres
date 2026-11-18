@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/onda_fogo_mula.tscn" id="4_onda"]
 [ext_resource type="Script" path="res://scripts/fase_chefe.gd" id="fase_chefe"]
 [ext_resource type="Script" path="res://scripts/combo_chefe.gd" id="combo_chefe"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/derrota_retrato_mula.png" id="retrato_derrota"]
 
 [sub_resource type="Resource" id="Combo_normal1_1"]
 script = ExtResource("combo_chefe")
@@ -81,6 +82,8 @@ fator_pausa = 0.8
 
 [resource]
 script = ExtResource("1_dados")
+retrato_derrota = ExtResource("retrato_derrota")
+frases_derrota = Array[String](["Quase perdi a cabeça jogando contra ti... brincadeira, essa eu já perdi faz tempo.", "Se eu tivesse cabeça, ia rir da tua cara agora.", "Sem cabeça e mesmo assim pensei mais rápido que tu.", "Tu tem fogo no cabelo, eu tenho fogo no lugar da cabeça. Ganhei."])
 nome = "Mula sem Cabeça"
 id_progresso = "fase1"
 recompensa = "Bola de Fogo e Canhão Flamejante"

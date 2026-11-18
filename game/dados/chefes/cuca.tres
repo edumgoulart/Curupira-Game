@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/nota_cuca.tscn" id="5_nota"]
 [ext_resource type="Script" path="res://scripts/fase_chefe.gd" id="fase_chefe"]
 [ext_resource type="Script" path="res://scripts/combo_chefe.gd" id="combo_chefe"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/derrota_retrato_cuca.png" id="retrato_derrota"]
 
 [sub_resource type="Resource" id="Combo_normal1_1"]
 script = ExtResource("combo_chefe")
@@ -76,6 +77,8 @@ fator_pausa = 0.8
 
 [resource]
 script = ExtResource("1_dados")
+retrato_derrota = ExtResource("retrato_derrota")
+frases_derrota = Array[String](["Nana, Curupira, que a Cuca já ganhou!", "Essa poção se chama \"volta pro mapa\".", "Teu cabelo é de fogo, mas quem se queimou foi tu.", "Fica tranquilo: eu guardo um lugarzinho no caldeirão pra ti."])
 nome = "Cuca"
 id_progresso = "fase2"
 recompensa = "Feitiço Perseguidor e Poção Maldita"

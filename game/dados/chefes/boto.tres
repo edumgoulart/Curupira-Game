@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/chapeu_boto.tscn" id="5_chapeu"]
 [ext_resource type="Script" path="res://scripts/fase_chefe.gd" id="fase_chefe"]
 [ext_resource type="Script" path="res://scripts/combo_chefe.gd" id="combo_chefe"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/derrota_retrato_boto.png" id="retrato_derrota"]
 
 [sub_resource type="Resource" id="Combo_normal1_1"]
 script = ExtResource("combo_chefe")
@@ -82,6 +83,8 @@ fator_pausa = 0.8
 
 [resource]
 script = ExtResource("1_dados")
+retrato_derrota = ExtResource("retrato_derrota")
+frases_derrota = Array[String](["Hoje, quem dançou foi tu.", "Mandei um beijinho e tu caiu de amores.", "Volta pra areia, que a água aqui é funda demais pra ti.", "Nem precisei tirar o chapéu."])
 nome = "Boto cor-de-rosa"
 artigo = "o"
 id_progresso = "fase3"

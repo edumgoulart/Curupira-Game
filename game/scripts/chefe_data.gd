@@ -15,6 +15,12 @@ extends Resource
 ## Texto próprio da tela de vitória. Vazio = "Você libertou <artigo> <nome> do chip da máquina!".
 @export var texto_vitoria: String = ""
 
+@export_group("Derrota do Curupira")
+## Retrato do chefe zombando, de frente, na carta da tela de derrota (gerador: derrota_px.js).
+@export var retrato_derrota: Texture2D
+## Frases de deboche da carta de derrota; sai uma por vez, sorteada.
+@export var frases_derrota: Array[String] = []
+
 @export_group("Geral")
 ## Vida do chefe (GDD).
 @export var vida: int = 1000

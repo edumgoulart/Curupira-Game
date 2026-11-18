@@ -362,7 +362,7 @@ function exportarAbertura() {
 }
 
 try {
-  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu(); exportarHud(); exportarMapa(); exportarAbertura();
+  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu(); exportarHud(); exportarMapa(); exportarAbertura(); exportarDerrota();
   document.getElementById('saida').textContent = JSON.stringify(saida);
   document.title = 'pronto';
 } catch (e) { document.getElementById('saida').textContent = 'ERRO ' + e.stack; }

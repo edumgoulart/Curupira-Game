@@ -17,3 +17,4 @@ Passo a passo em `docs/tdd.md`, seção 4.1. Cada personagem tem o próprio arqu
 | `mapa_px.js` | Mapa do mundo (terreno, áreas dos chefes, objetos, máscara do chão) |
 | `mapa_curupira_px.js` | Curupira visto de cima, em 5 direções |
 | `abertura_px.js` | As quatro cenas de abertura (imagens paradas de 480×270) |
+| `derrota_px.js` | Carta da tela de derrota: papel, retratos de deboche dos chefes e o chip |
