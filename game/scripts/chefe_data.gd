@@ -20,16 +20,16 @@ extends Resource
 @export var vida: int = 1000
 ## Pausa entre um ataque e o próximo (s) (GDD).
 @export_range(0.0, 5.0, 0.05, "suffix:s") var pausa_entre_ataques: float = 1.2
-## Golpes tirados do Curupira ao encostar no corpo do chefe. Provisório (combinado): 1.
+## Golpes tirados do Curupira ao encostar no corpo do chefe. v1.0 (combinado): 1.
 @export var golpes_contato: int = 1
 
 @export_group("Caixas de dano")
 ## As caixas acompanham a pose: a cada animação, Hurtbox e Contato ganham o tamanho do
 ## desenho (caixa da animação no .json da folha) vezes estas frações.
-## Hurtbox (onde o tiro do Curupira acerta), centrada no desenho. Provisório: 0,8 × 0,85.
+## Hurtbox (onde o tiro do Curupira acerta), centrada no desenho. v1.0: 0,8 × 0,85.
 @export var fracao_hurtbox: Vector2 = Vector2(0.8, 0.85)
 ## Contato (o corpo que machuca), presa embaixo do desenho, para o fogo, o cabelo e o chapéu
-## não machucarem. Provisório: 0,55 × 0,7.
+## não machucarem. v1.0: 0,55 × 0,7.
 @export var fracao_contato: Vector2 = Vector2(0.55, 0.7)
 
 @export_group("Fases")
@@ -42,9 +42,9 @@ extends Resource
 @export_group("Transição de fase")
 ## Duração mínima da transição (s): o chefe para, a tela limpa e ele faz a animação
 ## "transicao". Se a animação for mais longa, vale a animação. Ele continua levando dano.
-## Provisório: 1,2.
+## v1.0: 1,2.
 @export_range(0.0, 5.0, 0.05, "suffix:s") var duracao_transicao: float = 1.2
-## Respiro parado depois da transição, antes do primeiro combo da fase nova (s). Provisório: 0,5.
+## Respiro parado depois da transição, antes do primeiro combo da fase nova (s). v1.0: 0,5.
 @export_range(0.0, 3.0, 0.05, "suffix:s") var pausa_apos_transicao: float = 0.5
 
 

@@ -16,8 +16,8 @@ extends Resource
 @export var ataques: Array[StringName] = []
 ## Combos possíveis nesta fase. Vazio = a fase não tem combos.
 @export var combos: Array[ComboChefe] = []
-## Chance de a próxima jogada ser um combo em vez de um ataque só (0 a 1). Provisório: ajustar
+## Chance de a próxima jogada ser um combo em vez de um ataque só (0 a 1). v1.0: ajustar
 ## testando. A primeira jogada depois da transição é sempre um combo, para mostrar a novidade.
 @export_range(0.0, 1.0, 0.05) var chance_combo: float = 0.0
-## Multiplica a pausa entre ataques do chefe nesta fase (1 = a pausa do GDD). Provisório: 1.
+## Multiplica a pausa entre ataques do chefe nesta fase (1 = a pausa do GDD). v1.0: 1.
 @export_range(0.2, 2.0, 0.05) var fator_pausa: float = 1.0

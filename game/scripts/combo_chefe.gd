@@ -16,7 +16,7 @@ extends Resource
 @export var primeiro: StringName = &""
 ## Nome do segundo ataque.
 @export var segundo: StringName = &""
-## Espera entre o corpo ficar livre do primeiro e o começo do segundo (s). Provisório: ajustar
+## Espera entre o corpo ficar livre do primeiro e o começo do segundo (s). v1.0: ajustar
 ## testando, sem descer do mínimo que o verificador aponta.
 @export_range(0.0, 3.0, 0.05, "suffix:s") var atraso: float = 0.0
 

@@ -47,7 +47,7 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     coração tremendo ao levar golpe, o retrato mudando de cara e a onça acendendo com o
     especial cheio;
   - os tiros dos chefes saindo do lugar certo: bola da boca da Mula, feitiço da garra da Cuca, jato do bico do Boto, laser da lente da Máquina;
-  - a dificuldade: trocar Normal/Expert na seleção (←/→) e conferir as fases. Normal: Mula, Cuca e
+  - a dificuldade: trocar Normal/Expert no painel do mapa (←/→) e conferir as fases. Normal: Mula, Cuca e
     Boto sem troca de fase, Máquina com uma troca na metade. Expert: uma troca na metade (Máquina:
     em 2/3 e 1/3). A barra do chefe mostra os entalhes certos;
   - a transição: o chefe termina o ataque, a tela treme e clareia, os tiros dele somem, ele faz
@@ -106,7 +106,7 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     no controle. O `verificar_desvio.gd` achou desvio sem dash para todos os ataques sozinhos,
     mas ele joga como um robô;
   - os ataques ganhos: com `LIBERAR_TUDO_PARA_TESTE` (`game_state.gd`) todos já aparecem
-    na seleção, e a Máquina também. Pôr `false` para testar a progressão de verdade.
+    no painel do mapa, e a Máquina também. Pôr `false` para testar a progressão de verdade.
 
 - **Mapa do mundo (F6 em `scenes/mapa.tscn`)**, pedido do Eduardo: escolher o chefe andando até
   ele, como no Cuphead. Novo Jogo e Continuar levam ao mapa; vitória, derrota e pausa da luta
@@ -121,37 +121,21 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     Curupira volta para a frente da área, e a bandeira aparece na área vencida;
   - o portão da empresa: com `LIBERAR_TUDO_PARA_TESTE` em `true` ele já vem aberto. Pôr `false` para
     ver o portão com cadeado e o aviso "Portão trancado".
+- **Decisões da v1.0 (GDD e TDD), para conferir no F6:**
+  - a trava de mira no **L2** do controle (o Shift continua no teclado);
+  - o jogo abrindo em **tela cheia**;
+  - estourar um coração do Boto com tiro **não** enche mais a barra do especial (acertar o
+    Boto continua enchendo);
+  - a tela antiga `level_select` foi apagada: o menu leva ao mapa como antes.
+
 ## Decisões em aberto
 
-- **Valores "provisório".** Os ataques novos (pisoteio, investida, bote, ninar, beijos,
-  chapéu, pistões, varredura, jato baixo, chapéu invertido, rasante, e no Boto a perseguição
-  e o encanto dos corações e as bolhas mais rápidas) estão marcados "provisório" nos
-  `*_data.gd`. Os avisos subiram a pedido do Eduardo (TDD 8.3): os que o GDD fixa mudaram lá
-  também; os outros (pisoteio, investida, bote, ninar, beijos, chapéu, salto, pistões, placa,
-  varredura) são provisórios. As fases e os combos (chance, atraso, pausa, limiares) ficam no
-  `.tres` de cada chefe, com a tabela no TDD 8.2. Fechar no GDD (Q16) depois de testar. Depois de mudar um
-  combo, rodar `game/testes/verificar_desvio.gd` (TDD 15.3) para ver se ainda dá para desviar.
-- **Vitória no Expert.** O Claude assumiu: vencer no Normal já dá os ataques e libera a
-  Máquina; o Expert só marca "(derrotada · Expert)" na seleção. Confirmar ou mudar.
-- **Trava de mira no controle.** A trava ficou só no Shift, a pedido do Eduardo. No controle
-  ela não tem botão (era RB). Escolher um botão (GDD, Q15).
-- **Coração do Boto carrega o especial.** Estourar um coração com tiro conta como acerto,
-  porque a hurtbox dele está na layer `enemy`. Decidir se é desejado.
-- **Regras desatualizadas.** O resumo de regras do `CLAUDE.md` e do `AGENTS.md` ainda diz
-  "estado único" (agora são fases por dificuldade, com combos), "atira para onde está olhando",
-  que W/S não fazem nada e que a vida do chefe não aparece (agora há barra, a pedido do
-  Eduardo). O GDD e o TDD já estão atualizados. A dupla decide quando atualizar.
-- **`level_select` sem uso.** O mapa substituiu a tela de seleção; o painel de cada área copiou a
-  lógica dela. Apagar `level_select.tscn`/`.gd` ou guardar.
-- **Duração da pose de tiro** (`DURACAO_POSE_ATAQUE` 0,3 s) está fixa em `curupira.gd`. O
-  `CLAUDE.md` pede valores de ajuste num `.tres`. Mover para o `MovimentoData`
-  (`curupira_movimento.tres`)? A pose de dano agora dura o tempo da animação `dano` (0,33 s);
-  `DURACAO_POSE_DANO` só vale se ela faltar.
+Nenhuma. As decisões fechadas estão no GDD (Questões em aberto → Resolvidas) e no TDD (seção 19).
+Se um valor mudar no teste, atualizar o `.tres` e o GDD juntos e rodar
+`game/testes/verificar_desvio.gd` (TDD 15.3) para ver se ainda dá para desviar.
 
 ## Arte
 
-- **Animações sem uso.** `trote` (Mula) e `andar` (Cuca) saíram do código, porque os dois não
-  voltam mais para o lugar. Continuam na folha. Apagar do gerador ou guardar para depois.
 - **Animações novas** (gerador): `dano` (susto, 4 quadros) e `transicao` (24 quadros, 2 s) nos
   quatro chefes, `dano` novo do Curupira (5 quadros) e a faísca de acerto
   (`curupira/efeitos/acerto_1..6.png`).
@@ -161,8 +145,6 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
 - **Arte antiga.** Foi para `art/antiga/` e saiu do jogo. Só as folhas do dash
   (`game/assets/efeitos/folha.png`) continuam em uso, e por isso o filtro padrão do projeto
   ainda é `Linear`.
-- **GDD, Q5.** O GDD já registra a pixel art em 480×270 ×4. Conferir se a Q5 (tamanho dos
-  sprites) pode ser fechada.
 
 ## Repositório
 

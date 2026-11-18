@@ -1,6 +1,6 @@
 # Curupira: O Protetor da Floresta — TDD
 
-Documento de Design Técnico · v0.3 · Godot 4.7.1 · GDScript
+Documento de Design Técnico · v1.0 · Godot 4.7.1 · GDScript
 
 Este documento descreve **como** o jogo é construído. O **o quê** (regras, números, arte, história) está no GDD, que é a fonte de verdade para todos os valores.
 
@@ -8,8 +8,14 @@ Este documento descreve **como** o jogo é construído. O **o quê** (regras, n�
 - Sem marcação: vem do GDD.
 - **[Implementado]**: já existe no código; este documento reflete o que o projeto faz.
 - **[Assumido]**: padrão escolhido neste TDD; pode ser vetado.
-- **[Divergente]**: o código faz diferente do que uma versão anterior do TDD previa; vale a decisão do código (ver seção 19 para vetar).
+- **[Divergente]**: o código faz diferente do que uma versão anterior do TDD previa; vale a decisão do código (ver seção 19).
 - **[Aberto]**: ainda precisa ser decidido ou confirmado.
+- **[Planejado]**: decidido, com o desenho técnico pronto neste documento, mas ainda não feito no jogo.
+
+**O que mudou da v0.3 para a v1.0**
+- **Mapa do mundo** no lugar da tela de seleção: o Curupira anda até a área do chefe, e o painel da área escolhe ataques e dificuldade (9.1). O `level_select` foi apagado.
+- **Decisões fechadas** (GDD 1.0): trava de mira no **L2**; vencer no Expert não dá nada a mais; estourar coração do Boto **não carrega** o especial (`Hurtbox.carrega_especial`, 7.4); contato com o chefe tira 1 golpe; os valores "provisório" viraram os da versão 1.0; o jogo abre em **tela cheia**.
+- **Planejados**, com o desenho técnico aqui: áudio com Google Flow e bibliotecas open source (13), Opções (14.2), cenas de abertura (11.2), créditos e `CREDITS.md` (15.4), cheats de debug (15.3), versão e ids no save (14.1) e export (15.2).
 
 **O que mudou da v0.2 para a v0.3**
 - A arte passou a ser **pixel art** (480×270 ampliada 4×), gerada por código e importada como folhas de sprite com um `.json` de pontos (seção 10).
@@ -19,7 +25,7 @@ Este documento descreve **como** o jogo é construído. O **o quê** (regras, n�
 - As arenas trocaram o fundo antigo por `FundoArena` e o chão foi para y = 340 (seção 9).
 - O Input Map ganhou `aim_up`, `crouch` e `aim_lock` (seção 12).
 - Os ataques ganhos dos chefes, os menus (fonte, botões, título, fundo) e as áreas de dano passaram para a pixel art; a arte antiga foi para `art/antiga/` (seções 7, 10 e 11).
-- **Dificuldade Normal/Expert** escolhida na seleção. As fases de cada chefe dependem dela, os ataques saem embaralhados e às vezes em **combo**, e a troca de fase tem **transição** (seção 8.4). Golpes com retorno visual: pisca branco, faísca, tremor (6.5 e 8.1).
+- **Dificuldade Normal/Expert** escolhida na seleção (na v1.0, no painel do mapa). As fases de cada chefe dependem dela, os ataques saem embaralhados e às vezes em **combo**, e a troca de fase tem **transição** (seção 8.4). Golpes com retorno visual: pisca branco, faísca, tremor (6.5 e 8.1).
 - **Avisos mais longos** em todos os ataques dos chefes (8.3) e a Canção de ninar virou uma melodia de notas soltas. Sem marca na tela cobrindo a área do golpe (8.1): a Mula ganhou uma investida com a pata raspando a terra e um brilho no céu antes de cada meteoro. O Boto afunda na água até o bico ficar na altura do jato, que sai reto, e o aviso é a água crescendo no bico; em volta dele a água se mexe e respinga (8.3, 9 e 10.5).
 - **Boto mais difícil** (pedido do Eduardo). O chapéu perdeu a linha de aviso: o Boto tira o chapéu com a nadadeira e segura na altura da ida, e o chapéu sai reto dela. O salto ganhou uma segunda forma, o rasante (baixo e reto, abaixa-se), e o salto por cima solta cinco bolhas mais rápidas. Os corações perseguem o Curupira, e o que encosta encanta: puxa o Curupira para o Boto por 1 s (7.6 e 8.3).
 
@@ -27,7 +33,7 @@ Este documento descreve **como** o jogo é construído. O **o quê** (regras, n�
 
 ## 1. Status
 
-Revisão v0.3 feita sobre a pasta `game/` (branch `movimento-curupira`), depois do port da pixel art.
+Revisão v1.0 feita sobre a pasta `game/` (branch `main`), depois do mapa do mundo.
 
 | Área | Estado |
 |---|---|
@@ -38,13 +44,13 @@ Revisão v0.3 feita sobre a pasta `game/` (branch `movimento-curupira`), depois 
 | Arte em pixel: Curupira, 4 chefes, efeitos dos chefes, 4 arenas | Pronta, ligada nas cenas |
 | Efeitos de estado (veneno, lentidão) no chefe e no Curupira | Pronto, sem componente `StatusEffects` (ver 7.6) |
 | Arenas (4), HUD, pausa, derrota, vitória, créditos | Pronto |
-| Menu inicial, seleção de fase e ataques | Pronto, em pixel art |
+| Menu inicial, mapa do mundo e painel de cada fase (ataques e dificuldade) | Pronto, em pixel art (falta mostrar os botões do controle no menu) |
 | Save de progresso e equipamento | Pronto (formato `ConfigFile`, ver 14) |
-| **Opções (volume, tela cheia)** | **Não feito** (tela é só um aviso "em breve") |
-| **Áudio (barramentos, músicas, SFX)** | **Não feito** |
-| **Cenas de abertura** | **Não feito** |
-| **Cheats de debug** | **Não feito** |
-| **Export (Linux/Windows), `CREDITS.md`** | **Não feito** |
+| **Opções (volume, tela cheia)** | **Planejado** (14.2); hoje a tela é só um aviso "em breve" |
+| **Áudio (barramentos, músicas, SFX)** | **Planejado** (13) |
+| **Cenas de abertura** | **Planejado** (11.2) |
+| **Cheats de debug** | **Planejado** (15.3) |
+| **Export (Linux/Windows), `CREDITS.md`** | **Planejado** (15.2, 15.4) |
 
 ## 2. Visão técnica
 
@@ -59,7 +65,7 @@ Boss-rush de plataforma 2D em visão lateral. Quatro arenas de tela única (1920
 | Renderer | **GL Compatibility** **[Implementado]** (2D simples; roda em hardware modesto e simplifica o export) |
 | Resolução base | 1920×1080. A arte é desenhada em 480×270 e ampliada 4× (seção 10) |
 | Stretch | Mode `canvas_items`, aspect `expand` **[Implementado]** |
-| Tela | **[Aberto]** `window/size/mode = 2` (maximizada). O GDD pede tela cheia por padrão (modo 3), alternável nas Opções |
+| Tela | `window/size/mode = 3` (tela cheia) **[Implementado]**, como pede o GDD. A troca para janela fica nas Opções (14.2) |
 | Filtro de textura | **[Divergente]** Pixel art usa `Nearest`. As raízes das arenas (`level1..4`) têm `texture_filter = Nearest`, e os filhos herdam. Os menus também (raiz de cada tela). O padrão do projeto continua `Linear` por causa das folhas do dash, a última arte antiga em uso (10.3) |
 | Snap 2D to pixel | Desligado **[Assumido]** |
 | Física | 60 ticks/s (padrão). O combate roda no `_physics_process`, em ritmo fixo **[Implementado]** |
@@ -100,7 +106,7 @@ jogo-curupira/
 **Convenções [Implementado]**
 - Arquivos e pastas em `snake_case`; cena e script com o mesmo nome base (`mula.tscn` / `mula.gd`).
 - Nós em `PascalCase`.
-- Código (variáveis, funções, sinais, constantes, `class_name`) e nós **em português**, como no `CLAUDE.md`. Exceções em inglês: os nós dos níveis (`Floor`, `LeftWall`, `RightWall`, herdados do protótipo), `take_damage`, `Hitbox` e `Hurtbox`. **[Aberto]** O GDD pedia `Chao`, `ParedeEsquerda`, `ParedeDireita`: renomear ou atualizar o GDD.
+- Código (variáveis, funções, sinais, constantes, `class_name`) e nós **em português**, como no `CLAUDE.md`. Exceções em inglês: `take_damage`, `Hitbox` e `Hurtbox`.
 - Constantes em `MAIÚSCULAS_COM_UNDERLINE`.
 - Cada script documenta no topo as animações que espera no `SpriteFrames`.
 - `Hitbox` e `Hurtbox` são **scripts com `class_name`** aplicados nos `Area2D` de cada cena, sem cena própria.
@@ -122,9 +128,9 @@ Derrota          Vitória
 Máquina derrotada → Créditos (direto) → Menu inicial
 ```
 
-- **Cena principal**: `main.tscn` (hoje abre o `level1` direto, é a cena de teste). **[Aberto]** Trocar `run/main_scene` para `main_menu.tscn` antes do build.
-- **Abertura**: **[Aberto]** não existe. Decidir se entra no MVP.
-- `Pausa → Opções` e "voltar à seleção a partir das Opções em arena": **não feito**. A pausa tem hoje Continuar / Tentar de novo / Voltar para o mapa. O `level_select` antigo ficou sem uso (seção 9.1).
+- **Cena principal**: `main_menu.tscn` **[Implementado]**. O `main.tscn` é uma cena de teste que abre o `level1`.
+- **Abertura** **[Planejado]**: entra no MVP, como quatro imagens com texto (11.2). Novo Jogo → Abertura → Mapa; Continuar vai direto ao mapa.
+- `Pausa → Opções`: **[Planejado]** (14.2). A pausa tem hoje Continuar / Tentar de novo / Voltar para o mapa. O `level_select` antigo foi apagado.
 - Troca de cena: `get_tree().change_scene_to_file()` direto nos scripts de UI **[Implementado]**. **[Assumido]** Só criar um `SceneManager` se entrar transição.
 
 ### 5.2 Autoloads
@@ -139,7 +145,7 @@ Regras do `GameState` **[Implementado]**:
 - `boss_liberado()` só é verdadeiro com `fase1`, `fase2` e `fase3` concluídas.
 - `marcar_concluida()` salva na hora; `equipar()` também.
 - `GameState._ready()` carrega o save ao abrir o jogo, para que vencer uma fase aberta com F6 não apague o progresso existente.
-- **Opções (volume, tela cheia) ainda não estão no `GameState`** **[Aberto]**.
+- **Opções (volume, tela cheia) ainda não estão no `GameState`** **[Planejado]** (14.2).
 
 ### 5.3 Pausa
 
@@ -278,7 +284,7 @@ Um `.tres` (`AtaqueData`) por ataque em `dados/ataques/`. Segurar o botão atira
 - Barra cheia + `attack_special` dispara; a barra volta a 0 (`gastar()`).
 - A barra começa em 0 a cada fase (recarregar a cena zera).
 - Acertos do próprio especial não carregam a barra.
-- **[Aberto]** Estourar um coração do Boto também conta como acerto e carrega a barra (a hurtbox do coração está na layer `enemy`). Decidir se é desejado.
+- Estourar um coração do Boto **não** carrega a barra **[Implementado]** (decisão do GDD 1.0). A hurtbox do coração está na layer `enemy` para os tiros enxergarem ela, então o filtro é por flag: `Hurtbox.carrega_especial` (padrão `true`) fica `false` no coração, e o `Atirador` só emite `acerto_basico` se o alvo carrega o especial.
 - O HUD escuta `carga_mudou` e `vida_mudou` por sinal.
 
 ### 7.5 Especiais **[Implementado]**
@@ -337,8 +343,8 @@ A vida do chefe aparece numa barra no alto da tela (`hud_chefe.gd`, 11.1). Cada 
 | Campo | Valor | Para quê |
 |---|---|---|
 | `fases_normal` / `fases_expert` | `Array[FaseChefe]` | Fases de cada dificuldade. Expert vazio = usa as do Normal |
-| `duracao_transicao` | 1,2 s | Duração mínima da transição; vale a animação `transicao` (2 s) se for mais longa (provisório) |
-| `pausa_apos_transicao` | 0,5 s | Respiro antes do primeiro combo da fase nova (provisório) |
+| `duracao_transicao` | 1,2 s | Duração mínima da transição; vale a animação `transicao` (2 s) se for mais longa |
+| `pausa_apos_transicao` | 0,5 s | Respiro antes do primeiro combo da fase nova |
 
 Cada `FaseChefe` (`scripts/fase_chefe.gd`, sub-recurso no `.tres` do chefe):
 
@@ -350,7 +356,7 @@ Cada `FaseChefe` (`scripts/fase_chefe.gd`, sub-recurso no `.tres` do chefe):
 | `chance_combo` | Chance de a próxima jogada ser um combo |
 | `fator_pausa` | Multiplica `pausa_entre_ataques` nesta fase (0,8 = 20% mais curta) |
 
-Tudo isso se edita no inspetor: abrir o `.tres` do chefe, expandir a fase e o combo. Os valores atuais (provisórios, GDD Q16):
+Tudo isso se edita no inspetor: abrir o `.tres` do chefe, expandir a fase e o combo. Os valores atuais (versão 1.0, GDD Q16 resolvida):
 
 | Chefe | Dificuldade | Fase (vida) | Ataques | Chance | Pausa | Combos (atraso) |
 |---|---|---|---|---|---|---|
@@ -378,30 +384,30 @@ Todos os combos passaram no `verificar_desvio.gd` (15.3). O bote+leque do Expert
 | Boto cor-de-rosa | 2000 | 2 s | Bolha d'Água + Bolha Abissal | `fase3` |
 | Máquina controlada por IA | 2400 | 1,2 s | Nada (chefe final) | `boss` |
 
-Cada chefe tem a própria classe de dados (`MulaData`, `CucaData`, `BotoData`, `MaquinaData`), com um `@export_group` por ataque e a cena de cada projétil. Contato com o corpo do chefe (`Contato`) tira 1 golpe. **[Aberto]** Valor provisório, não está no GDD.
+Cada chefe tem a própria classe de dados (`MulaData`, `CucaData`, `BotoData`, `MaquinaData`), com um `@export_group` por ataque e a cena de cada projétil. Contato com o corpo do chefe (`Contato`) tira 1 golpe (`golpes_contato`), como fixa o GDD 1.0.
 
 ### 8.3 Ataques **[Implementado]**
 
-A coluna Fase é a ordem em que os ataques entram nas lutas com mais fases (Máquina no Expert); quais ataques cada fase usa está em 8.2. "Provisório" = não está no GDD, ajustar testando no `.tres`.
+A coluna Fase é a ordem em que os ataques entram nas lutas com mais fases (Máquina no Expert); quais ataques cada fase usa está em 8.2. Os números são os da versão 1.0 e ficam no `.tres`; se o teste mudar algum, atualizar o GDD junto.
 
 | Chefe | Fase | Ataque | Aviso | Golpes | O que acontece (valores no `.tres`) |
 |---|---|---|---|---|---|
 | Mula | 1 | `bolas` | 0,8 s | 1 cada | Abaixa o peito e cospe 3 bolas rente ao chão (60 px), a 700 px/s, uma a cada 0,35 s |
-| Mula | 1 | `pisoteio` | 1 s | 1 | Empina, bate as patas e solta uma onda de fogo pelo chão a 650 px/s (provisório) |
-| Mula | 2 | `investida` | 1,1 s | 1 | Aviso: agacha e raspa a pata da frente na terra duas vezes (`aviso_investida`, 13 quadros a 12/s, do tamanho do aviso). Corre até a parede do lado do Curupira a 1400 px/s, fica tonta 1,4 s e fica lá, virada para ele (provisório) |
+| Mula | 1 | `pisoteio` | 1 s | 1 | Empina, bate as patas e solta uma onda de fogo pelo chão a 650 px/s |
+| Mula | 2 | `investida` | 1,1 s | 1 | Aviso: agacha e raspa a pata da frente na terra duas vezes (`aviso_investida`, 13 quadros a 12/s, do tamanho do aviso). Corre até a parede do lado do Curupira a 1400 px/s, fica tonta 1,4 s e fica lá, virada para ele |
 | Mula | 3 | `meteoros` | 1,3 s cada | 2 cada | 3 meteoros, o 1º no Curupira e os outros a ±300 px. Cada um sobe da boca (dá para ver). No alto da tela, em cima do ponto de queda, um brilho fica mais forte e pisca mais rápido até a pedra cair (0,3 s finais), e a pedra sai dele; no chão a sombra cresce. Depois fica cansada 1,5 s |
 | Cuca | 1 | `leque` | 0,8 s | 1 cada | 3 feitiços em leque (abertura 20°) saindo da garra, o do meio mirado no Curupira na hora do disparo; 700 px/s |
 | Cuca | 1 | `pocao` | 0,8 s | ver poças (7.6) | Poção em arco (600 px/s, gravidade 1800) até onde o Curupira estava na hora de jogar; depois fica parada 1,5 s |
-| Cuca | 2 | `bote` | 0,9 s | 1 | Bote de jacaré: avança a 1100 px/s até 150 px da parede do lado do Curupira (`margem_parede_bote`), levanta e fica lá (provisório) |
-| Cuca | 3 | `ninar` | 0,9 s | 1 cada | Melodia de 6 notas soltas, uma a cada 0,7 s, a 400 px/s: grave (36 px do chão, laranja; pula-se) ou aguda (128 px, azul; abaixa-se), 50/50 (provisório) |
-| Boto | 1 | `jato` | 0,9 s | 1 | Sorteia alto (130 px do chão, dura 0,5 s; abaixa-se) ou baixo (40 px, dura 0,35 s; pula-se), 50/50. No começo do aviso afunda (ou sobe) na água até o bico, na pose `jato`, ficar na altura sorteada (0,3 s, `ajuste_jato`); o alto afunda ~70 px e o baixo ~160 px, só com a cabeça para fora. Nos 0,5 s finais (`crescida_jato`), a água sai do bico fina e vai crescendo (`jato_crescendo`). O jato sai reto do bico; no `fim_jato` ele volta para a linha d'água (também no combo). Depois fica parado 1,2 s (provisório) |
-| Boto | 1 | `beijos` | 0,6 s | 1 cada | 4 corações, um a cada 0,45 s, que perseguem o Curupira a 240 px/s virando no máximo 90°/s (curva larga, dá para despistar) e ondulam para os lados (24 px, 0,9 Hz). Estouram com tiro ou depois de 6 s. O que encosta também encanta: puxa o Curupira para o lado do Boto a 300 px/s por 1 s (7.6) (provisório) |
-| Boto | 2 | `chapeu` | 0,8 s | 1 | Chapéu bumerangue: vai baixo (40 px) e volta alto (140 px), ou o contrário (50/50), 0,9 s cada trecho (provisório). Aviso: `aviso_chapeu` (tira o chapéu e puxa o braço para trás) e `segura_chapeu` (segura, tremendo). No começo do aviso afunda ou sobe até a nadadeira, no último quadro do `arremesso`, ficar na altura da ida (0,3 s, `ajuste_chapeu`). O chapéu sai reto da nadadeira; no `fim_arremesso` ele volta para a linha d'água |
-| Boto | 3 | `salto` | 0,8 s | 1 cada bolha; contato no rasante | Duas formas, 50/50 (`chance_rasante`). Por cima: `mergulho` (afunda reto) e pula para o outro lado (1,4 s, arco de 520 px) soltando 5 bolhas que descem a 200 px/s balançando 48 px a 1,6 Hz. Rasante: `aviso_rasante` (deita para a frente e bate a cauda, 0,8 s) e atravessa deitado em 1,2 s, com a barriga 120 px acima da areia (entre o Curupira agachado, 86, e em pé, 172); sobe e desce só nos 12% das pontas, sobre a água. Abaixar ou dash (provisório) |
+| Cuca | 2 | `bote` | 0,9 s | 1 | Bote de jacaré: avança a 1100 px/s até 150 px da parede do lado do Curupira (`margem_parede_bote`), levanta e fica lá |
+| Cuca | 3 | `ninar` | 0,9 s | 1 cada | Melodia de 6 notas soltas, uma a cada 0,7 s, a 400 px/s: grave (36 px do chão, laranja; pula-se) ou aguda (128 px, azul; abaixa-se), 50/50 |
+| Boto | 1 | `jato` | 0,9 s | 1 | Sorteia alto (130 px do chão, dura 0,5 s; abaixa-se) ou baixo (40 px, dura 0,35 s; pula-se), 50/50. No começo do aviso afunda (ou sobe) na água até o bico, na pose `jato`, ficar na altura sorteada (0,3 s, `ajuste_jato`); o alto afunda ~70 px e o baixo ~160 px, só com a cabeça para fora. Nos 0,5 s finais (`crescida_jato`), a água sai do bico fina e vai crescendo (`jato_crescendo`). O jato sai reto do bico; no `fim_jato` ele volta para a linha d'água (também no combo). Depois fica parado 1,2 s |
+| Boto | 1 | `beijos` | 0,6 s | 1 cada | 4 corações, um a cada 0,45 s, que perseguem o Curupira a 240 px/s virando no máximo 90°/s (curva larga, dá para despistar) e ondulam para os lados (24 px, 0,9 Hz). Estouram com tiro ou depois de 6 s. O que encosta também encanta: puxa o Curupira para o lado do Boto a 300 px/s por 1 s (7.6) |
+| Boto | 2 | `chapeu` | 0,8 s | 1 | Chapéu bumerangue: vai baixo (40 px) e volta alto (140 px), ou o contrário (50/50), 0,9 s cada trecho. Aviso: `aviso_chapeu` (tira o chapéu e puxa o braço para trás) e `segura_chapeu` (segura, tremendo). No começo do aviso afunda ou sobe até a nadadeira, no último quadro do `arremesso`, ficar na altura da ida (0,3 s, `ajuste_chapeu`). O chapéu sai reto da nadadeira; no `fim_arremesso` ele volta para a linha d'água |
+| Boto | 3 | `salto` | 0,8 s | 1 cada bolha; 1 no rasante | Duas formas, 50/50 (`chance_rasante`). Por cima: `mergulho` (afunda reto) e pula para o outro lado (1,4 s, arco de 520 px) soltando 5 bolhas que descem a 200 px/s balançando 48 px a 1,6 Hz. Rasante: `aviso_rasante` (deita para a frente e bate a cauda, 0,8 s) e atravessa deitado em 1,2 s, com a barriga 120 px acima da areia (entre o Curupira agachado, 86, e em pé, 172); sobe e desce só nos 12% das pontas, sobre a água. Abaixar ou dash |
 | Máquina | 1 | `laser` | 1 s | 1 | Linha fina segue o Curupira e trava 0,3 s antes; laser dura 0,4 s |
 | Máquina | 1 | `bombas` | animação `aviso_bombas` | 2 | 3 alçapões abrem no teto e soltam bombas (1 no Curupira, 2 a ±300 px), que explodem 1,5 s depois no chão (raio 180); parada 1,2 s |
-| Máquina | 2 | `pistoes` | 0,9 s | 1 | Duas ondas de placas sobem do chão de um lado ao outro (960 px/s, a 2ª 1,25× mais rápida); cada placa avisa 0,4 s antes (provisório) |
-| Máquina | 3 | `varredura` | 0,8 s cada | 1 | Desce até a altura do Curupira e dispara um laser reto na altura da cabeça (0,6 s; agachar desvia); depois mira o chão e o ponto de impacto corre até a parede (0,85 s; pular desvia) (provisório). Linha fina antes de cada passada |
+| Máquina | 2 | `pistoes` | 0,9 s | 1 | Duas ondas de placas sobem do chão de um lado ao outro (960 px/s, a 2ª 1,25× mais rápida); cada placa avisa 0,4 s antes |
+| Máquina | 3 | `varredura` | 0,8 s cada | 1 | Desce até a altura do Curupira e dispara um laser reto na altura da cabeça (0,6 s; agachar desvia); depois mira o chão e o ponto de impacto corre até a parede (0,85 s; pular desvia). Linha fina antes de cada passada |
 
 Os avisos subiram a pedido do Eduardo ("não dá tempo de desviar"). Valores antigos: bolas 0,5, pisoteio 0,8, investida 0,9, meteoros 1, leque 0,5, poção 0,6, bote 0,6, ninar 0,4, jato 0,7, beijos 0,4 (não era usado), chapéu 0,6, salto sem aviso, laser 0,8 (trava 0,2), pistões 0,5 (placa 0,25), varredura 0,5. Os que o GDD fixa (bolas, meteoros, leque, poção, jato, laser) mudaram também no GDD.
 
@@ -442,7 +448,7 @@ A v0.2 tinha um `enum Estado` com um valor por passo de cada ataque (`AVISO_BOLA
 
 ### 8.5 Valores no código
 
-Números de balanceamento ficam em `Resource` (`ChefeData` → `MulaData`, `CucaData`, `BotoData`, `MaquinaData`; `AtaqueData`; `EspecialData`; `MovimentoData`; `VidaJogadorData`), editáveis no inspetor. Ficam como `const` só valores visuais ou ligados ao desenho: cores de aviso, tempo e força do pisca, tremores e clarão (`PISCA_*`, `TREMOR_*`, `TRANCO_PX`, `INTERVALO_SUSTO`), o pisca da água crescendo no bico (`PISCA_CRESCIDA`), quanto o Boto precisa mexer para a água respingar (`MOVIMENTO_RESPINGO`) e a volta à linha d'água na derrota (`VOLTA_NA_DERROTA`), o brilho do meteoro (`MARGEM_BRILHO`, `PISCA_BRILHO_*`), `QUADRO_PISADA` e `QUADRO_PISADA_TRANSICAO` (em que quadro a pata bate no chão), `DURACAO_POSE_ATAQUE` e `DURACAO_POSE_DANO` do Curupira. **[Aberto]** Mover as duas durações de pose para o `MovimentoData`.
+Números de balanceamento ficam em `Resource` (`ChefeData` → `MulaData`, `CucaData`, `BotoData`, `MaquinaData`; `AtaqueData`; `EspecialData`; `MovimentoData`; `VidaJogadorData`), editáveis no inspetor. Ficam como `const` só valores visuais ou ligados ao desenho: cores de aviso, tempo e força do pisca, tremores e clarão (`PISCA_*`, `TREMOR_*`, `TRANCO_PX`, `INTERVALO_SUSTO`), o pisca da água crescendo no bico (`PISCA_CRESCIDA`), quanto o Boto precisa mexer para a água respingar (`MOVIMENTO_RESPINGO`) e a volta à linha d'água na derrota (`VOLTA_NA_DERROTA`), o brilho do meteoro (`MARGEM_BRILHO`, `PISCA_BRILHO_*`), `QUADRO_PISADA` e `QUADRO_PISADA_TRANSICAO` (em que quadro a pata bate no chão), `DURACAO_POSE_ATAQUE` e `DURACAO_POSE_DANO` do Curupira (a pose de tiro é estática e igual para todos os tiros, então não é valor de balanceamento).
 
 ### 8.6 Derrota do chefe **[Implementado]**
 
@@ -505,7 +511,7 @@ Mapa (Node2D, mapa.gd)           # liga Curupira, câmera, aviso e painel; guard
 - **Animação**: fundo, frente e objetos animados trocam de quadro pelo mesmo relógio (16 quadros, 8 fps, laço de 2 s), para fogo, água, névoa e bandeiras baterem.
 - **Ajustes** em `dados/mapa/mapa_ajustes.tres` (`MapaData`): velocidade (64 px de arte/s), raio dos pés, suavidade da câmera.
 - **Controles**: anda com `move_left`/`move_right`/`aim_up`/`crouch` (analógico, direcional, WASD), entra com `ui_accept` ou `jump`, pausa com `pause` ou `ui_cancel`.
-- O painel copia a lógica de escolha do `level_select.gd`, que ficou sem uso (nenhuma cena leva mais a ele). **[Aberto]** apagar `level_select` ou guardar.
+- O painel herdou a lógica de escolha do antigo `level_select`, que foi apagado (está no histórico do Git).
 - **Arte** (`mapa_px.js`, `mapa_curupira_px.js`): o terreno sai de formas simples (lago, rio, trilhas, elipses de cada área) com ruído; a mata fechada é um tapete de copas; o Curupira do mapa é o mesmo da luta (cabeça, cabelo, rosto, saia de folhas, pés para trás) com o corpo encurtado, em 5 direções (`baixo`, `diag_baixo`, `lado`, `diag_cima`, `cima`; esquerda é espelho).
 
 ## 10. Arte e animações (pixel art)
@@ -599,16 +605,25 @@ Pixel art do gerador (`art/pixel/gerador/hud_px.js` → `assets/pixel/ui/hud_*.p
 
 | Tela | Estado |
 |---|---|
-| Cenas de abertura | **Não feito [Aberto]** |
-| Menu inicial | Pronto: Novo Jogo (apaga o save), Continuar (desabilitado sem save), Opções, Sair. **[Aberto]** o GDD pede os botões de cada ação do controle na tela |
+| Cenas de abertura | **[Planejado]**, ver abaixo |
+| Menu inicial | Pronto: Novo Jogo (apaga o save), Continuar (desabilitado sem save), Opções, Sair. **[Planejado]** mostrar os botões de cada ação do controle na tela, ver abaixo |
 | Mapa do mundo | Pronto (seção 9.1). O painel de cada área lista só ataques liberados, troca com ←/→, salva a escolha e tem o botão **Dificuldade** (Normal/Expert, ←/→) com uma linha de explicação; chefe vencido mostra "Derrotada" ou "Derrotada · Expert". Máquina atrás do portão até as 3 fases |
 | Pausa do mapa | Pronto: Continuar / Menu principal |
 | Arena (×4) | Pronto (seção 9) |
 | Pausa | Pronto: Continuar / Tentar de novo / Voltar para o mapa |
-| Opções | **Só placeholder** ("Volume e tela cheia chegam em breve") |
+| Opções | **Só placeholder** ("Volume e tela cheia chegam em breve"); **[Planejado]** em 14.2 |
 | Derrota | Pronto: Tentar de novo / Voltar para o mapa (aparece 1 s depois do último golpe) |
 | Vitória | Pronto |
-| Créditos | Pronto (tela + voltar ao menu); **[Aberto]** conteúdo real dos créditos |
+| Créditos | Pronto (tela + voltar ao menu); **[Planejado]** o texto, gerado do `CREDITS.md` (15.4) |
+
+**Cenas de abertura [Planejado]**
+- Cena `abertura.tscn` (`Control`, script `abertura.gd`), aberta pelo Novo Jogo antes do mapa. O Continuar não passa por ela.
+- Quatro imagens em pixel art de 480×270, geradas pelo gerador como o resto (`art/pixel/gerador/`), exportadas para `assets/pixel/abertura/cena_1..4.png` e mostradas ampliadas 4× (filtro `Nearest`).
+- Texto de uma ou duas frases embaixo de cada imagem, com a fonte do tema dos menus. Os textos ficam num `Resource` (`AberturaData`, `dados/abertura.tres`) para trocar sem mexer no código.
+- `ui_accept` (A, Enter, Espaço) avança; `pause` (Start, Esc) pula tudo e vai para o mapa. Troca de imagem com fade de 0,3 s.
+- As quatro cenas: a floresta viva com o Curupira; a empresa e a IA derrubando árvores para data centers; os chips na Mula, na Cuca e no Boto, de olho vermelho; o Curupira livre partindo para libertar as criaturas.
+
+**Botões no menu inicial [Planejado]**: uma faixa embaixo do menu com o ícone de cada botão do controle e o nome da ação (andar, pular, atirar, especial, dash, travar mira). Ícones em pixel art no gerador (`assets/pixel/ui/botao_*.png`).
 
 ### 11.3 Navegação de menus **[Implementado]**
 Menus são `Control`/`CanvasLayer` com tema compartilhado (`dados/tema_menus.tres`) e fundo (`fundo_menu.tscn`: `FundoArena` com a floresta de `arenas/menu` e brasas de 4 px). O tema usa a fonte em pixel e `StyleBoxTexture` em 9 fatias (margem de 12 px = 3 px da arte). A fonte tem 12 px de altura de linha e é importada com `scaling_mode = Integer Only`: os tamanhos de fonte das telas são múltiplos de 12 (24, 36, 48, 60, 72), senão os pixels saem desiguais. O contorno vem desenhado na fonte, então `outline_size = 0`. O menu inicial mostra o Curupira da folha (`idle`) em pé no chão da floresta. Usam `ui_*`, nunca as ações de jogo (exceto `pause` na luta). O primeiro botão recebe `grab_focus()` ao abrir. `ui_accept` e `ui_cancel` foram redefinidos no projeto (Enter/Espaço/A e Esc/B).
@@ -620,7 +635,7 @@ Menus são `Control`/`CanvasLayer` com tema compartilhado (`dados/tema_menus.tre
 | `move_left` / `move_right` | Direcional e analógico esquerdo | A / D |
 | `aim_up` | Direcional ↑ e analógico ↑ | W / ↑ |
 | `crouch` | Direcional ↓ e analógico ↓ | S / ↓ |
-| `aim_lock` | — (sem botão) | Shift |
+| `aim_lock` | L2 (gatilho esquerdo, eixo 4) | Shift |
 | `jump` | A | Espaço |
 | `attack_basic` | X | J |
 | `attack_special` | Y | K |
@@ -628,19 +643,19 @@ Menus são `Control`/`CanvasLayer` com tema compartilhado (`dados/tema_menus.tre
 | `pause` | Start | Esc |
 
 - `aim_up` e `crouch` também servem para mirar no ar (6.3).
-- Trava de mira só no Shift, decisão do Eduardo. **[Aberto]** No controle a trava ficou sem botão (era RB); falta escolher um (GDD Q15).
+- Trava de mira: Shift no teclado e **L2** no controle **[Implementado]** (GDD Q15). O L2 é um eixo (`InputEventJoypadMotion`, eixo 4), então vale a partir da deadzone 0,2 da ação.
 - O analógico usa deadzone 0,5 nas ações de movimento e mira.
 
-## 13. Áudio — **[Aberto, não iniciado]**
+## 13. Áudio — **[Planejado]**
 
-Nada implementado: não há barramentos configurados, `AudioStreamPlayer`, nem arquivos de áudio.
+Nada implementado ainda: não há barramentos configurados, `AudioStreamPlayer`, nem arquivos de áudio. As faixas e os efeitos de cada tela estão no GDD (Som e música).
 
-Proposta **[Assumido]**:
-- Barramentos: `Master`, `Music`, `SFX`.
-- Uma música por cena (menu, seleção, cada arena); troca ao entrar na cena.
-- Efeitos via `AudioStreamPlayer` / `AudioStreamPlayer2D`. As rotinas de ataque dos chefes (8.4) são o lugar natural para tocar o som de cada passo.
-- Volume: **dois sliders (música e efeitos)** + Master fixo em 0 dB; o valor é salvo nas opções.
-- Lista de faixas e efeitos (Q14): **[Aberto]**.
+- **Origem:** música e efeitos feitos com o **Google Flow** e com **bibliotecas open source**. Cada arquivo entra no `CREDITS.md` com fonte, autor e licença (15.4). Só entram licenças que permitem venda (o jogo é pago).
+- **Formato e pasta:** música em `.ogg` (com laço ligado na importação), efeitos em `.wav` curtos, em `game/assets/audio/musica/` e `game/assets/audio/efeitos/`. Adicionar `*.ogg` e `*.wav` ao Git LFS antes do primeiro arquivo.
+- **Barramentos:** `Master`, `Musica` e `Efeitos`, no `default_bus_layout.tres`.
+- **Música:** autoload `Musica` com um `AudioStreamPlayer` no barramento `Musica`. Cada cena chama `Musica.tocar(faixa)` no `_ready`; se for a mesma faixa, ela continua sem reiniciar (menu → mapa não corta), senão troca com fade de 0,5 s. A faixa de cada arena fica no `ChefeData` (`musica`), para o `.tres` escolher.
+- **Efeitos:** `AudioStreamPlayer` (interface) ou `AudioStreamPlayer2D` (na luta) no barramento `Efeitos`. As rotinas de ataque dos chefes (8.4) tocam o som de cada passo (aviso, golpe); o som de cada tiro e especial fica no `AtaqueData`/`EspecialData` (`som`), para cada ataque ter o seu.
+- **Volume:** dois sliders nas Opções (música e efeitos), de 0 a 100%, convertidos com `linear_to_db`. `Master` fica fixo em 0 dB.
 
 ## 14. Save e opções
 
@@ -657,25 +672,35 @@ Um único `ConfigFile` em `user://save.cfg`:
 ```
 
 - Carregar ao abrir o jogo (`GameState._ready`) e no Continuar; salvar a cada fase concluída e a cada mudança de equipamento ou de dificuldade.
-- **[Assumido]** Vencer no Normal já concede os ataques e libera a Máquina; o Expert só marca a vitória à parte.
+- Vencer no Normal já concede os ataques e libera a Máquina; o Expert só marca a vitória à parte e não dá nada a mais (decisão do GDD 1.0).
 - Novo Jogo apaga o arquivo e zera a memória.
-- Equipamento guarda **caminhos** de `.tres`: renomear ou mover um `.tres` de ataque quebra saves existentes. **[Aberto]** Guardar um id (`tiro_de_folha`) em vez do caminho, ou tratar o `load` nulo (hoje não há).
-- Sem versão de formato no arquivo. **[Aberto]** Adicionar `versao` antes do lançamento.
+- Equipamento guarda **caminhos** de `.tres`: renomear ou mover um `.tres` de ataque quebra saves existentes. **[Planejado]** Guardar o nome do arquivo sem pasta e sem extensão como id (`tiro_de_folha`) e procurar em `dados/ataques/`; se não achar, equipar o ataque inicial em vez de quebrar.
+- Sem versão de formato no arquivo. **[Planejado]** Gravar `[save] versao = 1` e, ao ler um save sem versão ou mais antigo, converter (caminho → id) e gravar de novo.
 
-### 14.2 Opções **[Aberto, não iniciado]**
-Volume e tela cheia/janela ainda não existem. **[Assumido]** Guardar em seção `[opcoes]` do mesmo `save.cfg` e aplicar no `_ready` do `GameState`, preservando essa seção em `apagar_save()` para o Novo Jogo não apagar as opções.
+### 14.2 Opções **[Planejado]**
+Volume e tela cheia/janela ainda não existem; a tela de Opções é um aviso "em breve".
+
+- **Tela** (`options_menu.tscn`, já existe): dois `HSlider` (Música e Efeitos, 0 a 100, passo 10) e um `CheckButton` (Tela cheia), com o tema dos menus, navegáveis no controle (←/→ mudam o slider).
+- **Onde salva:** seção `[opcoes]` do mesmo `save.cfg` (`volume_musica`, `volume_efeitos`, `tela_cheia`). `apagar_save()` passa a preservar essa seção, para o Novo Jogo não apagar as opções.
+- **Quando aplica:** no `_ready` do `GameState` e na hora em que o jogador mexe. Tela cheia = `DisplayServer.WINDOW_MODE_FULLSCREEN`; janela = `WINDOWED`.
+- **Na luta:** a pausa ganha o botão Opções, que abre a mesma tela por cima (com `PROCESS_MODE_ALWAYS`) e volta para a pausa.
 
 ## 15. Build, versionamento e qualidade
 
 ### 15.1 Git
-- Git LFS para `*.png`, `*.kra` e `*.mp4` **[Implementado]**; `*.ogg` e `*.wav` **[Aberto]** adicionar quando entrar áudio.
+- Git LFS para `*.png`, `*.kra` e `*.mp4` **[Implementado]**; `*.ogg` e `*.wav` **[Planejado]** antes do primeiro arquivo de áudio.
 - `.gitignore` ignora `game/.godot/`, `game/build/`, `*.pck`, `*.exe`. Mantém `.import` versionados.
-- `export_presets.cfg` não existe ainda. **[Aberto]** Versionar (sem segredos) para o build ser reproduzível pelos dois.
+- `export_presets.cfg` não existe ainda. **[Planejado]** Versionar (sem segredos) para o build ser reproduzível pelos dois.
 - `.tscn`, `.tres` e `.import` como `binary`: conflito de merge se resolve escolhendo uma versão inteira. A dupla não trabalha em paralelo (`CLAUDE.md`).
 - As cenas novas de projéteis e efeitos usam `ext_resource` só com `path` (sem `uid`); o Godot completa o `uid` na primeira vez que salvar a cena.
 
-### 15.2 Export — **[Aberto, não iniciado]**
-Presets para Linux (x86_64) e Windows Desktop, com `*.json` no filtro de arquivos não-recurso (10.3). Steam (GodotSteam ou similar): fora deste TDD.
+### 15.2 Export — **[Planejado]**
+- Dois presets no `export_presets.cfg`: **Linux** (x86_64, `.x86_64` + `.pck` embutido) e **Windows Desktop** (`.exe`, `.pck` embutido, ícone do jogo).
+- Filtro de arquivos não-recurso: `*.json` (pontos e âncoras da pixel art, 10.3) e `*.txt`, senão os tiros saem do lugar errado no build.
+- Saída em `game/build/` (já no `.gitignore`).
+- Antes de exportar: `LIBERAR_TUDO_PARA_TESTE` não vale no build (só em `is_debug_build()`), mas conferir a progressão de verdade com ele em `false`.
+- Testar o build nos dois sistemas: abrir em tela cheia, jogar uma luta com controle, vencer e conferir o save.
+- Steam e web: fora do MVP.
 
 ### 15.3 Testes
 Sem testes unitários. Teste manual e um teste de fumaça headless:
@@ -683,7 +708,7 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 - Cenas de teste em `game/testes/`: `teste_dano`, `teste_tiro`, `alvo_teste`.
 - `Debug > Visible Collision Shapes` para conferir hitboxes; aba Remote para valores em execução.
 - Validação headless: `godot --headless --path game --quit-after 120`. Depois de criar scripts com `class_name` ou PNGs novos, importar antes (`--headless --editor --quit`).
-- **Liberar tudo para testar**: `GameState.LIBERAR_TUDO_PARA_TESTE = true` libera a Máquina e todos os ataques na seleção, sem vencer as fases. Só vale em build de debug (`OS.is_debug_build()`); o jogo exportado ignora. Pôr `false` para testar a progressão de verdade.
+- **Liberar tudo para testar**: `GameState.LIBERAR_TUDO_PARA_TESTE = true` libera a Máquina e todos os ataques no painel do mapa, sem vencer as fases. Só vale em build de debug (`OS.is_debug_build()`); o jogo exportado ignora. Pôr `false` para testar a progressão de verdade.
 - **`testes/teste_lutas.gd`** **[Implementado]**: roda as quatro arenas no Normal e depois no Expert, 60 s cada, com o Curupira invencível, andando, agachando, mirando e atirando, e tira vida do chefe aos poucos. Imprime as trocas de fase e a ordem das jogadas (`a+b` = combo, `[TRANSICAO]`); qualquer erro de script aparece no log. Rodar com o editor fechado (ou numa cópia de `game/`):
   `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/teste_lutas.gd`
 - **`testes/verificar_desvio.gd`** **[Implementado]**: responde "dá para desviar?" para cada ataque e cada combo das fases, e qual o menor atraso de combo que ainda dá. Grava a luta de verdade (cena, scripts, projéteis) com um boneco no lugar do Curupira, força o ataque ou combo e marca, quadro a quadro, as caixas de dano ligadas numa grade de 8 px. Depois procura uma sequência de comandos (parado, andar, pular, pulo curto, abaixar, dash) com a física do `MovimentoData` e a hurtbox real, primeiro sem dash. Como os chefes miram no Curupira, grava de novo com o boneco seguindo o caminho achado e confere. Testa 3 posições iniciais × 2 sorteios (`SORTEIOS`, sementes 11 e 44: o primeiro número de cada uma dá 0,83 e 0,30, então as duas formas dos ataques sorteados 50/50 entram, como jato alto e baixo, chapéu normal e invertido, salto por cima e rasante). O boneco não atira, então coisas que se estouram com tiro (corações do Boto) contam como sólidas. "FALHOU" = não achou caminho (pode ser impossível ou apertado demais). Também mostra em quantos casos o Curupira parado leva golpe (prova de que a gravação pega o ataque). Leva ~5 min:
@@ -691,10 +716,12 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
   Filtros depois de `--`: `chefe=mula`, `dificuldade=1`, `so=combos` ou `so=ataques`, `rapido` (sem procurar o atraso mínimo), `depurar`.
 - **`testes/teste_mapa.gd`** **[Implementado]**: abre o mapa, anda para baixo, sai da volta de cada área e anda até a entrada, abre e fecha o painel da Mula com A/B, e confere que o portão trancado bloqueia. Com `FOTOS=1 PASTA_FOTOS=<pasta>` (e um display, ex. `xvfb-run`) grava prints.
   `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/teste_mapa.gd`
-- **Cheats de debug (`OS.is_debug_build()`): não implementados [Aberto]**: invencibilidade, carga total do especial, pular para a próxima fase do chefe, desbloquear todos os ataques. Sugestão: autoload `Debug` removível do build.
+- **Cheats de debug [Planejado]**: autoload `Debug` que só age em `OS.is_debug_build()`, com teclas de função: F1 invencibilidade, F2 especial cheio, F3 pular para a próxima fase do chefe, F4 vencer a luta, F5 liberar todos os ataques e a Máquina (o mesmo que `LIBERAR_TUDO_PARA_TESTE`). Mostra "DEBUG" num canto quando algum está ligado.
 
-### 15.4 Créditos
-`CREDITS.md` com fonte, autor e licença de cada asset: **não existe [Aberto]**. Há placeholders antigos em `art/antiga/placeholder/` (fora do jogo) cuja origem e licença precisam ser registradas.
+### 15.4 Créditos **[Planejado]**
+- `CREDITS.md` na raiz do repositório: equipe, ferramentas (Godot, Krita, gerador de pixel art, Google Flow) e uma tabela com cada asset de terceiros (arquivo, autor, fonte, licença). A fonte em pixel e todo o áudio entram nela.
+- A tela de créditos do jogo mostra o mesmo conteúdo: um `CreditosData` (`dados/creditos.tres`) com as linhas, atualizado junto com o `CREDITS.md`.
+- Os placeholders antigos em `art/antiga/placeholder/` estão fora do jogo; registrar a origem só se voltarem.
 
 ## 16. Ordem de implementação
 
@@ -706,46 +733,32 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 6. ~~Chefe base + Mula~~
 7. ~~Carga e disparo do especial~~
 8. ~~Veneno e lentidão~~
-9. ~~`GameState`, seleção, fluxo de telas, save~~
+9. ~~`GameState`, fluxo de telas, save~~
 10. ~~Cuca, Boto, Máquina (lógica)~~
-11. ~~Pixel art: personagens, efeitos, arenas; 3 fases × 4 ataques; mira em 8 direções; agachar~~
-12. **Agora**: teste manual de cada luta e balanceamento dos valores provisórios.
-13. **Restante**: áudio, Opções, abertura, conteúdo dos créditos, cheats de debug, `CREDITS.md`, `main_scene` = menu, export Linux/Windows.
+11. ~~Pixel art: personagens, efeitos, arenas; fases por dificuldade × 4 ataques; mira em 8 direções; agachar~~
+12. ~~Mapa do mundo~~
+13. **Agora**: teste manual de cada luta e do mapa no controle; ajustar os valores da v1.0 se precisar.
+14. **Depois**: Opções (14.2) → áudio (13) → cenas de abertura e botões no menu (11.2) → créditos e `CREDITS.md` (15.4) → cheats (15.3) → versão no save (14.1) → export Linux/Windows (15.2).
 
 ## 17. Pendências
 
 | Item | Impacto | Sugestão |
 |---|---|---|
-| Teste manual das 4 lutas | Nada da pixel art foi visto rodando no Godot | Rodar cada `levelN` com F6 (ver `PENDENCIAS.md`) |
-| Valores "provisório" dos ataques novos | Combate pode estar fácil ou difícil demais | Fechar no GDD (Q16) depois de testar |
-| Fases e combos (chance, atraso, pausa, limiares) | Ritmo da luta | Fechar no GDD (Q16) depois de testar; valores em 8.2 |
-| Trava de mira sem botão no controle | Controle | Escolher o botão (GDD Q15) |
-| Combos do Boto que começam com `beijos` | O `verificar_desvio.gd` não acha desvio com o Curupira em x = 480 (colado na água) desde que os corações perseguem; o boneco não atira | Testar no F6; se for injusto, baixar `curva_beijo` ou `quantidade_beijos`, ou subir o atraso desses combos |
-| Coração do Boto carrega o especial | Pode ser exploit | Decidir; se não, tirar a hurtbox do coração do sinal de acerto |
+| Teste manual das 4 lutas e do mapa | Nada da pixel art nem do mapa foi visto rodando no controle | Rodar cada `levelN` e o `mapa` com F6 (ver `PENDENCIAS.md`) |
+| Combos do Boto que começam com `beijos` | O `verificar_desvio.gd` não acha desvio com o Curupira em x = 480 (colado na água); o boneco não atira | Testar no F6; se for injusto, baixar `curva_beijo` ou `quantidade_beijos`, ou subir o atraso desses combos |
 | Folhas do dash com a arte antiga | Mistura de estilos | Gerar no `art/pixel/gerador` |
-| `CLAUDE.md` diz "chefes com estado único" | Instrução desatualizada | Atualizar o resumo de regras do `CLAUDE.md` |
-| Opções (volume, tela cheia) | Requisito do GDD | 2 sliders + toggle; salvar no `GameState` (14.2) |
-| Áudio (barramentos, faixas, SFX) | Requisito do GDD | Criar buses; lista de assets (Q14) |
-| Tela cheia por padrão | GDD pede; hoje `mode = 2` | Trocar para `mode = 3` |
-| `run/main_scene` | Hoje abre `main.tscn` → level1 | Apontar para `main_menu.tscn` |
-| Cenas de abertura | Requisito do GDD | Decidir se entra no MVP |
-| Cheats de debug | 15.3 | Autoload `Debug` só em `is_debug_build()` |
-| Export Linux/Windows | Entrega | `export_presets.cfg` com `*.json`; testar nos dois |
-| `CREDITS.md` | Licenças dos assets | Criar agora |
-| Save guarda caminho de `.tres` sem fallback | Save quebra se mover arquivos | Guardar id ou tratar `load` nulo; adicionar versão |
-| Dano de contato (1 golpe) | Provisório | Confirmar no GDD |
-| Nomes `Floor/LeftWall/RightWall` vs GDD | Consistência | Renomear ou atualizar o GDD |
+| Opções, áudio, abertura, créditos, cheats, save, export | Requisitos do GDD | Seguir a ordem da seção 16; o desenho de cada um está neste TDD |
 | Arte antiga sem uso em `game/assets/` | Peso do repositório | Apagar o que nenhuma cena usa mais |
 
 ## 18. Fora do MVP
 
-Ideias do GDD ainda não adotadas: hitstop e squash and stretch; exportação para Web.
+Ideias do GDD ainda não adotadas: hitstop e squash and stretch; exportação para web (itch.io); desenho próprio da Bola de Fogo em cada direção; remapear botões.
 
 Já implementados (saíram da lista): tremor de câmera (golpe no Curupira e troca de fase), coyote time, jump buffer, pulo de altura variável, valores em `Resource`, partículas no dash (`EfeitoDash`).
 
-## 19. Decisões registradas (para o Arthur vetar)
+## 19. Decisões registradas
 
-Escolhas que o código já fez e que este TDD trata como oficiais. Se alguma não for desejada, ela vira tarefa.
+Escolhas técnicas que o código fez e que a dupla aceitou como oficiais na v1.0.
 
 1. **Estrutura plana** em `scenes/`, `scripts/`, `dados/` (em vez de subpastas por tipo).
 2. **Português** em todo o código e nós, com `take_damage`, `Hitbox`, `Hurtbox` como exceção em inglês.

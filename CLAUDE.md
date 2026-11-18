@@ -52,6 +52,9 @@ Nomes de animação esperados no código: documentar no topo de cada script quai
 | `attack_basic` | J | X |
 | `attack_special` | K | Y |
 | `dash` | L | B |
+| `aim_up` | W / ↑ | direcional ↑ / analógico ↑ |
+| `crouch` | S / ↓ | direcional ↓ / analógico ↓ |
+| `aim_lock` | Shift | L2 |
 | `pause` | Esc | Start |
 
 Controle é a forma principal de jogar; teclado também precisa funcionar 100%.
@@ -77,20 +80,22 @@ Hitbox do jogador só detecta hurtbox de inimigo e vice-versa — **resolver com
 
 ## Regras de jogo (resumo — detalhes em `docs/`)
 
-- Curupira aguenta **4 golpes**; no 4º perde a fase.
+- Curupira aguenta **4 golpes**; no 4º perde a fase. Encostar no chefe tira 1 golpe.
 - **Dash dá invencibilidade.**
-- Curupira atira **para onde está olhando**.
-- Ataque básico + ataque especial. Especial **carrega por acertos**, não por dano causado.
-- Troca de ataques só na tela de seleção, antes da fase — nunca durante a luta.
+- Curupira atira em **8 direções**: para a frente, diagonais e para cima de pé; para baixo só no ar; agachado atira rente ao chão. Segurando `aim_lock` (Shift / L2) fica parado e mira em qualquer direção.
+- Ataque básico + ataque especial. Especial **carrega por acertos no chefe**, não por dano causado (estourar coração do Boto não carrega).
+- Troca de ataques e dificuldade só no painel da área do chefe, no **mapa do mundo**, antes da fase — nunca durante a luta.
 - Ataques iniciais: **Tiro de Folha** (básico, rajada de folhas) e **Instinto Selvagem** (especial, energia em forma de cabeça de onça).
 - Cada ser folclórico derrotado concede 1 básico + 1 especial. Todos os básicos são projéteis (variam tipo de tiro, dano, cadência).
-- Chefes: Mula sem Cabeça, Cuca, Boto (ordem livre) → Máquina de IA (final, liberada após os três).
-- Chefes têm **estado único** (sem fases dentro da luta). Ataques com telegrafo + janela de recuperação.
-- Vida do chefe **não aparece** na tela (estilo Cuphead).
+- Chefes: Mula sem Cabeça, Cuca, Boto (ordem livre) → Máquina de IA (final, liberada após os três, atrás do portão do mapa).
+- Chefes têm **fases por dificuldade**: Normal = 1 fase (Máquina: 2); Expert = 2 fases (Máquina: 3). 4 ataques cada, embaralhados, às vezes em combo; transição de 2 s na troca de fase. Ataques com aviso pela pose (sem marca na tela) + janela de recuperação.
+- Vencer no Expert só marca a vitória; não dá nada a mais.
+- Vida do chefe **aparece** numa barra no alto da tela, com o nome e os entalhes das fases.
 - HUD: vida e carga do especial no canto inferior esquerdo.
 - Arenas sem rolagem, só chão e paredes. Câmera fixa (filha da arena, não do Curupira).
 - Progresso salvo após cada chefe derrotado e persistente entre sessões.
-- Resolução base 1920×1080, tela cheia, PC (Linux primeiro, build fácil para Windows).
+- Resolução base 1920×1080 (pixel art em 480×270 ×4), tela cheia, PC (Linux primeiro, build fácil para Windows).
+- Áudio: Google Flow e bibliotecas open source, com a licença de cada arquivo no `CREDITS.md`.
 
 ---
 
