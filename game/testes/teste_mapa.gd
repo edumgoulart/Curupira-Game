@@ -1,6 +1,8 @@
 extends SceneTree
 ## Teste do mapa do mundo (headless): anda com o Curupira, confere as entradas das quatro áreas,
-## o painel abrindo e o portão trancado bloqueando. Tira prints se FOTOS estiver ligado.
+## o painel abrindo e o portão trancado bloqueando. Depois abre o mapa com os três seres
+## libertados: confere o fogo e a névoa sumindo, as criaturas, a conversa com cada uma e a copa
+## da samaúma ficando translúcida com o Curupira atrás. Tira prints se FOTOS estiver ligado.
 
 var mapa: Node
 var cur: Node2D
@@ -104,8 +106,64 @@ func _process(_d: float) -> bool:
 		_ok(cen.perto_do_portao_trancado(Vector2(cen.dados.portao.aviso[0], cen.dados.portao.aviso[1]) * 4.0), "aviso do portão trancado")
 		cen._portao_trancado = false
 		_ok(cen.pode_andar(meio), "portão aberto deixa passar")
-		print("FALHAS: ", falhas)
-		quit(1 if falhas else 0)
+		# antes de libertar: fogo e névoa no mapa, nenhuma criatura
+		_ok(cen.has_node("FogoMata") and cen.has_node("Nevoa") and not cen.has_node("MulaLivre"), "antes: fogo e névoa, sem criaturas")
+		_ok(cen.conversa_em(Vector2(cen.dados.conversas.mula.centro[0], cen.dados.conversas.mula.centro[1]) * 4.0) == "", "antes: não dá para conversar")
+		# de novo, com os três libertados
+		mapa.queue_free()
+		gs.concluidas.assign(["fase1", "fase2", "fase3"])
+		mapa = load("res://scenes/mapa.tscn").instantiate()
+		root.add_child(mapa)
+		etapa = 10
+		passos = 0
+	elif etapa == 10:
+		passos += 1
+		if passos == 3:
+			cur = mapa.get_node("Mundo/Curupira")
+			cen = mapa.get_node("Mundo")
+			_ok(not cen.has_node("FogoMata") and not cen.has_node("Nevoa") and cen.has_node("Brotos"), "depois: o fogo apagou, a névoa levantou e brotou mato")
+			_ok(cen.has_node("MulaLivre") and cen.has_node("CucaLivre") and cen.has_node("BotoLivre"), "depois: as três criaturas no mapa")
+			etapa = 11
+			i_id = 0
+			passos = 0
+	elif etapa == 11:
+		# conversa com cada criatura: A abre, A mostra o texto inteiro e passa, até fechar
+		var id: String = ["mula", "cuca", "boto"][i_id]
+		passos += 1
+		if passos == 1:
+			var c: Dictionary = cen.dados.conversas[id]
+			cur.position = Vector2(c.centro[0], c.centro[1]) * 4.0
+			mapa.get_node("Camera").position = cur.position
+		if passos == 4:
+			_ok(cen.pode_andar(cur.position), "%s: dá para pisar onde se conversa" % id)
+			_ok(mapa.get_node("%Aviso").text.ends_with("conversar"), "%s: aviso '%s'" % [id, mapa.get_node("%Aviso").text.replace("\n", " | ")])
+			_apertar("ui_accept")
+		if passos == 30:
+			var dl: Node = mapa.get_node("DialogoMapa")
+			_ok(dl.aberto and dl.visible, "%s: A abre a conversa ('%s: %s')" % [id, dl.get_node("%Quem").text, dl.get_node("%Texto").text])
+			_ok(cur.estado == cur.Estado.TRAVADO, "%s: o Curupira fica parado conversando" % id)
+			_foto("conversa_" + id)
+		if passos > 30 and passos % 6 == 0:
+			_apertar("ui_accept")
+		if passos > 30 and not mapa.get_node("DialogoMapa").aberto:
+			_ok(cur.estado != cur.Estado.TRAVADO and passos < 200, "%s: a conversa termina e o Curupira anda de novo (%d quadros)" % [id, passos])
+			i_id += 1
+			passos = 0
+			if i_id >= 3:
+				etapa = 12
+	elif etapa == 12:
+		passos += 1
+		var sam: Sprite2D = cen.get_node("Samauma")
+		if passos == 1:
+			cur.position = sam.position + Vector2(0, -40)
+		if passos == 40:
+			_ok(sam.modulate.a < 0.6, "copa da samaúma translúcida com o Curupira atrás (alfa %.2f)" % sam.modulate.a)
+			_foto("atras_da_samauma")
+			cur.position = sam.position + Vector2(0, 60)
+		if passos == 80:
+			_ok(sam.modulate.a > 0.95, "copa volta ao normal com o Curupira na frente (alfa %.2f)" % sam.modulate.a)
+			print("FALHAS: ", falhas)
+			quit(1 if falhas else 0)
 	return false
 
 

@@ -49,9 +49,9 @@ for nome, a in dados['arenas'].items():
 # (dados.json e não mapa.json: o gerar_spriteframes.gd trata <pasta>/<pasta>.json como folha de personagem)
 m = dados.get('mapa')
 if m:
-    for i, (f, fr) in enumerate(zip(m['fundo'], m['frente']), 1):
+    # (não há mais camada "frente": névoa e fumaça viraram objetos com z, para sumirem com o progresso)
+    for i, f in enumerate(m['fundo'], 1):
         gravar(f'{destino}/mapa/fundo_{i}.png', f)
-        gravar(f'{destino}/mapa/frente_{i}.png', fr)
     gravar(f'{destino}/mapa/andavel.png', m['andavel'])
     gravar(f'{destino}/mapa/objetos.png', m['objetos'])
     gravar_json(f'{destino}/mapa/dados.json', m['dados'])

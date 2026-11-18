@@ -3,11 +3,13 @@ extends Node2D
 ## pelo mapa (visto de cima, em diagonal) e escolhe o chefe indo até a área dele:
 ##   - Mula sem Cabeça: entra entre as árvores pegando fogo (embaixo, à esquerda);
 ##   - Cuca: entra na mata fechada, com névoa e a luz verde das poções (em cima, à esquerda);
-##   - Boto: desce até a prainha e vai até a ponta do píer (embaixo, à direita);
+##   - Boto: o encontro das águas (embaixo, à direita); vai pela praia até a ponta de areia;
 ##   - Máquina de IA: o prédio da empresa (em cima, à direita), atrás de um portão que só
 ##     abre depois que os três foram libertados (GDD: chefe final liberado após os três).
 ## Na entrada aparece o nome da área; A / Espaço abre o painel com ataques e dificuldade, e de
 ## lá se vai para a luta. Depois da luta, o Curupira volta para a frente da área de onde saiu.
+## Depois de libertada, cada criatura fica na sua área, e perto dela A / Espaço abre a conversa
+## (falas em dados/mapa/conversa_<id>.tres).
 ##
 ## Quem faz o quê: o cenário (Mundo) monta o desenho e diz onde dá para pisar; o Curupira só
 ## anda; este script liga os dois à câmera, ao aviso e ao painel.
@@ -24,8 +26,14 @@ const CHEFES: Dictionary = {
 	"boto": preload("res://dados/chefes/boto.tres"),
 	"maquina": preload("res://dados/chefes/maquina.tres"),
 }
+const CONVERSAS: Dictionary = {
+	"mula": preload("res://dados/mapa/conversa_mula.tres"),
+	"cuca": preload("res://dados/mapa/conversa_cuca.tres"),
+	"boto": preload("res://dados/mapa/conversa_boto.tres"),
+}
 
 var _area_perto: String = ""
+var _conversa_perto: String = ""
 
 @onready var cenario: CenarioMapa = $Mundo
 @onready var curupira: CurupiraMapa = $Mundo/Curupira
@@ -34,6 +42,7 @@ var _area_perto: String = ""
 @onready var aviso: Label = %Aviso
 @onready var painel: PainelFase = $PainelFase
 @onready var pausa: PausaMapa = $PausaMapa
+@onready var dialogo: DialogoMapa = $DialogoMapa
 
 
 func _ready() -> void:
@@ -50,15 +59,19 @@ func _ready() -> void:
 	camera.position = curupira.position
 	camera.reset_smoothing.call_deferred()
 	painel.lutar.connect(_lutar)
+	dialogo.terminou.connect(_ao_terminar_conversa)
 	_atualizar_aviso()
 
 
 func _process(_delta: float) -> void:
 	camera.position = curupira.position
+	cenario.ponto_curupira = curupira.position
 	_atualizar_aviso()
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if dialogo.aberto:
+		return
 	if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
 		caixa_aviso.visible = false
@@ -67,12 +80,26 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		caixa_aviso.visible = false
 		painel.abrir(_area_perto, CHEFES[_area_perto])
+	elif _conversa_perto != "" and (event.is_action_pressed("ui_accept") or event.is_action_pressed("jump")):
+		get_viewport().set_input_as_handled()
+		caixa_aviso.visible = false
+		curupira.travar(true)
+		dialogo.abrir(CONVERSAS[_conversa_perto])
+
+
+func _ao_terminar_conversa() -> void:
+	curupira.travar(false)
 
 
 func _atualizar_aviso() -> void:
 	_area_perto = cenario.entrada_em(curupira.position)
-	if _area_perto != "":
+	_conversa_perto = cenario.conversa_em(curupira.position) if _area_perto == "" else ""
+	if dialogo.aberto:
+		aviso.text = ""
+	elif _area_perto != "":
 		aviso.text = "%s\nA / Espaço: entrar" % CHEFES[_area_perto].nome
+	elif _conversa_perto != "":
+		aviso.text = "%s\nA / Espaço: conversar" % CONVERSAS[_conversa_perto].nome
 	elif cenario.perto_do_portao_trancado(curupira.position):
 		aviso.text = "Portão trancado\nLiberte a Mula, a Cuca e o Boto"
 	else:

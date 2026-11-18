@@ -321,13 +321,16 @@ function exportarMapa() {
   // objetos: todos os quadros num atlas só, empilhados em prateleiras
   const LARG_ATLAS = 2048, lista = [], blocos = [];
   for (const o of OBJETOS) {
-    const n = o.animado ? QUADROS_MAPA : 1;
-    const qs = Array.from({ length: n }, (_, k) => objetoQuadro(o, k * LACO_MAPA / QUADROS_MAPA));
+    // n quadros espalhados pelo laço de 2 s (o jogo mostra o quadro q·n/16 do relógio de 16)
+    const n = o.animado ? o.quadros : 1;
+    const qs = Array.from({ length: n }, (_, k) => objetoQuadro(o, k * LACO_MAPA / n));
     let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
     for (const q of qs) if (q.cam.x1 >= 0) { x0 = Math.min(x0, q.cam.x0); y0 = Math.min(y0, q.cam.y0); x1 = Math.max(x1, q.cam.x1); y1 = Math.max(y1, q.cam.y1); }
     if (x1 < 0) continue;
     const w = x1 - x0 + 1, h = y1 - y0 + 1, item = { nome: o.nome, pos: [o.x, o.y], deslocamento: [x0 - qs[0].ax, y0 - qs[0].ay], tamanho: [w, h], quadros: [] };
     if (o.mostrar) item.mostrar = o.mostrar;
+    if (o.z !== null) item.z = o.z;
+    if (o.transparente) item.transparente = true;
     qs.forEach(q => blocos.push({ item, tela: q.cam.paraTela(), x0, y0, w, h }));
     lista.push(item);
   }
@@ -344,13 +347,14 @@ function exportarMapa() {
 
   const v = p => [Math.round(p.x), Math.round(p.y)];
   saida.mapa = {
-    fundo: quadros.map(q => png(q.cam.paraTela())), frente: quadros.map(q => png(q.frente.paraTela())),
+    fundo: quadros.map(q => png(q.cam.paraTela())),
     andavel: png(tela), objetos: png(atlas),
     dados: {
       tamanho: [MAPA_W, MAPA_H], fps: QUADROS_MAPA / LACO_MAPA, quadros: QUADROS_MAPA, escala_no_jogo: 4,
       inicio: v(MAPA_INICIO),
       entradas: Object.fromEntries(Object.entries(ENTRADAS).map(([id, e]) => [id, { centro: v(e.centro), raio: e.raio, volta: v(e.volta) }])),
       portao: { retangulo: PORTAO.retangulo, aviso: v(PORTAO.aviso), raio: PORTAO.raio },
+      conversas: Object.fromEntries(Object.entries(CRIATURAS).map(([id, c]) => [id, { centro: v(c.conversa), raio: c.raio, mostrar: 'concluiu:' + c.progresso }])),
       objetos: lista
     }
   };

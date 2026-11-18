@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/curupira_mapa.tscn" id="3_curupira"]
 [ext_resource type="PackedScene" path="res://scenes/painel_fase.tscn" id="4_painel"]
 [ext_resource type="PackedScene" path="res://scenes/pausa_mapa.tscn" id="5_pausa"]
+[ext_resource type="PackedScene" path="res://scenes/dialogo_mapa.tscn" id="6_dialogo"]
 [ext_resource type="Theme" uid="uid://0ukwsfegmodb" path="res://dados/tema_menus.tres" id="t_tema"]
 
 [node name="Mapa" type="Node2D"]
@@ -46,3 +47,5 @@ vertical_alignment = 1
 [node name="PainelFase" parent="." instance=ExtResource("4_painel")]
 
 [node name="PausaMapa" parent="." instance=ExtResource("5_pausa")]
+
+[node name="DialogoMapa" parent="." instance=ExtResource("6_dialogo")]

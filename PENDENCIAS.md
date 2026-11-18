@@ -116,11 +116,42 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   - se ele passa atrás das árvores quando está acima do tronco e na frente quando está abaixo, e se
     não fica preso nas beiras (água, mata, troncos, cerca);
   - as quatro entradas: entre as árvores em chamas (Mula), na boca da mata da Cuca com a luz verde,
-    na ponta do píer (Boto) e na porta do prédio (Máquina). Aparece o nome e "A / Espaço: entrar";
+    na ponta da praia do encontro das águas (Boto) e na porta do prédio (Máquina). Aparece o nome e
+    "A / Espaço: entrar";
   - o painel: ataques, dificuldade, "Lutar!" e "Voltar ao mapa" (B também fecha). Depois da luta, o
     Curupira volta para a frente da área, e a bandeira aparece na área vencida;
   - o portão da empresa: com `LIBERAR_TUDO_PARA_TESTE` em `true` ele já vem aberto. Pôr `false` para
     ver o portão com cadeado e o aviso "Portão trancado".
+  - **Mapa refeito** (pedido do Eduardo: "o Curupira tá grande perto das árvores", "o píer do Boto
+    não faz sentido"). Agora tem 1440×810, três telas de 480×270, e a câmera segue o Curupira com
+    a mesma escala de antes. Conferir:
+    - se as árvores maiores e da Amazônia (castanheira, embaúba, açaí, buriti, samaúma no centro)
+      ficaram na proporção certa com o Curupira, e se a copa fica meio transparente quando ele
+      passa atrás;
+    - a velocidade, que subiu de 64 para 84 (`mapa_ajustes.tres`);
+    - o encontro das águas: o Rio Negro escuro e o Solimões barrento correndo lado a lado sem se
+      misturar, e a praia de areia branca onde fica a entrada do Boto;
+    - a camada `frente` saiu: o que passa na frente do Curupira agora é objeto com `z` no
+      `dados.json`. Ver se nada ficou atrás dele que devia ficar na frente (fumaça, névoa);
+    - o fundo tem 16 quadros de 1440×810. Se pesar na memória, dá para baixar para 8 no gerador.
+  - **Áreas que mudam e criaturas que conversam** (pedido do Eduardo). Para testar sem lutar, pôr
+    as fases em `concluidas` no `game_state.gd` (ou vencer as lutas):
+    - antes de vencer: mata da Mula pegando fogo, com brasas e fumaça; névoa e a luz verde no
+      caldeirão da Cuca; o Boto de olho vermelho no encontro das águas;
+    - depois de vencer: a mata da Mula apagada com brotos e as árvores rebrotando; a névoa some; e
+      a criatura aparece livre, sem o chip, perto da sua área;
+    - chegar perto dela mostra "A / Espaço: conversar". A conversa trava o Curupira, escreve letra
+      por letra (A completa e depois avança, B fecha) e solta ele no fim;
+    - as falas estão em `dados/mapa/conversa_mula.tres`, `conversa_cuca.tres` e
+      `conversa_boto.tres` (uma fala por linha, "Quem: texto"), para trocar pelo inspetor.
+- **Carta de derrota (F6 em `level1..4`, perder de propósito)**, pedido do Eduardo, no estilo do
+  Cuphead. Passou no `game/testes/teste_derrota.gd`, mas ninguém jogou. Observar:
+  - a carta descendo; o retrato do chefe de frente, rindo (olho e fogo vermelhos do chip);
+  - a frase de deboche sorteada cabendo na carta (as compridas usam a letra menor). As frases estão
+    em `frases_derrota` no `.tres` de cada chefe (`dados/chefes/`);
+  - a trilha: o Curupira correndo até onde chegou na vida do chefe, os entalhes das fases e o
+    chip na ponta;
+  - "Tentar de novo" e "Voltar para o mapa" no controle e no teclado.
 - **Cenas de abertura (F6 em `scenes/abertura.tscn`, ou Novo Jogo no menu)**, pedido do Eduardo.
   Quatro imagens paradas com uma frase embaixo, antes do mapa. Passou no
   `game/testes/teste_abertura.gd`, mas ninguém jogou. Observar:
