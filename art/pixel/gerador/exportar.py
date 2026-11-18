@@ -67,4 +67,7 @@ for nome, f in dados.get('fontes', {}).items():
         arq.write('\n'.join(linhas) + '\n')
 for nome, u in dados.get('ui', {}).items():
     gravar(f'{destino}/ui/{nome}.png', u['png'])
+# cenas de abertura: imagens paradas, sem .json
+for i, q in enumerate(dados.get('abertura', []), 1):
+    gravar(f'{destino}/abertura/cena_{i}.png', q)
 print('ok', len(dados['personagens']), 'personagens,', len(dados['efeitos']), 'efeitos,', len(dados['arenas']), 'arenas')

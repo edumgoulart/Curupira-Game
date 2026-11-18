@@ -121,6 +121,17 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     Curupira volta para a frente da área, e a bandeira aparece na área vencida;
   - o portão da empresa: com `LIBERAR_TUDO_PARA_TESTE` em `true` ele já vem aberto. Pôr `false` para
     ver o portão com cadeado e o aviso "Portão trancado".
+- **Cenas de abertura (F6 em `scenes/abertura.tscn`, ou Novo Jogo no menu)**, pedido do Eduardo.
+  Quatro imagens paradas com uma frase embaixo, antes do mapa. Passou no
+  `game/testes/teste_abertura.gd`, mas ninguém jogou. Observar:
+  - se A / Espaço / Enter avança uma cena por vez e Start / Esc pula direto para o mapa, no
+    controle e no teclado; o Continuar não passa por elas;
+  - se a troca (escurece e clareia em 0,3 s) não fica lenta nem rápida demais;
+  - os desenhos (gerador, `art/pixel/gerador/abertura_px.js`): o Curupira com o broto; o trator
+    derrubando a mata e o olho vermelho da IA no data center; a Máquina ligando os chips da Mula,
+    da Cuca e do Boto na câmara; o Curupira partindo ao amanhecer, com o incêndio, a mata da
+    Cuca, o rio e a empresa no horizonte;
+  - os textos estão em `dados/abertura.tres`, para trocar pelo inspetor.
 - **Decisões da v1.0 (GDD e TDD), para conferir no F6:**
   - a trava de mira no **L2** do controle (o Shift continua no teclado);
   - o jogo abrindo em **tela cheia**;

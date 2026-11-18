@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="AberturaData" format=3]
+
+[ext_resource type="Script" path="res://scripts/abertura_data.gd" id="1_dados"]
+[ext_resource type="Texture2D" path="res://assets/pixel/abertura/cena_1.png" id="2_cena1"]
+[ext_resource type="Texture2D" path="res://assets/pixel/abertura/cena_2.png" id="3_cena2"]
+[ext_resource type="Texture2D" path="res://assets/pixel/abertura/cena_3.png" id="4_cena3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/abertura/cena_4.png" id="5_cena4"]
+
+[resource]
+script = ExtResource("1_dados")
+imagens = Array[Texture2D]([ExtResource("2_cena1"), ExtResource("3_cena2"), ExtResource("4_cena3"), ExtResource("5_cena4")])
+textos = Array[String](["O Curupira, de cabelo de fogo, protege a floresta e todos os bichos que vivem nela.", "Mas uma empresa comandada por uma IA começou a derrubar a mata para construir data centers.", "Para ter ajuda, a Máquina pôs chips na Mula sem Cabeça, na Cuca e no Boto. Agora eles obedecem a ela.", "Só o Curupira ficou livre. Ele parte para libertar as criaturas e deter a Máquina."])
+duracao_troca = 0.3

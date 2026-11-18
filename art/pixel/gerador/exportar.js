@@ -356,8 +356,13 @@ function exportarMapa() {
   };
 }
 
+/* ---------- cenas de abertura: quatro imagens paradas de 480×270 ---------- */
+function exportarAbertura() {
+  saida.abertura = ABERTURA_CENAS.map(cena => png(cena().paraTela()));
+}
+
 try {
-  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu(); exportarHud(); exportarMapa();
+  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu(); exportarHud(); exportarMapa(); exportarAbertura();
   document.getElementById('saida').textContent = JSON.stringify(saida);
   document.title = 'pronto';
 } catch (e) { document.getElementById('saida').textContent = 'ERRO ' + e.stack; }
