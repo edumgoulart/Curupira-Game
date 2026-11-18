@@ -12,23 +12,6 @@ Este documento descreve **como** o jogo é construído. O **o quê** (regras, n�
 - **[Aberto]**: ainda precisa ser decidido ou confirmado.
 - **[Planejado]**: decidido, com o desenho técnico pronto neste documento, mas ainda não feito no jogo.
 
-**O que mudou da v0.3 para a v1.0**
-- **Mapa do mundo** no lugar da tela de seleção: o Curupira anda até a área do chefe, e o painel da área escolhe ataques e dificuldade (9.1). O `level_select` foi apagado.
-- **Decisões fechadas** (GDD 1.0): trava de mira no **L2**; vencer no Expert não dá nada a mais; estourar coração do Boto **não carrega** o especial (`Hurtbox.carrega_especial`, 7.4); contato com o chefe tira 1 golpe; os valores "provisório" viraram os da versão 1.0; o jogo abre em **tela cheia**.
-- **Planejados**, com o desenho técnico aqui: áudio com Google Flow e bibliotecas open source (13), Opções (14.2), cenas de abertura (11.2), créditos e `CREDITS.md` (15.4), cheats de debug (15.3), versão e ids no save (14.1) e export (15.2).
-
-**O que mudou da v0.2 para a v0.3**
-- A arte passou a ser **pixel art** (480×270 ampliada 4×), gerada por código e importada como folhas de sprite com um `.json` de pontos (seção 10).
-- Os chefes têm **três fases** e **quatro ataques** cada, e a lógica deles virou um sequenciador com `await` (seção 8).
-- O Curupira **mira em 8 direções** e **agacha** (seção 6).
-- Projéteis e efeitos são **modulares**: uma imagem por projétil, e o código cria quantos o ataque pedir (seção 10.5).
-- As arenas trocaram o fundo antigo por `FundoArena` e o chão foi para y = 340 (seção 9).
-- O Input Map ganhou `aim_up`, `crouch` e `aim_lock` (seção 12).
-- Os ataques ganhos dos chefes, os menus (fonte, botões, título, fundo) e as áreas de dano passaram para a pixel art; a arte antiga foi para `art/antiga/` (seções 7, 10 e 11).
-- **Dificuldade Normal/Expert** escolhida na seleção (na v1.0, no painel do mapa). As fases de cada chefe dependem dela, os ataques saem embaralhados e às vezes em **combo**, e a troca de fase tem **transição** (seção 8.4). Golpes com retorno visual: pisca branco, faísca, tremor (6.5 e 8.1).
-- **Avisos mais longos** em todos os ataques dos chefes (8.3) e a Canção de ninar virou uma melodia de notas soltas. Sem marca na tela cobrindo a área do golpe (8.1): a Mula ganhou uma investida com a pata raspando a terra e um brilho no céu antes de cada meteoro. O Boto afunda na água até o bico ficar na altura do jato, que sai reto, e o aviso é a água crescendo no bico; em volta dele a água se mexe e respinga (8.3, 9 e 10.5).
-- **Boto mais difícil** (pedido do Eduardo). O chapéu perdeu a linha de aviso: o Boto tira o chapéu com a nadadeira e segura na altura da ida, e o chapéu sai reto dela. O salto ganhou uma segunda forma, o rasante (baixo e reto, abaixa-se), e o salto por cima solta cinco bolhas mais rápidas. Os corações perseguem o Curupira, e o que encosta encanta: puxa o Curupira para o Boto por 1 s (7.6 e 8.3).
-
 ---
 
 ## 1. Status
