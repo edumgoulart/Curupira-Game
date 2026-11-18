@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/curupira_mapa.gd" id="1_script"]
+[ext_resource type="SpriteFrames" path="res://assets/pixel/curupira_mapa/curupira_mapa_frames.tres" id="2_quadros"]
+
+[node name="CurupiraMapa" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("2_quadros")
+animation = &"parado_baixo"
+autoplay = "parado_baixo"

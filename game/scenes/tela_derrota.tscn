@@ -58,7 +58,7 @@ text = "Tentar de novo"
 [node name="Selecao" type="Button" parent="Painel/Caixa"]
 custom_minimum_size = Vector2(0, 72)
 layout_mode = 2
-text = "Voltar para a seleção"
+text = "Voltar para o mapa"
 
 [connection signal="pressed" from="Painel/Caixa/TentarDeNovo" to="." method="_on_tentar_de_novo_pressed"]
 [connection signal="pressed" from="Painel/Caixa/Selecao" to="." method="_on_selecao_pressed"]

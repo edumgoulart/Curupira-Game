@@ -112,19 +112,19 @@ jogo-curupira/
 ```
 Menu inicial ⇄ Opções
      ↓ (Novo Jogo apaga o save; Continuar só habilita se houver save)
-Seleção de fase e ataques  (level_select)
-     ↓
+Mapa do mundo (mapa) ⇄ Pausa do mapa (→ Menu inicial)
+     ↓ (anda até a área do chefe, A abre o painel: ataques e dificuldade, "Lutar!")
 Arena (level1..4) ⇄ Pausa
    ↙              ↘
 Derrota          Vitória
 (tentar de novo   ↓
- ou Seleção)    Seleção
+ ou Mapa)        Mapa (na frente da área de onde saiu)
 Máquina derrotada → Créditos (direto) → Menu inicial
 ```
 
 - **Cena principal**: `main.tscn` (hoje abre o `level1` direto, é a cena de teste). **[Aberto]** Trocar `run/main_scene` para `main_menu.tscn` antes do build.
 - **Abertura**: **[Aberto]** não existe. Decidir se entra no MVP.
-- `Pausa → Opções` e "voltar à seleção a partir das Opções em arena": **não feito**. A pausa tem hoje Continuar / Tentar de novo / Seleção.
+- `Pausa → Opções` e "voltar à seleção a partir das Opções em arena": **não feito**. A pausa tem hoje Continuar / Tentar de novo / Voltar para o mapa. O `level_select` antigo ficou sem uso (seção 9.1).
 - Troca de cena: `get_tree().change_scene_to_file()` direto nos scripts de UI **[Implementado]**. **[Assumido]** Só criar um `SceneManager` se entrar transição.
 
 ### 5.2 Autoloads
@@ -484,6 +484,30 @@ LevelN (Node2D)                   # texture_filter = Nearest (pixel art)
 - A água em volta do Boto (`AguaBoto`, `agua_boto.gd`, criada no `_ready` do Boto) fica na linha d'água e segue o Boto em x; ele afunda e sobe para o jato, e ela não. Duas camadas: a de trás (metade de lá dos anéis, z −1) e a da frente (espuma colada no corpo, gotinhas e metade de cá dos anéis, z 6, por cima da água da frente). Duas paletas, como a arena: `agua_*_azul` na margem esquerda e `agua_*_barro` na direita, trocadas pelo lado em que ele está. `respingar(x)` solta `agua_respingo_*` quando ele afunda ou sobe mais de 16 px e na saída e na chegada do salto; no ar a água em volta some. Quantidade de quadros, fps e centro saem do `efeitos.json`.
 - **[Assumido]** Extrair uma `arena_base.tscn` só se as quatro começarem a divergir; hoje a duplicação é de poucos nós.
 
+### 9.1 Mapa do mundo **[Implementado]**
+
+Pedido do Eduardo: escolher o chefe andando até ele, como no tabuleiro do Cuphead, visto de cima em diagonal. O mapa tem 960×540 px de arte (3840×2160 na tela) e a câmera segue o Curupira, sem passar da borda.
+
+```
+Mapa (Node2D, mapa.gd)           # liga Curupira, câmera, aviso e painel; guarda a área ao ir lutar
+├── Mundo (Node2D, CenarioMapa)  # y-sort; monta Fundo (z −10), objetos e Frente (z 10) de assets/pixel/mapa/
+│   └── Curupira (curupira_mapa.tscn, CurupiraMapa)
+├── Camera (Camera2D)            # segue o Curupira, com limites no tamanho do mapa
+├── Interface/CaixaAviso/Aviso   # nome da área + "A / Espaço: entrar", ou "Portão trancado"
+├── PainelFase (painel_fase.tscn) # ataques, dificuldade, Lutar!, Voltar ao mapa (pausa o mapa)
+└── PausaMapa (pausa_mapa.tscn)   # Continuar / Menu principal
+```
+
+- **Áreas** (centro da entrada, em pixels da arte, no `dados.json`): Mula (184, 464), entre quatro árvores pegando fogo na beira da mata em chamas; Cuca (250, 186), na boca da mata fechada, com névoa, frascos e a luz verde do caldeirão; Boto (728, 465), na ponta do píer da prainha; Máquina (833, 154), na porta do prédio. Começo no pé da samaúma (480, 374). Depois da luta o Curupira aparece no ponto `volta` da área (`GameState.entrada_mapa`, só na memória).
+- **Profundidade**: o `Mundo` tem `y_sort_enabled`, e cada objeto (árvore, palmeira, samaúma, cerca, portão, bandeira) tem a origem na base. Assim o Curupira passa atrás da árvore quando está acima da base dela, sem código de profundidade.
+- **Onde dá para andar**: máscara `andavel.png` (branco = chão), exportada pelo gerador junto com o desenho, em vez de `CollisionShape2D`. Água, mata fechada, troncos, prédio e cerca ficam fora. O Curupira confere 4 pontos em volta dos pés (`raio_pes`) e desliza na beira (tenta só x, depois só y). O portão trancado (`portao.retangulo`) bloqueia até `GameState.boss_liberado()`.
+- **Bandeiras**: aparecem na volta de cada área depois de vencer o chefe (`mostrar: "concluiu:faseN"`). Portão: `trancado` / `aberto`.
+- **Animação**: fundo, frente e objetos animados trocam de quadro pelo mesmo relógio (16 quadros, 8 fps, laço de 2 s), para fogo, água, névoa e bandeiras baterem.
+- **Ajustes** em `dados/mapa/mapa_ajustes.tres` (`MapaData`): velocidade (64 px de arte/s), raio dos pés, suavidade da câmera.
+- **Controles**: anda com `move_left`/`move_right`/`aim_up`/`crouch` (analógico, direcional, WASD), entra com `ui_accept` ou `jump`, pausa com `pause` ou `ui_cancel`.
+- O painel copia a lógica de escolha do `level_select.gd`, que ficou sem uso (nenhuma cena leva mais a ele). **[Aberto]** apagar `level_select` ou guardar.
+- **Arte** (`mapa_px.js`, `mapa_curupira_px.js`): o terreno sai de formas simples (lago, rio, trilhas, elipses de cada área) com ruído; a mata fechada é um tapete de copas; o Curupira do mapa é o mesmo da luta (cabeça, cabelo, rosto, saia de folhas, pés para trás) com o corpo encurtado, em 5 direções (`baixo`, `diag_baixo`, `lado`, `diag_cima`, `cima`; esquerda é espelho).
+
 ## 10. Arte e animações (pixel art)
 
 ### 10.1 Pipeline **[Implementado]**
@@ -505,6 +529,8 @@ A arte é pixel art em 480×270, ampliada 4× para 1920×1080. Ela é desenhada 
 - `<personagem>_frames.tres`: `SpriteFrames` gerado da folha, com os mesmos nomes de animação do JSON.
 - `<personagem>/efeitos/<efeito>_<n>.png`: projéteis e efeitos em quadros soltos, descritos em `efeitos/efeitos.json` (fps, loop, tamanho, centro).
 - `arenas/<chefe>/fundo_<n>.png` e `frente_<n>.png`: 16 quadros de 480×270, num laço de 2 s (8 fps, no `arena.json`). `arenas/menu/` é a floresta do fundo dos menus (8 quadros a 4 fps).
+- `mapa/`: `fundo_<n>.png` e `frente_<n>.png` (16 quadros de 960×540), `andavel.png` (máscara do chão), `objetos.png` (atlas de todos os objetos e quadros) e `dados.json` (tamanho, fps, início, entradas, portão e, por objeto, `pos` da base, `deslocamento` do recorte, `tamanho`, `quadros` no atlas e `mostrar`). Chama-se `dados.json`, e não `mapa.json`, porque o `gerar_spriteframes.gd` trata `<pasta>/<pasta>.json` como folha de personagem.
+- `curupira_mapa/`: folha do Curupira do mapa (`parado_*` e `andar_*` nas 5 direções), com `curupira_mapa_frames.tres` gerado.
 - `ui/fonte_pixel.fnt` + `.png`: fonte BMFont (11 linhas: acento, maiúscula de 7 e descendente), com o contorno escuro já desenhado. `ui/titulo.png` e `ui/botao_<estado>.png` (normal, foco, hover, apertado, desabilitado, painel) já vêm ampliados 4×, para o `StyleBoxTexture` usar no tamanho da tela.
 
 ### 10.3 Importação e filtro
@@ -575,11 +601,12 @@ Pixel art do gerador (`art/pixel/gerador/hud_px.js` → `assets/pixel/ui/hud_*.p
 |---|---|
 | Cenas de abertura | **Não feito [Aberto]** |
 | Menu inicial | Pronto: Novo Jogo (apaga o save), Continuar (desabilitado sem save), Opções, Sair. **[Aberto]** o GDD pede os botões de cada ação do controle na tela |
-| Seleção de fase e ataques | Pronto: lista só ataques liberados, troca com ←/→, salva a escolha; Máquina bloqueada até as 3 fases. Botão **Dificuldade** (Normal/Expert, ←/→) com uma linha de explicação; chefe vencido no Expert aparece como "(derrotada · Expert)" |
+| Mapa do mundo | Pronto (seção 9.1). O painel de cada área lista só ataques liberados, troca com ←/→, salva a escolha e tem o botão **Dificuldade** (Normal/Expert, ←/→) com uma linha de explicação; chefe vencido mostra "Derrotada" ou "Derrotada · Expert". Máquina atrás do portão até as 3 fases |
+| Pausa do mapa | Pronto: Continuar / Menu principal |
 | Arena (×4) | Pronto (seção 9) |
-| Pausa | Pronto: Continuar / Tentar de novo / Seleção |
+| Pausa | Pronto: Continuar / Tentar de novo / Voltar para o mapa |
 | Opções | **Só placeholder** ("Volume e tela cheia chegam em breve") |
-| Derrota | Pronto: Tentar de novo / Seleção (aparece 1 s depois do último golpe) |
+| Derrota | Pronto: Tentar de novo / Voltar para o mapa (aparece 1 s depois do último golpe) |
 | Vitória | Pronto |
 | Créditos | Pronto (tela + voltar ao menu); **[Aberto]** conteúdo real dos créditos |
 
@@ -662,6 +689,8 @@ Sem testes unitários. Teste manual e um teste de fumaça headless:
 - **`testes/verificar_desvio.gd`** **[Implementado]**: responde "dá para desviar?" para cada ataque e cada combo das fases, e qual o menor atraso de combo que ainda dá. Grava a luta de verdade (cena, scripts, projéteis) com um boneco no lugar do Curupira, força o ataque ou combo e marca, quadro a quadro, as caixas de dano ligadas numa grade de 8 px. Depois procura uma sequência de comandos (parado, andar, pular, pulo curto, abaixar, dash) com a física do `MovimentoData` e a hurtbox real, primeiro sem dash. Como os chefes miram no Curupira, grava de novo com o boneco seguindo o caminho achado e confere. Testa 3 posições iniciais × 2 sorteios (`SORTEIOS`, sementes 11 e 44: o primeiro número de cada uma dá 0,83 e 0,30, então as duas formas dos ataques sorteados 50/50 entram, como jato alto e baixo, chapéu normal e invertido, salto por cima e rasante). O boneco não atira, então coisas que se estouram com tiro (corações do Boto) contam como sólidas. "FALHOU" = não achou caminho (pode ser impossível ou apertado demais). Também mostra em quantos casos o Curupira parado leva golpe (prova de que a gravação pega o ataque). Leva ~5 min:
   `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/verificar_desvio.gd`
   Filtros depois de `--`: `chefe=mula`, `dificuldade=1`, `so=combos` ou `so=ataques`, `rapido` (sem procurar o atraso mínimo), `depurar`.
+- **`testes/teste_mapa.gd`** **[Implementado]**: abre o mapa, anda para baixo, sai da volta de cada área e anda até a entrada, abre e fecha o painel da Mula com A/B, e confere que o portão trancado bloqueia. Com `FOTOS=1 PASTA_FOTOS=<pasta>` (e um display, ex. `xvfb-run`) grava prints.
+  `godot --headless --fixed-fps 60 --disable-vsync --path game --script res://testes/teste_mapa.gd`
 - **Cheats de debug (`OS.is_debug_build()`): não implementados [Aberto]**: invencibilidade, carga total do especial, pular para a próxima fase do chefe, desbloquear todos os ataques. Sugestão: autoload `Debug` removível do build.
 
 ### 15.4 Créditos

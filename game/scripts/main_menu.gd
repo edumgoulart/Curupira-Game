@@ -1,5 +1,8 @@
 extends Control
 ## Tela principal. O Curupira parado na floresta usa a animação "idle" do curupira_frames.tres.
+## Novo jogo e Continuar levam ao mapa do mundo, onde se escolhe o chefe andando até ele.
+
+const CENA_MAPA: String = "res://scenes/mapa.tscn"
 
 
 func _ready() -> void:
@@ -13,12 +16,12 @@ func _ready() -> void:
 
 func _on_novo_jogo_pressed() -> void:
 	GameState.apagar_save()
-	get_tree().change_scene_to_file("res://scenes/level_select.tscn")
+	get_tree().change_scene_to_file(CENA_MAPA)
 
 
 func _on_continuar_pressed() -> void:
 	if GameState.carregar():
-		get_tree().change_scene_to_file("res://scenes/level_select.tscn")
+		get_tree().change_scene_to_file(CENA_MAPA)
 
 
 func _on_opcoes_pressed() -> void:

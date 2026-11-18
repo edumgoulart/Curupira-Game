@@ -4,7 +4,7 @@ extends Node
 # Neste codigo, progresso:  Quais inimgos foram derrotados, ja da pra enfrentar o boss final?
 const SAVE_PATH := "user://save.cfg"
 
-# A ordem aqui define a ordem no level_select.
+# Ids de progresso: fase1 = Mula, fase2 = Cuca, fase3 = Boto.
 const FASES := ["fase1", "fase2", "fase3"]
 const BOSS := "boss"
 # Para testar: com true, a Máquina e todos os ataques ficam liberados na seleção, sem
@@ -25,6 +25,10 @@ var dificuldade: Dificuldade = Dificuldade.NORMAL
 # (Tiro de Folha / Instinto Selvagem). Salvos junto com o progresso.
 var basico_equipado: String = ""
 var especial_equipado: String = ""
+## Última área do mapa do mundo de onde o Curupira saiu para lutar ("mula", "cuca", "boto",
+## "maquina"). Ao voltar para o mapa ele aparece na frente dela. Só na memória: ao abrir o jogo
+## de novo ele começa no pé da samaúma.
+var entrada_mapa: String = ""
 
 
 # Lê o save ao abrir o jogo: assim, vencer uma fase aberta direto (F6) não
@@ -126,5 +130,6 @@ func apagar_save() -> void:
 	dificuldade = Dificuldade.NORMAL
 	basico_equipado = ""
 	especial_equipado = ""
+	entrada_mapa = ""
 	if tem_save():
 		DirAccess.remove_absolute(SAVE_PATH)

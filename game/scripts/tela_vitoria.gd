@@ -1,10 +1,11 @@
 extends CanvasLayer
 ## Tela de vitória: aparece quando o chefe da arena é derrotado.
 ## Salva o progresso na hora (GDD: salvo a cada chefe derrotado) e depois mostra
-## quem foi libertado e os ataques ganhos. Depois dela o jogador volta para a seleção (GDD).
+## quem foi libertado e os ataques ganhos. Depois dela o jogador volta para o mapa do mundo.
 ## Mesmo esquema da derrota: congela a luta e fica com process_mode "sempre".
 
-const CENA_SELECAO: String = "res://scenes/level_select.tscn"
+## Fora da luta, o jogo volta para o mapa do mundo (antes era a tela de seleção de fase).
+const CENA_SELECAO: String = "res://scenes/mapa.tscn"
 ## Depois do chefe final, os créditos (GDD: aparecem logo depois que o chefe final é derrotado).
 const CENA_CREDITOS: String = "res://scenes/creditos.tscn"
 ## Espera antes de mostrar a tela, para o chefe sumir (ele some em 1 s). Só visual.

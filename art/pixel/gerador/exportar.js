@@ -300,8 +300,64 @@ function exportarArenas() {
   }
 }
 
+/* ---------- mapa do mundo ---------- */
+function exportarMapa() {
+  // Curupira do mapa: parado (respira, 2 s) e andando (4 passos) nas 5 direções; a esquerda é espelho
+  const anims = [];
+  for (const dir of CMAPA_DIRECOES) {
+    anims.push({ nome: 'parado_' + dir, quadros: Array.from({ length: 8 }, (_, k) => ({ cam: curupiraMapaPx(dir, 0, k * 0.25) })), fps: 4, loop: true, nota: 'olhando para a direita; espelhar para a esquerda' });
+    anims.push({ nome: 'andar_' + dir, quadros: [1, 2, 3, 4].map(p => ({ cam: curupiraMapaPx(dir, p, p * 0.125) })), fps: 8, loop: true });
+  }
+  montarFolha('curupira_mapa', CMAPA_ANCORA, anims);
+
+  const quadros = Array.from({ length: QUADROS_MAPA }, (_, k) => mapaQuadro(k * LACO_MAPA / QUADROS_MAPA));
+  // máscara de onde dá para andar: branco = chão livre
+  const tela = document.createElement('canvas');
+  tela.width = MAPA_W; tela.height = MAPA_H;
+  const ctx = tela.getContext('2d'), im = ctx.createImageData(MAPA_W, MAPA_H);
+  for (let i = 0; i < ANDA.length; i++) if (ANDA[i]) im.data.fill(255, i * 4, i * 4 + 4);
+  ctx.putImageData(im, 0, 0);
+
+  // objetos: todos os quadros num atlas só, empilhados em prateleiras
+  const LARG_ATLAS = 2048, lista = [], blocos = [];
+  for (const o of OBJETOS) {
+    const n = o.animado ? QUADROS_MAPA : 1;
+    const qs = Array.from({ length: n }, (_, k) => objetoQuadro(o, k * LACO_MAPA / QUADROS_MAPA));
+    let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
+    for (const q of qs) if (q.cam.x1 >= 0) { x0 = Math.min(x0, q.cam.x0); y0 = Math.min(y0, q.cam.y0); x1 = Math.max(x1, q.cam.x1); y1 = Math.max(y1, q.cam.y1); }
+    if (x1 < 0) continue;
+    const w = x1 - x0 + 1, h = y1 - y0 + 1, item = { nome: o.nome, pos: [o.x, o.y], deslocamento: [x0 - qs[0].ax, y0 - qs[0].ay], tamanho: [w, h], quadros: [] };
+    if (o.mostrar) item.mostrar = o.mostrar;
+    qs.forEach(q => blocos.push({ item, tela: q.cam.paraTela(), x0, y0, w, h }));
+    lista.push(item);
+  }
+  let px = 0, py = 0, alturaLinha = 0;
+  for (const b of blocos.sort((a, c) => c.h - a.h)) {
+    if (px + b.w > LARG_ATLAS) { px = 0; py += alturaLinha + 1; alturaLinha = 0; }
+    b.ax = px; b.ay = py; px += b.w + 1; alturaLinha = Math.max(alturaLinha, b.h);
+  }
+  const atlas = document.createElement('canvas');
+  atlas.width = LARG_ATLAS; atlas.height = py + alturaLinha;
+  const actx = atlas.getContext('2d');
+  // a ordem dos quadros de cada objeto é a ordem em que foram gerados (o sort é estável por altura igual)
+  for (const b of blocos) { actx.drawImage(b.tela, b.x0, b.y0, b.w, b.h, b.ax, b.ay, b.w, b.h); b.item.quadros.push([b.ax, b.ay]); }
+
+  const v = p => [Math.round(p.x), Math.round(p.y)];
+  saida.mapa = {
+    fundo: quadros.map(q => png(q.cam.paraTela())), frente: quadros.map(q => png(q.frente.paraTela())),
+    andavel: png(tela), objetos: png(atlas),
+    dados: {
+      tamanho: [MAPA_W, MAPA_H], fps: QUADROS_MAPA / LACO_MAPA, quadros: QUADROS_MAPA, escala_no_jogo: 4,
+      inicio: v(MAPA_INICIO),
+      entradas: Object.fromEntries(Object.entries(ENTRADAS).map(([id, e]) => [id, { centro: v(e.centro), raio: e.raio, volta: v(e.volta) }])),
+      portao: { retangulo: PORTAO.retangulo, aviso: v(PORTAO.aviso), raio: PORTAO.raio },
+      objetos: lista
+    }
+  };
+}
+
 try {
-  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu(); exportarHud();
+  exportarCurupira(); exportarAtaquesJogador(); exportarMula(); exportarCuca(); exportarBoto(); exportarMaquina(); exportarArenas(); exportarMenu(); exportarHud(); exportarMapa();
   document.getElementById('saida').textContent = JSON.stringify(saida);
   document.title = 'pronto';
 } catch (e) { document.getElementById('saida').textContent = 'ERRO ' + e.stack; }

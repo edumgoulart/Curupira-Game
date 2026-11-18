@@ -4,7 +4,8 @@ extends CanvasLayer
 ## projéteis, timers). Este nó usa process_mode "sempre" para continuar ouvindo o
 ## controle e os botões enquanto o resto está parado.
 
-const CENA_SELECAO: String = "res://scenes/level_select.tscn"
+## Fora da luta, o jogo volta para o mapa do mundo (antes era a tela de seleção de fase).
+const CENA_SELECAO: String = "res://scenes/mapa.tscn"
 
 @onready var continuar: Button = %Continuar
 

@@ -108,6 +108,19 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   - os ataques ganhos: com `LIBERAR_TUDO_PARA_TESTE` (`game_state.gd`) todos já aparecem
     na seleção, e a Máquina também. Pôr `false` para testar a progressão de verdade.
 
+- **Mapa do mundo (F6 em `scenes/mapa.tscn`)**, pedido do Eduardo: escolher o chefe andando até
+  ele, como no Cuphead. Novo Jogo e Continuar levam ao mapa; vitória, derrota e pausa da luta
+  voltam para ele. Passou no `game/testes/teste_mapa.gd`, mas ninguém jogou. Observar:
+  - se andar no controle e no teclado é gostoso (velocidade em `dados/mapa/mapa_ajustes.tres`) e se
+    o Curupira vira certo nas 8 direções, sem a de lado ficar bugada;
+  - se ele passa atrás das árvores quando está acima do tronco e na frente quando está abaixo, e se
+    não fica preso nas beiras (água, mata, troncos, cerca);
+  - as quatro entradas: entre as árvores em chamas (Mula), na boca da mata da Cuca com a luz verde,
+    na ponta do píer (Boto) e na porta do prédio (Máquina). Aparece o nome e "A / Espaço: entrar";
+  - o painel: ataques, dificuldade, "Lutar!" e "Voltar ao mapa" (B também fecha). Depois da luta, o
+    Curupira volta para a frente da área, e a bandeira aparece na área vencida;
+  - o portão da empresa: com `LIBERAR_TUDO_PARA_TESTE` em `true` ele já vem aberto. Pôr `false` para
+    ver o portão com cadeado e o aviso "Portão trancado".
 ## Decisões em aberto
 
 - **Valores "provisório".** Os ataques novos (pisoteio, investida, bote, ninar, beijos,
@@ -128,6 +141,8 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   "estado único" (agora são fases por dificuldade, com combos), "atira para onde está olhando",
   que W/S não fazem nada e que a vida do chefe não aparece (agora há barra, a pedido do
   Eduardo). O GDD e o TDD já estão atualizados. A dupla decide quando atualizar.
+- **`level_select` sem uso.** O mapa substituiu a tela de seleção; o painel de cada área copiou a
+  lógica dela. Apagar `level_select.tscn`/`.gd` ou guardar.
 - **Duração da pose de tiro** (`DURACAO_POSE_ATAQUE` 0,3 s) está fixa em `curupira.gd`. O
   `CLAUDE.md` pede valores de ajuste num `.tres`. Mover para o `MovimentoData`
   (`curupira_movimento.tres`)? A pose de dano agora dura o tempo da animação `dano` (0,33 s);
