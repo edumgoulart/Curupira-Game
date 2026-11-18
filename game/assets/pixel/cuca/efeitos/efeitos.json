@@ -1,0 +1,62 @@
+{
+ "feitico": {
+  "nome": "feitico",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [20, 20],
+  "centro": [10, 10],
+  "quadros": 4
+ },
+ "pocao_veneno": {
+  "nome": "pocao_veneno",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [11, 11],
+  "centro": [5, 5],
+  "nota": "girando no voo",
+  "quadros": 4
+ },
+ "pocao_lentidao": {
+  "nome": "pocao_lentidao",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [11, 11],
+  "centro": [5, 5],
+  "nota": "girando no voo",
+  "quadros": 4
+ },
+ "poca_veneno": {
+  "nome": "poca_veneno",
+  "fps": 8,
+  "loop": true,
+  "tamanho": [38, 15],
+  "centro": [19, 12],
+  "nota": "centro na linha do chão",
+  "quadros": 6
+ },
+ "poca_lentidao": {
+  "nome": "poca_lentidao",
+  "fps": 8,
+  "loop": true,
+  "tamanho": [38, 15],
+  "centro": [19, 12],
+  "nota": "centro na linha do chão",
+  "quadros": 6
+ },
+ "vidro_quebrando": {
+  "nome": "vidro_quebrando",
+  "fps": 20,
+  "loop": false,
+  "tamanho": [26, 22],
+  "centro": [13, 10],
+  "quadros": 6
+ },
+ "nota": {
+  "nome": "nota",
+  "fps": 6,
+  "loop": true,
+  "tamanho": [8, 8],
+  "centro": [3, 4],
+  "quadros": 4
+ }
+}

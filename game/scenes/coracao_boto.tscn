@@ -1,0 +1,43 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/coracao_boto.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/hurtbox.gd" id="2"]
+[ext_resource type="Texture2D" path="res://assets/pixel/boto/efeitos/coracao_1.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/boto/efeitos/coracao_2.png" id="4"]
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="5"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2"]
+radius = 20.0
+
+[node name="CoracaoBoto" type="Area2D"]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_2")
+
+[node name="Visual" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("3")
+centered = false
+offset = Vector2(-4, -4)
+script = ExtResource("5")
+quadros = Array[Texture2D]([ExtResource("3"), ExtResource("4")])
+fps = 6.0
+loop = true
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]

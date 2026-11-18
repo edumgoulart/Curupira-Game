@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bwq1v5woh2rdu"]
+
+[ext_resource type="Script" uid="uid://vc2jrym5xxhd" path="res://testes/alvo_teste.gd" id="1_alvo"]
+[ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="2_hurt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_alvo"]
+size = Vector2(120, 240)
+
+[node name="AlvoTeste" type="Node2D"]
+script = ExtResource("1_alvo")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.55, 0.35, 0.2, 1)
+polygon = PackedVector2Array(-60, -120, 60, -120, 60, 120, -60, 120)
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("2_hurt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("RectangleShape2D_alvo")
+
+[node name="Texto" type="Label" parent="."]
+offset_left = -100.0
+offset_top = -220.0
+offset_right = 100.0
+offset_bottom = -130.0
+horizontal_alignment = 1
+
+[connection signal="golpe_recebido" from="Hurtbox" to="." method="take_damage"]

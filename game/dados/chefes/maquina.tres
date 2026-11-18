@@ -1,0 +1,132 @@
+[gd_resource type="Resource" script_class="MaquinaData" format=3 uid="uid://bfmwcs6qaiyys"]
+
+[ext_resource type="Script" path="res://scripts/maquina_data.gd" id="1_dados"]
+[ext_resource type="PackedScene" path="res://scenes/laser_maquina.tscn" id="2_laser"]
+[ext_resource type="PackedScene" path="res://scenes/bomba_maquina.tscn" id="3_bomba"]
+[ext_resource type="PackedScene" path="res://scenes/placa_maquina.tscn" id="4_placa"]
+[ext_resource type="Script" path="res://scripts/fase_chefe.gd" id="fase_chefe"]
+[ext_resource type="Script" path="res://scripts/combo_chefe.gd" id="combo_chefe"]
+
+[sub_resource type="Resource" id="Combo_normal1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"bombas"
+segundo = &"laser"
+atraso = 0.6
+
+[sub_resource type="Resource" id="Fase_normal1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"laser", &"bombas", &"pistoes"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_normal1_1")])
+chance_combo = 0.2
+fator_pausa = 1.0
+
+[sub_resource type="Resource" id="Combo_normal2_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"bombas"
+segundo = &"laser"
+atraso = 0.5
+
+[sub_resource type="Resource" id="Combo_normal2_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"pistoes"
+segundo = &"laser"
+atraso = 0.5
+
+[sub_resource type="Resource" id="Combo_normal2_3"]
+script = ExtResource("combo_chefe")
+primeiro = &"pistoes"
+segundo = &"varredura"
+atraso = 0.5
+
+[sub_resource type="Resource" id="Fase_normal2"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 0.5
+ataques = Array[StringName]([&"laser", &"bombas", &"pistoes", &"varredura"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_normal2_1"), SubResource("Combo_normal2_2"), SubResource("Combo_normal2_3")])
+chance_combo = 0.35
+fator_pausa = 0.9
+
+[sub_resource type="Resource" id="Combo_expert1_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"bombas"
+segundo = &"laser"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Fase_expert1"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 1.0
+ataques = Array[StringName]([&"laser", &"bombas"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert1_1")])
+chance_combo = 0.3
+fator_pausa = 0.9
+
+[sub_resource type="Resource" id="Combo_expert2_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"bombas"
+segundo = &"laser"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"pistoes"
+segundo = &"laser"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert2_3"]
+script = ExtResource("combo_chefe")
+primeiro = &"bombas"
+segundo = &"pistoes"
+atraso = 0.5
+
+[sub_resource type="Resource" id="Fase_expert2"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 0.667
+ataques = Array[StringName]([&"laser", &"bombas", &"pistoes"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert2_1"), SubResource("Combo_expert2_2"), SubResource("Combo_expert2_3")])
+chance_combo = 0.45
+fator_pausa = 0.85
+
+[sub_resource type="Resource" id="Combo_expert3_1"]
+script = ExtResource("combo_chefe")
+primeiro = &"bombas"
+segundo = &"laser"
+atraso = 0.25
+
+[sub_resource type="Resource" id="Combo_expert3_2"]
+script = ExtResource("combo_chefe")
+primeiro = &"pistoes"
+segundo = &"laser"
+atraso = 0.25
+
+[sub_resource type="Resource" id="Combo_expert3_3"]
+script = ExtResource("combo_chefe")
+primeiro = &"pistoes"
+segundo = &"varredura"
+atraso = 0.3
+
+[sub_resource type="Resource" id="Combo_expert3_4"]
+script = ExtResource("combo_chefe")
+primeiro = &"bombas"
+segundo = &"varredura"
+atraso = 0.4
+
+[sub_resource type="Resource" id="Fase_expert3"]
+script = ExtResource("fase_chefe")
+comeca_com_vida = 0.333
+ataques = Array[StringName]([&"laser", &"bombas", &"pistoes", &"varredura"])
+combos = Array[ExtResource("combo_chefe")]([SubResource("Combo_expert3_1"), SubResource("Combo_expert3_2"), SubResource("Combo_expert3_3"), SubResource("Combo_expert3_4")])
+chance_combo = 0.6
+fator_pausa = 0.8
+
+[resource]
+script = ExtResource("1_dados")
+nome = "Máquina de IA"
+id_progresso = "boss"
+texto_vitoria = "Você derrotou a Máquina de IA e salvou a floresta!"
+vida = 2400
+fases_normal = Array[ExtResource("fase_chefe")]([SubResource("Fase_normal1"), SubResource("Fase_normal2")])
+fases_expert = Array[ExtResource("fase_chefe")]([SubResource("Fase_expert1"), SubResource("Fase_expert2"), SubResource("Fase_expert3")])
+cena_laser = ExtResource("2_laser")
+cena_bomba = ExtResource("3_bomba")
+cena_placa = ExtResource("4_placa")

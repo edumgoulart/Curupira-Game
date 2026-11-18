@@ -1,0 +1,170 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Curupira em pixel art</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout: coluna única larga; cada seção abre com o palco de pixels e fecha com as escolhas. */
+:root {
+  --fundo: #EDF0EA; --painel: #FFFFFF; --tinta: #1B211C; --suave: #566258; --linha: #D2D9CF;
+  --fogo: #C2410C; --fogo-fundo: #FBE3D2; --verde: #2C6A2C;
+  --display: 'Pixelify Sans', 'Courier New', monospace; --corpo: 'Figtree', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --fundo: #121613; --painel: #1A1F1B; --tinta: #E6ECE5; --suave: #9AA89C; --linha: #2C342D;
+  --fogo: #FF8A4C; --fogo-fundo: #3A2014; --verde: #86B83C; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --fundo: #121613; --painel: #1A1F1B; --tinta: #E6ECE5; --suave: #9AA89C; --linha: #2C342D;
+  --fogo: #FF8A4C; --fogo-fundo: #3A2014; --verde: #86B83C; color-scheme: dark }
+body { background: var(--fundo); color: var(--tinta); font: 16px/1.55 var(--corpo); }
+.pagina { max-width: 1100px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-wrap: balance; margin: 0; letter-spacing: .01em; }
+h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05; }
+h2 { font-size: 1.7rem; }
+h3 { font-size: 1.1rem; font-weight: 500; }
+p { margin: 0; max-width: 68ch; }
+.rotulo { font: 600 .75rem/1 var(--corpo); text-transform: uppercase; letter-spacing: .08em; color: var(--fogo); }
+.topo { display: grid; gap: 14px; }
+.resposta { border-left: 4px solid var(--fogo); background: var(--painel); padding: 14px 18px; border-radius: 0 8px 8px 0; display: grid; gap: 6px; max-width: 76ch; }
+.resposta strong { font-family: var(--display); font-weight: 500; font-size: 1.15rem; }
+section { display: grid; gap: 18px; }
+.cab-secao { display: grid; gap: 8px; }
+.pixels { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+.palco-cena { background: #0E1E2A; border-radius: 6px; overflow: hidden; justify-self: start; max-width: 100%; }
+.controles { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button { font: 600 .9rem var(--corpo); color: var(--tinta); background: var(--painel); border: 1px solid var(--linha); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+button:hover { border-color: var(--fogo); }
+button[aria-pressed="true"] { background: var(--fogo); border-color: var(--fogo); color: #fff; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--fogo); outline-offset: 2px; }
+label.marca { display: inline-flex; gap: 6px; align-items: center; font-size: .92rem; color: var(--suave); }
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.cartao { background: var(--painel); border: 1px solid var(--linha); border-radius: 8px; padding: 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.cartao canvas { justify-self: center; max-width: 100%; }
+.cartao .linha-topo { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.chip { font: 600 .78rem ui-monospace, 'SFMono-Regular', Menlo, monospace; background: var(--fogo-fundo); color: var(--fogo); border-radius: 4px; padding: 2px 6px; }
+.quadro-atual { font: .8rem ui-monospace, Menlo, monospace; color: var(--suave); }
+.desc { font-size: .9rem; color: var(--suave); }
+.grade-rostos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.grade-rostos figure { margin: 0; background: var(--painel); border: 1px solid var(--linha); border-radius: 8px; padding: 8px; display: grid; gap: 4px; justify-items: center; }
+.grade-rostos canvas { background: #7D9478; border-radius: 4px; }
+figcaption { font-size: .85rem; color: var(--suave); }
+.rolagem { overflow-x: auto; background: var(--painel); border: 1px solid var(--linha); border-radius: 8px; padding: 12px; }
+.rolagem img { max-width: none; background: #7D9478; }
+.amostras { display: flex; flex-wrap: wrap; gap: 2px; }
+.amostras span { width: 12px; height: 12px; border-radius: 2px; }
+ul.regras { margin: 0; padding-left: 18px; font-size: .88rem; color: var(--suave); display: grid; gap: 2px; }
+.numeros { display: flex; gap: 14px; flex-wrap: wrap; font: .85rem ui-monospace, Menlo, monospace; color: var(--tinta); }
+.numeros b { font-weight: 700; color: var(--fogo); }
+.esperando { font-size: .9rem; color: var(--suave); }
+.notas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; }
+.notas article { background: var(--painel); border: 1px solid var(--linha); border-radius: 8px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.notas ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .94rem; }
+code { font: .88em ui-monospace, Menlo, monospace; background: var(--fogo-fundo); padding: 1px 4px; border-radius: 3px; }
+.barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--fundo); padding-block: 10px; border-bottom: 1px solid var(--linha); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--fundo); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+.placar { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; font-size: .95rem; min-height: 1.6em; }
+.placar b { font-family: var(--display); font-weight: 500; color: var(--fogo); }
+.dica { color: var(--suave); }
+#luta { cursor: pointer; }
+#luta:focus-visible { outline: 3px solid var(--fogo); outline-offset: 3px; }
+.teclas { font-size: .9rem; color: var(--suave); }
+kbd { font: 600 .8rem ui-monospace, Menlo, monospace; background: var(--painel); border: 1px solid var(--linha); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; }
+.cartao.ataque { transition: border-color .15s; }
+.cartao.ataque.ativo { border-color: var(--fogo); box-shadow: 0 0 0 1px var(--fogo); }
+</style>
+
+<div class="pagina">
+  <header class="topo">
+    <span class="rotulo">Curupira E5 · testes de pixel art</span>
+    <h1>Curupira em pixel art</h1>
+    <p>O Curupira, os quatro chefes e as arenas desenhados direto no grid, pixel por pixel, com cada chefe lutando em três fases. Tudo está no tamanho que teria numa tela de 1920×1080, e as mesmas animações já foram exportadas como folhas de sprites para o Godot.</p>
+    <div class="resposta">
+      <strong>Sim, o pixel tem o mesmo tamanho em tudo.</strong>
+      <p>Personagem, chefe, tiro, efeito e cenário são desenhados numa resolução base só, 480×270, e ampliados 4×. Um chefe maior tem mais pixels, não pixels maiores.</p>
+    </div>
+  </header>
+
+  <div class="barra controles" role="group" aria-label="Controles de animação">
+    <button type="button" id="bt-pausar">Pausar</button>
+    <label class="marca"><input type="checkbox" id="op-lento"> Câmera lenta (¼)</label>
+    <label class="marca"><input type="checkbox" id="op-virados"> Pés virados para trás</label>
+  </div>
+
+  <section aria-labelledby="t-mao">
+    <div class="cab-secao">
+      <span class="rotulo">A · desenhado à mão · 480×270, ×4</span>
+      <h2 id="t-mao">Pixel por pixel</h2>
+      <p>Cabeça, olhos, bocas, pés, mãos, saia e a onça foram desenhados no grid. O cabelo é vermelho comum e só pega fogo no especial. Ele atira em oito direções: de pé (cima, diagonal para cima, frente e diagonal para baixo com a mira travada), correndo (frente e diagonal para cima), no ar (cinco direções, até para baixo) e agachado. A folha do tiro tem um desenho para cada direção, sem girar pixel.</p>
+    </div>
+    <canvas id="cena-mao" class="pixels palco-cena" width="480" height="270" aria-label="Curupira desenhado em pixels numa floresta ao amanhecer"></canvas>
+    <div class="controles" id="escolha-cena" role="group" aria-label="Animação na cena"></div>
+    <h3>Todas as animações</h3>
+    <div class="grade" id="grade-mao"></div>
+    <h3>Rostos</h3>
+    <div class="grade-rostos" id="rostos-mao"></div>
+    <h3>Folha de sprites</h3>
+    <p class="desc" id="info-folha"></p>
+    <div class="rolagem"><img id="folha-mao" class="pixels" alt="Folha de sprites do Curupira desenhado à mão"></div>
+  </section>
+
+  <section aria-labelledby="t-chefes">
+    <div class="cab-secao">
+      <span class="rotulo">C · chefes e arenas à mão · 480×270, ×4</span>
+      <h2 id="t-chefes">Os quatro chefes, em fases</h2>
+      <p>Cada chefe tem quatro ataques animados do zero, com aviso antes e respiro depois. A luta abre com dois ataques. Cada fase nova soma um ataque mais difícil e mistura os anteriores. Os tempos aqui servem só para a animação: duração, dano e velocidade de cada ataque ainda precisam entrar no GDD.</p>
+    </div>
+    <div class="controles" id="escolha-chefe" role="group" aria-label="Chefe"></div>
+    <div class="controles" id="escolha-ataque" role="group" aria-label="Ataque"></div>
+    <canvas id="luta" class="pixels palco-cena" width="480" height="270" tabindex="0" aria-label="Arena com o chefe escolhido e o Curupira; clique para jogar"></canvas>
+    <div class="placar" aria-live="polite"><span id="luta-status"></span></div>
+    <p class="teclas">Clique na arena para jogar: <kbd>A</kbd> <kbd>D</kbd> andam, <kbd>Espaço</kbd> pula (soltar cedo pula menos), <kbd>S</kbd> abaixa, <kbd>J</kbd> atira, <kbd>W</kbd> mira para cima (com <kbd>A</kbd>/<kbd>D</kbd>, na diagonal), <kbd>S</kbd> no ar mira para baixo, <kbd>Shift</kbd> trava a mira parado (aí <kbd>S</kbd> + frente mira na diagonal para baixo), <kbd>L</kbd> dá o dash (invencível). Não tem dano de verdade: o Curupira pisca a cada golpe e perde a fase no quarto.</p>
+    <p class="desc" id="desc-arena"></p>
+    <div class="grade" id="cartoes-ataques"></div>
+  </section>
+
+  <section aria-labelledby="t-godot">
+    <div class="cab-secao">
+      <span class="rotulo">No jogo</span>
+      <h2 id="t-godot">Como isso vai para o Godot</h2>
+    </div>
+    <div class="notas">
+      <article>
+        <h3>Folhas exportadas</h3>
+        <ul>
+          <li>Em <code>game/assets/pixel/</code>: uma folha por personagem, com um <code>SpriteFrames</code> pronto (<code>*_frames.tres</code>) e um <code>.json</code> com fps, âncora e o ponto de onde sai cada tiro (mão, boca, bico, lente).</li>
+          <li>Cada ataque de chefe vira três animações: <code>aviso_</code>, a ação e <code>fim_</code>. O aviso pode durar o que o <code>.tres</code> de dados mandar.</li>
+          <li>Projéteis e efeitos são quadros PNG soltos (<code>efeitos/</code>), como as bolas de fogo de hoje. Quantidade, espaçamento e velocidade ficam nos dados do chefe.</li>
+        </ul>
+      </article>
+      <article>
+        <h3>Na cena</h3>
+        <ul>
+          <li><code>scale = 4</code> e <code>texture_filter = Nearest</code> em todo sprite de pixel art; o <code>offset</code> de cada personagem está no TDD.</li>
+          <li>O jogo continua em coordenadas de 1920×1080: os números de movimento e de combate do GDD não mudam.</li>
+          <li>Para virar o personagem, <code>scale.x = −4</code> em vez de <code>flip_h</code>, para a âncora não sair do lugar.</li>
+        </ul>
+      </article>
+      <article>
+        <h3>Ainda falta</h3>
+        <ul>
+          <li>Ligar as folhas nas cenas e ajustar as colisões (Arthur).</li>
+          <li>O código da mira em 8 direções, do agachar e dos ataques novos com fases.</li>
+          <li>Decidir o botão de travar a mira e os números dos ataques novos (Q15 e Q16 do GDD).</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+</div>
+
+<script src="base.js"></script>
+<script src="curupira.js"></script>
+<script src="pixel.js"></script>
+<script src="desenho.js"></script>
+<script src="poses_px.js"></script>
+<script src="chefes_px.js"></script>
+<script src="arenas_px.js"></script>
+<script src="pagina.js"></script>
+<script src="pagina_chefes.js"></script>

@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://bvw56o7kxr3em"]
+
+[ext_resource type="Script" uid="uid://4e5gcar6hady" path="res://scripts/feixe_canhao.gd" id="1_feixe"]
+[ext_resource type="Script" uid="uid://bku4kjgoguonj" path="res://scripts/animacao_quadros.gd" id="9_anim"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_meio_1.png" id="10_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_meio_2.png" id="11_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_meio_3.png" id="12_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_meio_4.png" id="13_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_boca_1.png" id="20_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_boca_2.png" id="21_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_boca_3.png" id="22_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/feixe_boca_4.png" id="23_q"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_feixe"]
+size = Vector2(1900, 60)
+
+[node name="FeixeCanhao" type="Area2D"]
+collision_layer = 4
+collision_mask = 8
+script = ExtResource("1_feixe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_feixe")
+
+[node name="Fogo" type="Sprite2D" parent="."]
+texture_filter = 1
+texture_repeat = 2
+scale = Vector2(4, 4)
+texture = ExtResource("10_q")
+centered = false
+offset = Vector2(0, -9)
+region_enabled = true
+region_rect = Rect2(0, 0, 475, 19)
+
+[node name="Boca" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("20_q")
+centered = false
+offset = Vector2(-14, -12)
+script = ExtResource("9_anim")
+quadros = Array[Texture2D]([ExtResource("20_q"), ExtResource("21_q"), ExtResource("22_q"), ExtResource("23_q")])
+fps = 16.0

@@ -1,42 +1,63 @@
 [gd_scene format=3 uid="uid://cgscaaxbomnlu"]
 
 [ext_resource type="Script" uid="uid://b254wjgbq6vsd" path="res://scripts/curupira.gd" id="1_38npl"]
-[ext_resource type="Texture2D" uid="uid://deqd8mnvn15uy" path="res://assets/char/idle_0.png" id="1_se248"]
-[ext_resource type="Texture2D" uid="uid://ca12ko0cdsiwo" path="res://assets/char/idle_3.png" id="2_38npl"]
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_wrsmq"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": ExtResource("1_se248")
-}, {
-"duration": 1.0,
-"texture": ExtResource("2_38npl")
-}],
-"loop": 1,
-"name": &"idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"jump",
-"speed": 5.0
-}]
+[ext_resource type="Resource" uid="uid://b8r8xbjv8wljx" path="res://dados/curupira_movimento.tres" id="4_mov"]
+[ext_resource type="Script" uid="uid://clbs5p7o6xlh4" path="res://scripts/atirador.gd" id="5_atir"]
+[ext_resource type="Resource" uid="uid://ccami2t22011l" path="res://dados/ataques/tiro_de_folha.tres" id="6_folha"]
+[ext_resource type="Script" uid="uid://ksseueomg1ru" path="res://scripts/vida.gd" id="7_vida"]
+[ext_resource type="Script" uid="uid://bp8byqmk0367j" path="res://scripts/hurtbox.gd" id="8_hurt"]
+[ext_resource type="Resource" uid="uid://n8vp1eurw1hm" path="res://dados/curupira_vida.tres" id="9_dvida"]
+[ext_resource type="Script" uid="uid://cx2jichctvq18" path="res://scripts/carga_especial.gd" id="10_carga"]
+[ext_resource type="Resource" uid="uid://clkijo3bqhq4m" path="res://dados/ataques/instinto_selvagem.tres" id="11_especial"]
+[ext_resource type="PackedScene" path="res://scenes/efeito_dash.tscn" id="14_dash"]
+[ext_resource type="SpriteFrames" path="res://assets/pixel/curupira/curupira_frames.tres" id="15_quadros"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ixury"]
-radius = 16.0
-height = 60.0
+radius = 30.0
+height = 192.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_hurtbox"]
+radius = 24.0
+height = 172.0
 
 [node name="Curupira" type="CharacterBody2D" unique_id=722028489]
-position = Vector2(-55, -351)
+collision_layer = 2
+collision_mask = 33
 script = ExtResource("1_38npl")
+dados = ExtResource("4_mov")
+dados_vida = ExtResource("9_dvida")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=188185585]
-position = Vector2(201.75, 479.25)
-scale = Vector2(0.13793945, 0.12426758)
-sprite_frames = SubResource("SpriteFrames_wrsmq")
+texture_filter = 1
+position = Vector2(0, 96)
+scale = Vector2(4, 4)
+sprite_frames = ExtResource("15_quadros")
 animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1661674320]
-position = Vector2(202, 543)
 shape = SubResource("CapsuleShape2D_ixury")
+
+[node name="Atirador" type="Marker2D" parent="." unique_id=700014690]
+position = Vector2(91.5, -30.5)
+script = ExtResource("5_atir")
+ataque = ExtResource("6_folha")
+especial = ExtResource("11_especial")
+
+[node name="Vida" type="Node" parent="."]
+script = ExtResource("7_vida")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+monitoring = false
+script = ExtResource("8_hurt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, 10)
+shape = SubResource("CapsuleShape2D_hurtbox")
+
+[node name="CargaEspecial" type="Node" parent="."]
+script = ExtResource("10_carga")
+
+[node name="EfeitoDash" parent="." node_paths=PackedStringArray("sprite") instance=ExtResource("14_dash")]
+sprite = NodePath("../AnimatedSprite2D")

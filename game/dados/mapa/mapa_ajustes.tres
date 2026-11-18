@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MapaData" format=3]
+
+[ext_resource type="Script" path="res://scripts/mapa_data.gd" id="1_mapa"]
+
+[resource]
+script = ExtResource("1_mapa")
+velocidade = 64.0
+raio_pes = 3.0
+suavidade_camera = 6.0

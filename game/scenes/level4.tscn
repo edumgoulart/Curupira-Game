@@ -1,0 +1,68 @@
+[gd_scene format=3 uid="uid://dfwvdnt5g58eg"]
+
+[ext_resource type="PackedScene" uid="uid://cgscaaxbomnlu" path="res://scenes/curupira.tscn" id="2_curupira"]
+
+[ext_resource type="PackedScene" uid="uid://c4ljlrw5gxf3c" path="res://scenes/maquina.tscn" id="3_maquina"]
+
+[ext_resource type="PackedScene" uid="uid://bvnebvbn71xmw" path="res://scenes/hud.tscn" id="4_hud"]
+
+[ext_resource type="PackedScene" uid="uid://2koum5on3ej0" path="res://scenes/menu_pausa.tscn" id="5_pausa"]
+
+[ext_resource type="PackedScene" uid="uid://ct14xo7td23v6" path="res://scenes/tela_derrota.tscn" id="6_derrota"]
+
+[ext_resource type="PackedScene" uid="uid://br6lsujf6wbes" path="res://scenes/tela_vitoria.tscn" id="7_vitoria"]
+
+[ext_resource type="Script" path="res://scripts/fundo_arena.gd" id="90_fundo"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_chao"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_parede"]
+
+[node name="Level4" type="Node2D"]
+texture_filter = 1
+
+[node name="Fundo" type="Node2D" parent="."]
+script = ExtResource("90_fundo")
+pasta = "res://assets/pixel/arenas/maquina"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(0, 340)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("WorldBoundaryShape2D_chao")
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(-965, 9)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+rotation = 1.5707964
+shape = SubResource("WorldBoundaryShape2D_parede")
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(959, 3)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+rotation = 4.712389
+shape = SubResource("WorldBoundaryShape2D_parede")
+
+[node name="Curupira" parent="." instance=ExtResource("2_curupira")]
+position = Vector2(-540, 244)
+
+[node name="Maquina" parent="." node_paths=PackedStringArray("alvo") instance=ExtResource("3_maquina")]
+position = Vector2(648, -484)
+alvo = NodePath("../Curupira")
+
+[node name="HUD" parent="." node_paths=PackedStringArray("curupira", "chefe") instance=ExtResource("4_hud")]
+curupira = NodePath("../Curupira")
+chefe = NodePath("../Maquina")
+
+[node name="MenuPausa" parent="." instance=ExtResource("5_pausa")]
+
+[node name="TelaDerrota" parent="." node_paths=PackedStringArray("curupira") instance=ExtResource("6_derrota")]
+curupira = NodePath("../Curupira")
+
+[node name="TelaVitoria" parent="." node_paths=PackedStringArray("chefe", "curupira") instance=ExtResource("7_vitoria")]
+chefe = NodePath("../Maquina")
+curupira = NodePath("../Curupira")

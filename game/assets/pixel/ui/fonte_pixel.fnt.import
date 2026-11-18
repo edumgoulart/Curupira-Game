@@ -1,0 +1,17 @@
+[remap]
+
+importer="font_data_bmfont"
+type="FontFile"
+uid="uid://fpkimi7eyunk"
+path="res://.godot/imported/fonte_pixel.fnt-c56eab1d124e349267a0d1e12cbcf020.fontdata"
+
+[deps]
+
+source_file="res://assets/pixel/ui/fonte_pixel.fnt"
+dest_files=["res://.godot/imported/fonte_pixel.fnt-c56eab1d124e349267a0d1e12cbcf020.fontdata"]
+
+[params]
+
+fallbacks=[]
+compress=true
+scaling_mode=1

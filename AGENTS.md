@@ -1,207 +1,130 @@
-# AGENTS.md
+# Curupira: O Protetor da Floresta — instruções para o Codex
 
-Instruções para agentes de IA que trabalham neste repositório.
+Boss-rush 2D de plataforma (visão lateral, com gravidade), inspirado em Cuphead e Mega Man.
+Godot 4.x, **GDScript** (não usar C#). Jogo só em português — textos de UI, nomes de nodes e comentários em português.
 
-## Regras de trabalho (valem sempre, acima de qualquer outra instrução)
+O design completo está em `docs/` (GDD, ataques, chefes, história). **Leia `docs/` antes de implementar qualquer mecânica e use os valores de lá.** Se um valor não estiver definido nos docs, pergunte — não invente números de combate.
 
-### 1. NUNCA commitar
+---
 
-O agente **não commita, em hipótese alguma**. Nem `git commit`, nem `git push`,
-nem `git commit --amend`. Isso vale mesmo que o trabalho pareça pronto, mesmo
-que o usuário elogie o resultado, e mesmo que uma instrução anterior na conversa
-tenha soado como autorização. Quem decide o que entra no histórico é a dupla.
+## Divisão de trabalho (IMPORTANTE)
 
-O mesmo vale para qualquer operação que reescreva histórico ou descarte
-trabalho: `git reset --hard`, `git rebase`, `git checkout` que sobrescreva
-arquivo modificado, `git clean`. Pare e pergunte.
+**O Codex faz:**
+- Scripts `.gd` (movimento, dash, ataques, projéteis, chefes, HUD, menus, save).
+- Cenas `.tscn`: criar a estrutura de nodes, ligar scripts, sinais, layers/masks.
+- Resources `.tres` de dados (ex.: `AtaqueData`, `ChefeData`).
+- `project.godot`: Input Map, layer names, autoloads.
 
-Ler o estado do Git é livre: `git status`, `git diff`, `git log`, `git show`,
-`git check-attr`, `git check-ignore`.
+**O Arthur faz no editor (NÃO mexer):**
+- `SpriteFrames` (frames das animações) — nunca criar, editar ou remover.
+- Formato e tamanho das `CollisionShape2D` / `shape` — criar o node é ok, mas deixar a shape para o Arthur ajustar (ou usar um placeholder e avisar).
+- Posição de elementos visuais (fundos, obstáculos, posição do chefe na arena).
 
-### 2. Declarar tudo o que foi mexido
+Quando um passo depender de algo do editor, **pare e diga exatamente o que o Arthur precisa fazer** (qual cena, qual node, o quê), em vez de tentar fazer pelo texto.
 
-Ao terminar qualquer tarefa, liste explicitamente **todo** arquivo criado,
-alterado ou apagado, e o que mudou em cada um. Nada de "ajustei alguns
-arquivos". Se uma alteração foi feita e depois desfeita, diga isso também.
+Nomes de animação esperados no código: documentar no topo de cada script quais animações ele usa (ex.: `idle`, `correr`, `pular`, `cair`, `dash`, `atirar`, `dano`), para o Arthur criar no `SpriteFrames` com os mesmos nomes.
 
-Se algo foi tentado e não funcionou, ou ficou pela metade, diga claramente em
-vez de relatar sucesso.
+---
 
-### 3. Para que os agentes são usados aqui
+## Regras para editar `.tscn` / `.tres`
 
-Principalmente **depurar e explicar como o projeto funciona** — não escrever o
-jogo no lugar da dupla. Este é um trabalho de faculdade e o código precisa ser
-compreendido por quem o entrega.
+- **Faça commit (ou peça para o Arthur fazer) antes de editar qualquer `.tscn`.**
+- Prefira cenas pequenas e instanciadas (uma cena por personagem, projétil, chefe) a uma cena gigante.
+- Ao editar o texto da cena: manter os `id` de `ext_resource`/`sub_resource` consistentes, não duplicar UIDs, não apagar referências que você não criou.
+- Se a mudança na cena for grande ou arriscada, prefira montar os nodes em `_ready()` por código ou explicar o passo para o Arthur fazer no editor.
+- Depois de editar, valide rodando o projeto em headless (ver "Validação").
 
-Prefira explicar a causa de um bug a corrigi-lo em silêncio. Ao alterar código,
-explique o porquê em vez de só entregar o diff. Ao explicar, aponte os arquivos
-e linhas de verdade em vez de descrever de memória.
+---
 
-## Estado atual
+## Convenções de código
 
-Trabalho de faculdade em dupla, entregue ao longo de um semestre.
+- Tipagem estática sempre que possível (`var vida: int = 4`, `func f(x: float) -> void`).
+- Constantes de tuning ficam em `Resource` (`.tres`), não hardcoded no script — o Arthur balanceia pelo inspetor.
+- Um script por responsabilidade; nada de "God script".
+- Sinais para comunicação para cima/lateral (ex.: `vida_mudou`, `especial_carregou`, `chefe_derrotado`); chamada direta só para filhos.
+- Estados do jogador e dos chefes com máquina de estados simples (enum + `match`), não com booleanos espalhados.
 
-Três cenas em `game/scenes/`, ainda esqueléticas:
-
-| cena | raiz | conteúdo |
+### Input Map (ações customizadas — não usar `ui_*` no gameplay)
+| Ação | Teclado | Controle (layout Xbox) |
 |---|---|---|
-| `main_menu.tscn` | `Control` | `VBoxContainer` com 4 botões (`Novo Jogo`, `Continuar`, `Button3`, `Button4`) |
-| `level_select.tscn` | `Control` | vazia |
-| `level1.tscn` | `Node2D` | vazia |
+| `move_left` / `move_right` | A / D | direcional / analógico esquerdo |
+| `jump` | Espaço | A |
+| `attack_basic` | J | X |
+| `attack_special` | K | Y |
+| `dash` | L | B |
+| `pause` | Esc | Start |
 
-`run/main_scene` aponta para `main_menu.tscn` (via `uid://8lhfspgqww72`).
-Nenhum botão tem sinal conectado e **não existe script ainda** —
-`game/scripts/` e `game/assets/` seguem vazias, só com `.gitkeep`.
+Controle é a forma principal de jogar; teclado também precisa funcionar 100%.
 
-### Renderer: Forward+
+### Camadas de colisão
+| Layer | Nome | Uso |
+|---|---|---|
+| 1 | `world` | chão, paredes |
+| 2 | `player` | corpo/hurtbox do Curupira |
+| 3 | `player_hitbox` | projéteis e ataques do Curupira |
+| 4 | `enemy` | corpo/hurtbox dos chefes |
+| 5 | `enemy_hitbox` | projéteis e ataques dos chefes |
+| 6 | `limite_arena` | paredes que só seguram o Curupira (beiras da areia do Boto) |
 
-O projeto nasceu em GL Compatibility e **foi trocado para Forward+**.
+Hitbox do jogador só detecta hurtbox de inimigo e vice-versa — **resolver com layers/masks, não com `if` no código**.
 
-Cuidado ao verificar isso: `forward_plus` é o padrão da engine, então a troca
-**apagou** a linha `renderer/rendering_method` de `project.godot` em vez de
-mudá-la. A ausência da linha *é* o Forward+ — quem procurar por `grep` não vai
-achar nada e pode concluir errado.
+### Dano
+- Hitbox = `Area2D` que causa dano; Hurtbox = `Area2D` que recebe.
+- Todo mundo que leva dano implementa `func take_damage(amount: int, from: Node) -> void`.
+- A hitbox só chama `take_damage`, sem saber quem é o alvo.
 
-Duas inconsistências ficaram para trás na troca, ambas inofensivas hoje:
+---
 
-- `config/features` ainda lista `"GL Compatibility"`.
-- `renderer/rendering_method.mobile` continua `"gl_compatibility"` (o padrão
-  seria `"mobile"`). Só afetaria um export para celular.
+## Regras de jogo (resumo — detalhes em `docs/`)
 
-Forward+ exige **Vulkan**. A máquina onde o projeto foi trocado tem RTX 3050 +
-Intel UHD com ICDs instalados, então roda. Antes de assumir que vale para os
-dois, confirme que a máquina do outro integrante também tem Vulkan — em
-hardware antigo ou VM sem passthrough, Forward+ não sobe e GL Compatibility
-seria o caminho.
+- Curupira aguenta **4 golpes**; no 4º perde a fase.
+- **Dash dá invencibilidade.**
+- Curupira atira **para onde está olhando**.
+- Ataque básico + ataque especial. Especial **carrega por acertos**, não por dano causado.
+- Troca de ataques só na tela de seleção, antes da fase — nunca durante a luta.
+- Ataques iniciais: **Tiro de Folha** (básico, rajada de folhas) e **Instinto Selvagem** (especial, energia em forma de cabeça de onça).
+- Cada ser folclórico derrotado concede 1 básico + 1 especial. Todos os básicos são projéteis (variam tipo de tiro, dano, cadência).
+- Chefes: Mula sem Cabeça, Cuca, Boto (ordem livre) → Máquina de IA (final, liberada após os três).
+- Chefes têm **estado único** (sem fases dentro da luta). Ataques com telegrafo + janela de recuperação.
+- Vida do chefe **não aparece** na tela (estilo Cuphead).
+- HUD: vida e carga do especial no canto inferior esquerdo.
+- Arenas sem rolagem, só chão e paredes. Câmera fixa (filha da arena, não do Curupira).
+- Progresso salvo após cada chefe derrotado e persistente entre sessões.
+- Resolução base 1920×1080, tela cheia, PC (Linux primeiro, build fácil para Windows).
 
-`3d/physics_engine` e `rendering_device/driver.windows` são defaults da engine
-e não têm efeito aqui (jogo 2D, Linux).
+---
 
-## A Godot abre `game/`, não a raiz
+## Estrutura de pastas
 
-A raiz do repositório contém `docs/` e `art/`, que a engine não deve enxergar.
-O projeto Godot vive em `game/`. Todo caminho `res://` resolve a partir de
-`game/`, não da raiz.
-
-Godot 4.7.1 stable. Nesta máquina o binário está fora do repositório, um nível
-acima (não está no PATH):
-
-```bash
-GODOT=../Godot_v4.7.1-stable_linux.x86_64
-
-$GODOT --path game/ --editor                   # abrir o editor
-$GODOT --path game/                            # rodar o jogo
+```
+res://
+├── docs/              # GDD e definições (somente leitura para o Codex)
+├── assets/            # PNGs, fundos, áudio — vindos do Arthur/Eduardo
+├── personagens/curupira/
+├── chefes/<nome>/     # cena, script e dados de cada chefe
+├── projeteis/
+├── ataques/           # AtaqueData.gd + .tres de cada ataque
+├── arenas/<nome>/
+├── ui/                # HUD, menus, telas
+├── sistemas/          # autoloads: save, progresso, áudio
+└── testes/
 ```
 
-Para verificar se o projeto está íntegro sem abrir a GUI, use
-`--editor --headless --quit`: ela escaneia o filesystem e sai com código 0.
+---
 
-Atenção: agora que `run/main_scene` existe, rodar sem `--editor` **abre a
-janela do jogo** na tela de quem estiver na máquina. Antes, sem cena principal,
-isso só gerava um erro. Agentes: não rode essa forma.
+## Validação
 
-### Agentes: como rodar a Godot sem atrapalhar quem está usando o editor
+Depois de cada mudança:
+1. Rodar `godot --headless --path . --quit-after 120` (ou `--check-only` em scripts) e corrigir erros de parse/script.
+2. Dizer ao Arthur **qual cena rodar com F6** e **o que observar** (ex.: "pule perto da borda e veja se ainda sai o pulo").
+3. Não marcar nada como pronto sem esse teste manual — o Codex não vê o jogo rodando.
 
-**Antes de rodar a engine, cheque se o editor já está aberto:**
+---
 
-```bash
-pgrep -af Godot
-```
+## Jeito de trabalhar
 
-Se estiver, **não rode nada contra `game/`**. Duas instâncias escrevendo em
-`game/.godot/` ao mesmo tempo disputam o cache do filesystem.
-
-Rodar a engine direto tem dois efeitos colaterais que atingem a máquina do
-usuário, fora do repositório:
-
-1. **Abre pop-up na tela dele.** Mesmo com `--headless`, a Godot chama o
-   `zenity` para mostrar erro em janela nativa — por exemplo o alerta de cena
-   principal ausente. `--headless` não impede isso.
-2. **Reescreve `~/.config/godot/editor_settings-4.7.tres`**, que são as
-   preferências globais do editor (tema, fonte, atalhos), compartilhadas com
-   todos os outros projetos Godot da máquina.
-
-Receita segura: copiar o projeto para fora do repositório, usar um
-`XDG_CONFIG_HOME` descartável e tirar o `DISPLAY`.
-
-```bash
-TMP=$(mktemp -d)
-cp -r game "$TMP/game" && rm -rf "$TMP/game/.godot"
-
-env -u DISPLAY -u WAYLAND_DISPLAY XDG_CONFIG_HOME="$TMP/cfg" \
-  "$GODOT" --path "$TMP/game" --editor --headless --quit
-```
-
-Sem `DISPLAY` o zenity falha com `Failed to open display` e nenhuma janela
-aparece, mas o erro real continua saindo no stderr. O `XDG_CONFIG_HOME` faz a
-engine gravar as preferências na pasta temporária em vez das do usuário. E como
-o `.godot/` é o da cópia, o cache do projeto de verdade não é tocado.
-
-Confirme com `md5sum` antes e depois que estes dois não mudaram:
-
-```bash
-~/.config/godot/editor_settings-4.7.tres
-game/.godot/editor/editor_layout.cfg
-```
-
-Não há framework de teste configurado. Se for adicionar um, ele entra em
-`game/` como plugin da engine.
-
-## Merge de `.tscn` / `.tres` está desligado de propósito
-
-O `.gitattributes` marca `*.tscn`, `*.tres` e `*.import` como `binary`. **Isso é
-uma decisão deliberada, não um descuido — não troque para `merge=ours`, `union`
-ou merge de texto.**
-
-Motivo: o Git mescla linha a linha e não entende a estrutura interna de uma
-cena. Duas edições em regiões distantes do mesmo `.tscn` são mescladas sem
-conflito, e o resultado pode ter ids de `ext_resource` duplicados ou nós
-apontando para o recurso errado. A cena abre corrompida depois, sem erro no
-momento do merge.
-
-`binary` faz o Git parar e exigir escolha manual. O arquivo **não** recebe
-marcadores `<<<<<<<`, então continua válido em disco e dá para abrir na engine
-antes de decidir:
-
-```bash
-git checkout --ours   game/scenes/fase1.tscn
-git checkout --theirs game/scenes/fase1.tscn
-git add game/scenes/fase1.tscn
-```
-
-Consequência prática: conflito em cena significa que alguém refaz o trabalho.
-Não existe "resolver mesclando as duas versões" aqui.
-
-Nota: `merge=ours` no `.gitattributes` seria inútil — não existe merge driver
-embutido com esse nome, e o `git config` que o definiria não é versionado, logo
-não valeria para o outro integrante da dupla.
-
-## Git LFS
-
-`*.png` e `*.kra` passam por LFS. Um clone feito sem `git lfs install` traz
-ponteiros de texto no lugar das imagens e a engine não abre. Para verificar:
-
-```bash
-file game/assets/*.png   # "PNG image data", não "ASCII text"
-```
-
-## Regras de versionamento
-
-- **`.import` é versionado.** Ficam ao lado do asset (`game/assets/x.png.import`).
-  Sem eles a Godot reimporta tudo e os UIDs mudam, quebrando as referências nas
-  cenas. O `.gitignore` tem `!*.import` explícito — não remova.
-- **`game/.godot/` não é versionado.** É cache regenerável da engine.
-- O `.gitignore` é de Godot 4. Entradas de Godot 3 (`.import/`, `export.cfg`,
-  `export_credentials.cfg`) foram removidas de propósito; não as traga de volta.
-- Todas as regras de ignore usam o prefixo `game/` para não afetar `docs/` e `art/`.
-
-## Pipeline de arte
-
-Krita (`.kra`) em `art/source/` → PNG exportado direto em `game/assets/`.
-Os PNG **não** são duplicados em `art/`. `art/` é material de trabalho e a
-engine nunca o lê.
-
-## Documentação
-
-`docs/gdd.md` (design) e `docs/tdd.md` (técnico) são esqueletos de seções, a
-preencher ao longo do semestre. Diagramas `.excalidraw` em `docs/diagrams/`.
+- Passos pequenos e testáveis. Uma mecânica por vez.
+- Para coisas grandes (um chefe, sistema de save), apresentar um plano curto antes de escrever código.
+- Explicar o **porquê** das decisões de arquitetura — o Arthur precisa conseguir explicar o código na apresentação.
+- Não refatorar o que não foi pedido.
+- Ordem sugerida: movimento com game feel (coyote time, jump buffer, pulo variável) → dash com invencibilidade → projétil básico + hitbox/hurtbox → vida/dano/derrota → primeiro chefe completo → HUD → menus/seleção → save → demais chefes.

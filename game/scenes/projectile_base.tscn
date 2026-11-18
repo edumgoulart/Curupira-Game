@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://d0jqbwe0xx7yu"]
+
+[ext_resource type="Script" path="res://scripts/projectile_base.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_cima_1.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_cima_2.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_diag_cima_1.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_diag_cima_2.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_lado_1.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/folha_lado_2.png" id="7"]
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="8"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 12.0
+
+[node name="ProjectileBase" type="Area2D"]
+collision_layer = 4
+collision_mask = 9
+script = ExtResource("1")
+quadros_cima = Array[Texture2D]([ExtResource("2"), ExtResource("3")])
+quadros_diagonal = Array[Texture2D]([ExtResource("4"), ExtResource("5")])
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_1")
+
+[node name="Visual" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("6")
+centered = false
+offset = Vector2(-6, -3)
+script = ExtResource("8")
+quadros = Array[Texture2D]([ExtResource("6"), ExtResource("7")])
+fps = 12.0
+loop = true
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]

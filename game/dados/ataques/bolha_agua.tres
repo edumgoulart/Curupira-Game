@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AtaqueData" format=3 uid="uid://d1tlnjx60r35u"]
+
+[ext_resource type="Script" uid="uid://ctxn0hif3pl2o" path="res://scripts/ataque_data.gd" id="1_atq"]
+[ext_resource type="PackedScene" uid="uid://5ouqth25bmac" path="res://scenes/projetil_bolha_agua.tscn" id="2_proj"]
+
+[resource]
+script = ExtResource("1_atq")
+nome = "Bolha d'Água"
+dano = 26
+tiros_por_segundo = 0.8
+carga_por_acerto = 6
+velocidade_projetil = 600.0
+cena_projetil = ExtResource("2_proj")
+fase_que_libera = "fase3"

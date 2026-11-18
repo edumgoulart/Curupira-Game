@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://3fniu52xl0js"]
+
+[ext_resource type="Script" path="res://scripts/bomba_maquina.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/hitbox.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/explosao_maquina.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/maquina/efeitos/bomba_1.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/pixel/maquina/efeitos/bomba_2.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/pixel/maquina/efeitos/bomba_3.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/pixel/maquina/efeitos/bomba_4.png" id="7"]
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="8"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_1"]
+radius = 100.0
+
+[node name="BombaMaquina" type="Node2D"]
+script = ExtResource("1")
+cena_explosao = ExtResource("3")
+
+[node name="AreaAviso" type="Polygon2D" parent="."]
+color = Color(0.89, 0.15, 0.11, 0.55)
+polygon = PackedVector2Array(100.0, -4.0, 98.1, -1.7, 92.4, 0.6, 83.1, 2.7, 70.7, 4.5, 55.6, 6.0, 38.3, 7.1, 19.5, 7.8, -0.0, 8.0, -19.5, 7.8, -38.3, 7.1, -55.6, 6.0, -70.7, 4.5, -83.1, 2.7, -92.4, 0.6, -98.1, -1.7, -100.0, -4.0, -98.1, -6.3, -92.4, -8.6, -83.1, -10.7, -70.7, -12.5, -55.6, -14.0, -38.3, -15.1, -19.5, -15.8, 0.0, -16.0, 19.5, -15.8, 38.3, -15.1, 55.6, -14.0, 70.7, -12.5, 83.1, -10.7, 92.4, -8.6, 98.1, -6.3)
+
+[node name="Corpo" type="Node2D" parent="."]
+
+[node name="Visual" type="Sprite2D" parent="Corpo"]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("4")
+centered = false
+offset = Vector2(-6, -8)
+script = ExtResource("8")
+quadros = Array[Texture2D]([ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7")])
+fps = 8.0
+loop = true
+
+[node name="Explosao" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Explosao"]
+shape = SubResource("CircleShape2D_1")

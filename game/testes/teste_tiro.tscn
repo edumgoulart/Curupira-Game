@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bwypyprk778vs"]
+
+[ext_resource type="PackedScene" uid="uid://x5gtkowxmddu" path="res://scenes/level1.tscn" id="1_fase"]
+[ext_resource type="PackedScene" uid="uid://bwq1v5woh2rdu" path="res://testes/alvo_teste.tscn" id="2_alvo"]
+
+[node name="TesteTiro" type="Node2D"]
+
+[node name="Level1" parent="." instance=ExtResource("1_fase")]
+
+[node name="AlvoTeste" parent="." instance=ExtResource("2_alvo")]
+position = Vector2(600, 290)

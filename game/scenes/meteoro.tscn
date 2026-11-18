@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://bwrinv2p0og0s"]
+
+[ext_resource type="Script" path="res://scripts/meteoro.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/hitbox.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/explosao_mula.tscn" id="3"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_1.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_2.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_3.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_4.png" id="7"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_5.png" id="8"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_6.png" id="9"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_7.png" id="10"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/sombra_meteoro_8.png" id="11"]
+[ext_resource type="Script" path="res://scripts/animacao_quadros.gd" id="12"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/rocha_caindo_1.png" id="13"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/rocha_caindo_2.png" id="14"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/rocha_caindo_3.png" id="15"]
+[ext_resource type="Texture2D" path="res://assets/pixel/mula/efeitos/rocha_caindo_4.png" id="16"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(140, 90)
+
+[node name="Meteoro" type="Node2D"]
+script = ExtResource("1")
+cena_estouro = ExtResource("3")
+
+[node name="Sombra" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("4")
+centered = false
+offset = Vector2(-13, -4)
+script = ExtResource("12")
+quadros = Array[Texture2D]([ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11")])
+fps = 8.0
+loop = false
+
+[node name="Fogo" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("13")
+centered = false
+offset = Vector2(-9, -20)
+script = ExtResource("12")
+quadros = Array[Texture2D]([ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16")])
+fps = 12.0
+loop = true
+position = Vector2(0, -28)
+
+[node name="Impacto" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 2
+script = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Impacto"]
+position = Vector2(0, -45)
+shape = SubResource("RectangleShape2D_1")

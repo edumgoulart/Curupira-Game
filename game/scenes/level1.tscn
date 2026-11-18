@@ -2,6 +2,18 @@
 
 [ext_resource type="PackedScene" uid="uid://cgscaaxbomnlu" path="res://scenes/curupira.tscn" id="1_g2h75"]
 
+[ext_resource type="PackedScene" uid="uid://bvnebvbn71xmw" path="res://scenes/hud.tscn" id="4_hud"]
+
+[ext_resource type="PackedScene" uid="uid://ykd41u8qskm5" path="res://scenes/mula.tscn" id="6_mula"]
+
+[ext_resource type="PackedScene" uid="uid://2koum5on3ej0" path="res://scenes/menu_pausa.tscn" id="7_pausa"]
+
+[ext_resource type="PackedScene" uid="uid://ct14xo7td23v6" path="res://scenes/tela_derrota.tscn" id="8_derrota"]
+
+[ext_resource type="PackedScene" uid="uid://br6lsujf6wbes" path="res://scenes/tela_vitoria.tscn" id="9_vitoria"]
+
+[ext_resource type="Script" path="res://scripts/fundo_arena.gd" id="90_fundo"]
+
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_rsrsk"]
 
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_rsrsk"]
@@ -9,29 +21,51 @@
 [sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_5gxoi"]
 
 [node name="Node2D" type="Node2D" unique_id=548584006]
+texture_filter = 1
+
+[node name="Fundo" type="Node2D" parent="."]
+script = ExtResource("90_fundo")
+pasta = "res://assets/pixel/arenas/mula"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=673135974]
 
 [node name="Floor" type="StaticBody2D" parent="." unique_id=1824960003]
-position = Vector2(0, 265)
+position = Vector2(0, 340)
 physics_material_override = SubResource("PhysicsMaterial_rsrsk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=396065718]
 shape = SubResource("WorldBoundaryShape2D_rsrsk")
 
 [node name="LeftWall" type="StaticBody2D" parent="." unique_id=1503441096]
-position = Vector2(-573, 0)
+position = Vector2(-965, 9)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall" unique_id=533410303]
 rotation = 1.5707964
 shape = SubResource("WorldBoundaryShape2D_5gxoi")
 
 [node name="RightWall" type="StaticBody2D" parent="." unique_id=255086197]
-position = Vector2(573, 0)
+position = Vector2(959, 3)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall" unique_id=1743014974]
 rotation = 4.712389
 shape = SubResource("WorldBoundaryShape2D_5gxoi")
 
 [node name="Curupira" parent="." unique_id=722028489 instance=ExtResource("1_g2h75")]
-position = Vector2(-704, -368)
+position = Vector2(-540, 244)
+
+[node name="Mula" parent="." unique_id=1371985556 node_paths=PackedStringArray("alvo") instance=ExtResource("6_mula")]
+position = Vector2(488, 340)
+alvo = NodePath("../Curupira")
+
+[node name="HUD" parent="." unique_id=617932235 node_paths=PackedStringArray("curupira", "chefe") instance=ExtResource("4_hud")]
+curupira = NodePath("../Curupira")
+chefe = NodePath("../Mula")
+
+[node name="MenuPausa" parent="." unique_id=1737279760 instance=ExtResource("7_pausa")]
+
+[node name="TelaDerrota" parent="." unique_id=1088725448 node_paths=PackedStringArray("curupira") instance=ExtResource("8_derrota")]
+curupira = NodePath("../Curupira")
+
+[node name="TelaVitoria" parent="." unique_id=1727411398 node_paths=PackedStringArray("chefe", "curupira") instance=ExtResource("9_vitoria")]
+chefe = NodePath("../Mula")
+curupira = NodePath("../Curupira")

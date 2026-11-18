@@ -1,0 +1,103 @@
+[gd_resource type="Theme" format=3 uid="uid://0ukwsfegmodb"]
+
+[ext_resource type="FontFile" path="res://assets/pixel/ui/fonte_pixel.fnt" id="fonte"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/botao_normal.png" id="normal"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/botao_foco.png" id="foco"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/botao_hover.png" id="hover"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/botao_apertado.png" id="apertado"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/botao_desabilitado.png" id="desabilitado"]
+[ext_resource type="Texture2D" path="res://assets/pixel/ui/botao_painel.png" id="painel"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_normal"]
+content_margin_left = 32.0
+content_margin_top = 12.0
+content_margin_right = 32.0
+content_margin_bottom = 16.0
+texture = ExtResource("normal")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_foco"]
+content_margin_left = 32.0
+content_margin_top = 12.0
+content_margin_right = 32.0
+content_margin_bottom = 16.0
+texture = ExtResource("foco")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hover"]
+content_margin_left = 32.0
+content_margin_top = 12.0
+content_margin_right = 32.0
+content_margin_bottom = 16.0
+texture = ExtResource("hover")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_apertado"]
+content_margin_left = 32.0
+content_margin_top = 12.0
+content_margin_right = 32.0
+content_margin_bottom = 16.0
+texture = ExtResource("apertado")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_desabilitado"]
+content_margin_left = 32.0
+content_margin_top = 12.0
+content_margin_right = 32.0
+content_margin_bottom = 16.0
+texture = ExtResource("desabilitado")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_painel"]
+content_margin_left = 48.0
+content_margin_top = 40.0
+content_margin_right = 48.0
+content_margin_bottom = 40.0
+texture = ExtResource("painel")
+texture_margin_left = 12.0
+texture_margin_top = 12.0
+texture_margin_right = 12.0
+texture_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_separador"]
+color = Color(0.96, 0.92, 0.8, 0.35)
+thickness = 4
+
+[resource]
+default_font = ExtResource("fonte")
+default_font_size = 36
+Button/colors/font_color = Color(0.96, 0.92, 0.8, 1)
+Button/colors/font_disabled_color = Color(0.55, 0.53, 0.47, 1)
+Button/colors/font_focus_color = Color(1, 0.96, 0.75, 1)
+Button/colors/font_hover_color = Color(0.96, 0.92, 0.8, 1)
+Button/colors/font_hover_pressed_color = Color(1, 0.96, 0.75, 1)
+Button/colors/font_pressed_color = Color(1, 0.96, 0.75, 1)
+Button/constants/outline_size = 0
+Button/font_sizes/font_size = 36
+Button/styles/disabled = SubResource("StyleBoxTexture_desabilitado")
+Button/styles/focus = SubResource("StyleBoxTexture_foco")
+Button/styles/hover = SubResource("StyleBoxTexture_hover")
+Button/styles/hover_pressed = SubResource("StyleBoxTexture_apertado")
+Button/styles/normal = SubResource("StyleBoxTexture_normal")
+Button/styles/pressed = SubResource("StyleBoxTexture_apertado")
+HSeparator/constants/separation = 28
+HSeparator/styles/separator = SubResource("StyleBoxLine_separador")
+Label/colors/font_color = Color(0.96, 0.92, 0.8, 1)
+Label/constants/outline_size = 0
+Label/font_sizes/font_size = 36
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_painel")

@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://5ouqth25bmac"]
+
+[ext_resource type="Script" uid="uid://dctv4xykh0cvt" path="res://scripts/projectile_base.gd" id="1_proj"]
+[ext_resource type="PackedScene" uid="uid://cr0q4x7e54gbe" path="res://scenes/respingo_agua.tscn" id="2_resp"]
+[ext_resource type="Script" uid="uid://bku4kjgoguonj" path="res://scripts/animacao_quadros.gd" id="9_anim"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/bolha_agua_1.png" id="10_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/bolha_agua_2.png" id="11_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/bolha_agua_3.png" id="12_q"]
+[ext_resource type="Texture2D" path="res://assets/pixel/curupira/efeitos/bolha_agua_4.png" id="13_q"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bolha"]
+radius = 22.0
+
+[node name="BolhaAgua" type="Area2D"]
+collision_layer = 4
+collision_mask = 9
+script = ExtResource("1_proj")
+cena_impacto = ExtResource("2_resp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_bolha")
+
+[node name="Visual" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(4, 4)
+texture = ExtResource("10_q")
+centered = false
+offset = Vector2(-7, -7)
+script = ExtResource("9_anim")
+quadros = Array[Texture2D]([ExtResource("10_q"), ExtResource("11_q"), ExtResource("12_q"), ExtResource("13_q")])
+fps = 10.0
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+rect = Rect2(-30, -30, 60, 60)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_screen_exited"]

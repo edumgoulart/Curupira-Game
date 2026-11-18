@@ -1,0 +1,143 @@
+{
+ "imagem": "curupira_mapa.png",
+ "celula": [32, 44],
+ "ancora": [15, 39],
+ "escala_no_jogo": 4,
+ "animacoes": [
+  {
+   "nome": "parado_baixo",
+   "linha": 0,
+   "quadros": 8,
+   "fps": 4,
+   "loop": true,
+   "caixa": [
+    -13,
+    -36,
+    14,
+    3
+   ],
+   "nota": "olhando para a direita; espelhar para a esquerda"
+  },
+  {
+   "nome": "andar_baixo",
+   "linha": 1,
+   "quadros": 4,
+   "fps": 8,
+   "loop": true,
+   "caixa": [
+    -13,
+    -35,
+    15,
+    3
+   ]
+  },
+  {
+   "nome": "parado_diag_baixo",
+   "linha": 2,
+   "quadros": 8,
+   "fps": 4,
+   "loop": true,
+   "caixa": [
+    -13,
+    -36,
+    15,
+    3
+   ],
+   "nota": "olhando para a direita; espelhar para a esquerda"
+  },
+  {
+   "nome": "andar_diag_baixo",
+   "linha": 3,
+   "quadros": 4,
+   "fps": 8,
+   "loop": true,
+   "caixa": [
+    -13,
+    -36,
+    15,
+    3
+   ]
+  },
+  {
+   "nome": "parado_lado",
+   "linha": 4,
+   "quadros": 8,
+   "fps": 4,
+   "loop": true,
+   "caixa": [
+    -14,
+    -38,
+    11,
+    3
+   ],
+   "nota": "olhando para a direita; espelhar para a esquerda"
+  },
+  {
+   "nome": "andar_lado",
+   "linha": 5,
+   "quadros": 4,
+   "fps": 8,
+   "loop": true,
+   "caixa": [
+    -13,
+    -38,
+    11,
+    3
+   ]
+  },
+  {
+   "nome": "parado_diag_cima",
+   "linha": 6,
+   "quadros": 8,
+   "fps": 4,
+   "loop": true,
+   "caixa": [
+    -14,
+    -36,
+    14,
+    3
+   ],
+   "nota": "olhando para a direita; espelhar para a esquerda"
+  },
+  {
+   "nome": "andar_diag_cima",
+   "linha": 7,
+   "quadros": 4,
+   "fps": 8,
+   "loop": true,
+   "caixa": [
+    -14,
+    -36,
+    14,
+    3
+   ]
+  },
+  {
+   "nome": "parado_cima",
+   "linha": 8,
+   "quadros": 8,
+   "fps": 4,
+   "loop": true,
+   "caixa": [
+    -13,
+    -36,
+    14,
+    3
+   ],
+   "nota": "olhando para a direita; espelhar para a esquerda"
+  },
+  {
+   "nome": "andar_cima",
+   "linha": 9,
+   "quadros": 4,
+   "fps": 8,
+   "loop": true,
+   "caixa": [
+    -13,
+    -35,
+    15,
+    3
+   ]
+  }
+ ]
+}
