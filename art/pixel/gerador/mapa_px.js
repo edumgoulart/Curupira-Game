@@ -3,11 +3,13 @@
    No meio, a samaúma do Curupira; dela saem trilhas de terra vermelha para as quatro áreas:
      - Mula (embaixo, à esquerda): mata pegando fogo; entra-se por um arco de castanheiras em chamas.
      - Cuca (em cima, à esquerda): mata fechada e escura, com névoa e a luz verde do caldeirão.
-     - Boto (embaixo, à direita): o encontro das águas. O rio Negro (escuro) desce da esquerda, o
-       Solimões (barrento) sobe de baixo, e os dois se juntam na ponta da praia de areia branca e
-       seguem lado a lado para cima e para a direita, o Negro do lado de cima e o Solimões do de
-       baixo, até a borda do mapa. Da ponta da areia, olhando rio abaixo, o Negro fica à esquerda e
-       o Solimões à direita: é a vista da luta (arenas_px.js, encontroDasAguasPx).
+     - Boto (embaixo, à direita): o encontro das águas, como o desenho do Eduardo. O rio Negro
+       (escuro) desce do alto, faz a curva e corre para a direita; o Solimões (barrento) sobe na
+       diagonal de baixo e encosta nele por baixo, na ponta da praia de areia branca. Dali os dois
+       seguem lado a lado até a borda do mapa, o Negro em cima e o Solimões embaixo, com praia
+       nas margens do Negro e mata fechada em cima e embaixo. Da ponta da areia, olhando rio
+       abaixo, o Negro fica à esquerda e o Solimões à direita: é a vista da luta (arenas_px.js,
+       encontroDasAguasPx).
      - Máquina (em cima, à direita): o prédio da empresa, cercado, entre o Negro e o Solimões, com a
        mata derrubada em volta e o portão trancado até os três seres serem libertados. A trilha
        atravessa o rio Negro por uma ponte.
@@ -31,16 +33,17 @@ const CONTORNO_MAPA = '#14200E';
 const HUB = pt(720, 570);
 const MAPA_INICIO = pt(720, 560);
 const SAMAUMA = pt(720, 500);
-// os rios: o Negro desce da esquerda, o Solimões sobe de baixo, e juntos viram o Amazonas, que
-// corre para cima e para a direita. O encontro fica na ponta da areia (a entrada do Boto), e a
-// linha entre as duas águas sai dela no rumo do rio (a ponta aponta rio abaixo)
-const ENCONTRO = pt(1220, 592);
-const RIO_NEGRO = [pt(848, -24), pt(838, 92), pt(858, 206), pt(924, 308), pt(1030, 404), pt(1108, 500), pt(1160, 572), ENCONTRO];
-const RIO_SOLIMOES = [pt(1340, 850), pt(1312, 790), pt(1278, 712), pt(1246, 640), ENCONTRO];
-const RIO_AMAZONAS = [ENCONTRO, pt(1296, 553), pt(1384, 508), pt(1480, 462)];
-const BACIA = 40;   // raio da água larga onde os dois rios se juntam
-// a ponta de areia que avança até a linha das duas águas (entrada do Boto)
-const ESPIGA = [pt(1136, 626), pt(1210, 598)];
+// os rios: o Negro desce do alto, faz a curva e corre para a direita; o Solimões sobe na diagonal
+// e encosta nele por baixo na ponta da areia (a entrada do Boto). Dali os dois correm lado a lado
+// (cada um na sua faixa, coladas) até a borda, e a linha entre as duas águas fica onde elas se tocam
+const ENCONTRO = pt(1245, 550);
+const I_ENCONTRO = 9;   // o ponto do Negro onde ele passa a correr colado ao Solimões
+const RIO_NEGRO = [pt(848, -24), pt(838, 92), pt(858, 206), pt(924, 308), pt(1030, 404), pt(1062, 466), pt(1098, 510), pt(1142, 532), pt(1190, 534),
+  pt(1239, 528), pt(1306, 512), pt(1384, 490), pt(1474, 466)];
+const RIO_SOLIMOES = [pt(1132, 850), pt(1138, 792), pt(1160, 728), pt(1196, 668), pt(1236, 618), pt(1272, 582),
+  pt(1318, 556), pt(1396, 534), pt(1486, 510)];
+// a ponta de areia entre os dois rios, que avança até a linha das duas águas (entrada do Boto)
+const ESPIGA = [pt(1146, 612), pt(1240, 556)];
 const TRILHAS = {
   cuca: [HUB, pt(657, 507), pt(562, 428), pt(483, 368), pt(423, 323), pt(406, 307)],
   mula: [HUB, pt(618, 603), pt(488, 638), pt(384, 660), pt(318, 675), pt(290, 689)],
@@ -55,7 +58,7 @@ const CALDEIRAO = pt(452, 310);
 const ENTRADAS = {
   mula: { centro: pt(286, 691), raio: 22, volta: pt(369, 663) },
   cuca: { centro: pt(403, 304), raio: 22, volta: pt(468, 360) },
-  boto: { centro: pt(1192, 606), raio: 16, volta: pt(1104, 638) },
+  boto: { centro: pt(1192, 584), raio: 16, volta: pt(1104, 638) },
   maquina: { centro: pt(1250, 231), raio: 20, volta: pt(1200, 255) }
 };
 const PORTAO = { retangulo: [CERCA.portao[0], CERCA.y - 8, CERCA.portao[1], CERCA.y + 3], aviso: pt(1148, 309), raio: 36 };
@@ -167,8 +170,6 @@ function ladoRio(p, rio) {
   const r = distPoli(p, rio), a = rio[r.i], b = rio[r.i + 1], d = unit(sub(b, a));
   return { lado: d.x * (p.y - a.y) - d.y * (p.x - a.x), r };
 }
-// no Amazonas: < 0 do lado do Negro (noroeste, à esquerda rio abaixo); > 0 do lado do Solimões
-const ladoAmazonas = p => ladoRio(p, RIO_AMAZONAS);
 
 function classificar() {
   const N = MAPA_W * MAPA_H;
@@ -177,13 +178,13 @@ function classificar() {
   for (let y = 0; y < MAPA_H; y++) for (let x = 0; x < MAPA_W; x++) {
     const p = pt(x + 0.5, y + 0.5), i = y * MAPA_W + x;
     const n = ruido(x, y, 45, 1), n2 = ruido(x, y, 16, 2);
-    // os três rios e a bacia do encontro: d < 0 é água
-    const rN = distPoli(p, RIO_NEGRO), rS = distPoli(p, RIO_SOLIMOES), la = ladoAmazonas(p), rA = la.r;
-    const dN = rN.d - (mix(14, 24, (rN.i + rN.u) / (RIO_NEGRO.length - 1)) + (n2 - 0.5) * 3);
-    const dS = rS.d - (mix(34, 26, (rS.i + rS.u) / (RIO_SOLIMOES.length - 1)) + (n2 - 0.5) * 3);
-    const dA = rA.d - (mix(40, 62, (rA.i + rA.u) / (RIO_AMAZONAS.length - 1)) + (n2 - 0.5) * 4);
-    const dE = Math.hypot(p.x - ENCONTRO.x, p.y - ENCONTRO.y) - BACIA;
-    const dAgua = Math.min(dN, dS, dA, dE);
+    // os dois rios: d < 0 é água
+    const ln = ladoRio(p, RIO_NEGRO), rN = ln.r, ls = ladoRio(p, RIO_SOLIMOES), rS = ls.r;
+    const dN = rN.d - (mix(14, 26, clamp((rN.i + rN.u) / I_ENCONTRO, 0, 1)) + (n2 - 0.5) * 3);
+    const dS = rS.d - (mix(34, 26, clamp((rS.i + rS.u) / 6, 0, 1)) + (n2 - 0.5) * 3);
+    // união suave das duas águas: a ponta da ilha entre os rios fica redonda, sem bico
+    const kP = 64, hP = Math.max(kP - Math.abs(dN - dS), 0) / kP;
+    const dAgua = Math.min(dN, dS) - hP * hP * kP / 4;
     let dTrilha = Infinity;
     for (const tr of trilhas) dTrilha = Math.min(dTrilha, distPoli(p, tr).d);
     const hwTrilha = 6 + (ruido(x, y, 10, 3) - 0.5) * 2.4;
@@ -194,30 +195,33 @@ function classificar() {
     const fogo = (x / 333) ** 2 + ((MAPA_H - y) / 210) ** 2 < 1 + (n - 0.5) * 0.16;
     const queim = (x / 543) ** 2 + ((MAPA_H - y) / 347) ** 2 < 1 + (n - 0.5) * 0.14;
     const patio = x > CERCA.x0 && x < CERCA.x1 && y < CERCA.y;
-    // a margem de lá, entre o Solimões e o Amazonas: mata fechada (não se chega lá)
-    // (com uma faixa de margem verde, para a mata não cobrir a água)
-    const lesteRios = la.lado > 0 && ladoRio(p, RIO_SOLIMOES).lado > 0;
+    // as margens de lá: embaixo do Solimões e em cima do Negro, mata fechada (não se chega lá),
+    // com uma faixa de margem (praia no Negro, verde no Solimões) para a mata não cobrir a água
+    const lesteRios = ls.lado > 0 && x > 1100;
     const lesteAmazonas = lesteRios && dAgua > 22 + n * 16;
-    const ep = distSeg(p, ESPIGA[0], ESPIGA[1]), naEspiga = ep.d < mix(15, 7, ep.u) + (n2 - 0.5) * 2;
-    // praia de areia branca só nas margens do Negro (o Solimões tem barranco de lama)
-    const praia = dAgua < 14 + n * 12 && x > 990 && y > 400 && !lesteRios && Math.min(dN, dE, la.lado < 0 ? dA : Infinity) < dS;
+    const norteNegro = ln.lado < 0 && x > 1070 + n * 24 && y > 392 + n * 34 && dAgua > 26 + n * 12;
+    const ep = distSeg(p, ESPIGA[0], ESPIGA[1]), naEspiga = ep.d < mix(30, 5, ep.u) + (n2 - 0.5) * 3 && dAgua > -1;
+    // praia de areia branca larga nas duas margens do Negro e na margem de dentro do Solimões (a da
+    // ponta); a margem de fora do Solimões tem barranco e mata
+    const praia = dAgua < 22 + n * 14 && x > 950 + ruido(x, y, 20, 7) * 70 && y > 380 + ruido(x, y, 20, 8) * 40 && !lesteRios;
     let t = TRN.GRAMA;
     if (naEspiga) t = TRN.AREIA;
     else if (dAgua < 0) {
       t = TRN.AGUA; PROF[i] = -dAgua;
-      if (dAgua === dN) { AGUA_COR[i] = 0; RIO_U[i] = (rN.i + rN.u) * 110; }
-      else if (dAgua === dS) { AGUA_COR[i] = 1; RIO_U[i] = (rS.i + rS.u) * 110; }
-      else {
-        // no Amazonas as duas águas correm lado a lado: escura no noroeste, barrenta no sudeste
-        const u = (rA.i + rA.u) * 120;
-        RIO_U[i] = u; LADO[i] = la.lado + Math.sin(u * 0.09) * 3.5 * Math.min(1, u / 40) + (ruido(x, y, 26, 12) - 0.5) * 5;
+      if (dN < 10 && dS < 10) {
+        // onde os dois correm colados: a linha entre as águas fica onde as faixas se tocam e
+        // ondula descendo o rio a partir da ponta da areia
+        const u = (rN.i + rN.u - I_ENCONTRO) * 120, k = clamp(u / 40, 0, 1);
+        RIO_U[i] = u; LADO[i] = (dN - dS) / 2 + (Math.sin(u * 0.05) * 1 + (ruido(x, y, 26, 12) - 0.5) * 1) * k;
         AGUA_COR[i] = LADO[i] < 0 ? 0 : 1;
       }
+      else if (dN < dS) { AGUA_COR[i] = 0; RIO_U[i] = (rN.i + rN.u) * 110; }
+      else { AGUA_COR[i] = 1; RIO_U[i] = (rS.i + rS.u) * 110; }
     }
     else if (cuca) t = TRN.MATA_CUCA;
     else if (fogo) t = TRN.MATA_FOGO;
     else if (patio) t = TRN.PATIO;
-    else if (lesteAmazonas) t = TRN.MATA;
+    else if (lesteAmazonas || norteNegro) t = TRN.MATA;
     else if (borda < larguraBorda && dTrilha > hwTrilha + 6 && dAgua > 20) t = TRN.MATA;
     else if (praia) t = TRN.AREIA;
     else if (dTrilha < hwTrilha) t = TRN.TRILHA;
@@ -757,7 +761,7 @@ function montarMapa() {
   FRASCOS.forEach(([x, y, cor]) => cam.carimbo(['.k.', '.k.', 'GLG', 'GGG', '.G.'], x - 1, y - 4, { k: '#6E5A44', G: cor, L: tingir(cor, '#FFFFFF', 0.5) }));
 
   // Boto: canoa na praia, vitórias-régias no remanso do Negro e buritis na beira
-  canoaMapa(cam, 1100, 566);
+  canoaMapa(cam, 1120, 552);
   for (const [x, y, r] of [[1104, 512, 7], [1080, 470, 9], [1150, 506, 6], [1120, 690, 8], [1096, 712, 6]]) if (ter(x, y) === TRN.AGUA && AGUA_COR[y * MAPA_W + x] === 0) vitoriaRegia(cam, x, y, r);
   for (const [x, y, s] of [[1000, 690, 1], [1030, 594, 2], [968, 610, 3], [1012, 740, 4], [1080, 580, 5], [1180, 760, 6]]) {
     if (ter(x, y) !== TRN.AREIA && ter(x, y) !== TRN.GRAMA) continue;
@@ -916,7 +920,7 @@ function camadasDoProgresso() {
   }
   // Boto: ainda possuído, nada na linha das duas águas (só a barbatana, com um brilho vermelho)
   {
-    const c0 = pt(1256, 574);
+    const c0 = pt(1282, 540);
     sobreposicao('boto_possuido', c0.x - 40, c0.y - 24, c0.x + 40, c0.y + 24, (c, t, ox, oy) => {
       const a = voltaM(t) * TAU, p = pt(c0.x + Math.cos(a) * 26 - ox, c0.y + Math.sin(a) * 11 - oy);
       for (let k = 1; k < 8; k++) { const b = pt(p.x - Math.cos(a + Math.PI / 2) * k * 2, p.y - Math.sin(a + Math.PI / 2) * k); c.set(b.x + k * 0.6, b.y + 1, PAL_CHAO.negroEspuma); c.set(b.x - k * 0.6, b.y + 1, PAL_CHAO.negroEspuma); }
@@ -945,9 +949,9 @@ function mapaQuadro(t) {
   for (const i of AGUA_PIX) {
     const x = i % MAPA_W, y = (i - x) / MAPA_W, h = hash(x * 0.37 + y * 1.71), u = RIO_U[i];
     let cor = AGUA_COR[i];
-    // a linha onde as duas águas se encontram: línguas de uma entrando na outra, descendo o rio
+    // a linha onde as duas águas se encontram: quase reta, com uma ondinha leve descendo o rio
     if (!Number.isNaN(LADO[i]) && Math.abs(LADO[i]) < 9) {
-      const s = LADO[i] + Math.sin(u * 0.09 - v * TAU) * 3.5 + Math.sin(u * 0.23 + y * 0.05 + v * TAU * 2) * 1.6;
+      const s = LADO[i] + Math.sin(u * 0.06 - v * TAU) * 1 + Math.sin(u * 0.2 + y * 0.05 + v * TAU * 2) * 0.5;
       cor = s < 0 ? 0 : 1;
       const cores = cor ? PAL_CHAO.solimoes : PAL_CHAO.negro;
       cam.set(x, y, Math.abs(s) < 1.2 && pontilha(x, y, 0.5) ? (cor ? PAL_CHAO.negro[2] : PAL_CHAO.solimoes[0]) : PROF[i] > 22 ? cores[0] : cores[1]);
