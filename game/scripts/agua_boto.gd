@@ -4,7 +4,8 @@ extends Node2D
 ## Filha do Boto, mas fica sempre na linha d'água: ele afunda e sobe para o jato, e a água não.
 ## Duas camadas: a de trás (metade de lá dos anéis) fica atrás do Boto, e a da frente (espuma,
 ## gotas e a metade de cá) fica por cima da água da frente da arena (FundoArena, z 5).
-## A margem da esquerda é azul e a da direita, barrenta: a cor troca quando ele troca de lado.
+## A água da esquerda é a do rio Negro (escura, arquivos "azul") e a da direita, a do Solimões
+## (barrenta): a cor troca quando ele troca de lado.
 ## Os quadros vêm do gerador (efeitos do Boto: agua_atras_*, agua_frente_*, agua_respingo_*);
 ## a quantidade, o fps e o centro saem do efeitos.json.
 

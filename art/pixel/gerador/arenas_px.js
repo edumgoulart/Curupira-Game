@@ -173,6 +173,120 @@ function textoPx(cam, txt, x, y, cor) {
   [...txt].forEach((ch, i) => (FONTE_PX[ch] || FONTE_PX[' ']).forEach((l, j) => [...l].forEach((c, k) => { if (c === '#') cam.set(x + i * 4 + k, y + j, cor); })));
 }
 
+/* ---------- encontro das águas (arena do Boto) ----------
+   Como a foto de Manaus: o Curupira está na ponta de areia onde os dois rios se juntam, olhando
+   rio abaixo. O Negro (escuro) fica à esquerda e o Solimões (barrento) à direita, e os dois seguem
+   lado a lado até sumir no fundo entre as duas margens de mata. Perto, a linha entre eles é nítida;
+   longe, ela ondula e as duas águas se misturam. É o mesmo rumo do mapa: lá o rio junto corre para
+   cima e para a direita (para o fundo da tela), com o Negro do lado de cima e o Solimões do de baixo. */
+const RIO_BOTO = { horizonte: 146, fuga: 262, perto: 206, ponta: pt(232, 209) };
+// rampas de longe (refletindo o céu) para perto
+const RAMPA_NEGRO = ['#6A7E8E', '#4A5868', '#323C48', '#232A33', '#181C22', '#121519'];
+const RAMPA_SOLIMOES = ['#CCB290', '#C0A076', '#AE8656', '#9C7244', '#8C6238', '#7E5630'];
+// profundidade na tela: 0 no horizonte, 1 na linha "perto" (passa de 1 embaixo dela)
+const fundoRio = y => (y - RIO_BOTO.horizonte) / (RIO_BOTO.perto - RIO_BOTO.horizonte);
+// o meio do rio: vem reto da frente e dobra à direita lá longe, sumindo atrás da mata
+const meioRio = s => 240 + 44 * (1 - clamp(s, 0, 1)) ** 4;
+const larguraRio = s => 5 + 272 * s;
+// as margens, com umas voltas de barranco (maiores perto)
+const margemE = y => { const s = fundoRio(y); return meioRio(s) - larguraRio(s) + (Math.sin(s * 23) * 2 + Math.sin(s * 9 + 1) * 3) * s; };
+const margemD = y => { const s = fundoRio(y); return meioRio(s) + larguraRio(s) + (Math.sin(s * 19 + 2) * 2 + Math.sin(s * 7) * 4) * s; };
+// a linha entre as duas águas: sai da ponta da areia e segue o meio do rio até o fundo
+const linhaAguas = y => { const s = fundoRio(y); return meioRio(s) - 8 * clamp(s, 0, 1.2); };
+function rampa(cores, u, x, y) {
+  const f = clamp(u, 0, 0.999) * (cores.length - 1), i = Math.floor(f);
+  return i < cores.length - 1 && pontilha(x, y, (f - i - 0.5) / 0.5) ? cores[i + 1] : cores[i];
+}
+// lado da água num ponto: < 0 é o Negro, > 0 o Solimões. As línguas de uma água entrando na outra
+// descem o rio (fase v), e quanto mais longe, mais largas e moles (lá elas já se misturam)
+function ladoAguas(x, y, v) {
+  const s = clamp(fundoRio(y), 0.02, 1.2), z = 1 / (s + 0.06);   // z: distância de verdade
+  const amp = 1 + 6.5 * s;
+  // as línguas do Solimões entrando no Negro são mais compridas que as do Negro no Solimões
+  const onda = Math.sin(z * 1.3 + v * TAU), lingua = onda > 0 ? onda ** 0.6 * 1.5 : onda * 0.7;
+  return x - linhaAguas(y) + lingua * amp + Math.sin(z * 3.1 + 1.7 + v * TAU * 2) * amp * 0.4;
+}
+// mata de uma margem: copas do fundo para a frente, cada uma do tamanho da distância
+function margemMataPx(cam, lado, t) {
+  const parte = nova(), H = RIO_BOTO.horizonte;
+  const PERTO = { luz: '#5E9A4E', base: '#4A8442', sombra: '#386A36' };
+  const MEIO = { luz: '#7EA678', base: '#6A946A', sombra: '#5A845E' };
+  const LONGE = { luz: '#9CC0BA', base: '#8CB2AE', sombra: '#80A6A4' };
+  const passos = [];
+  for (let s = 0.03; s < 1.25; s *= 1.16) passos.push(s);
+  passos.forEach((s, k) => {
+    const y = H + s * (RIO_BOTO.perto - H), xb = lado < 0 ? margemE(y) : margemD(y);
+    const r = 1.6 + 15 * s, sem = k * 7 + (lado < 0 ? 0 : 50);
+    const c = s < 0.22 ? LONGE : s < 0.55 ? MEIO : PERTO;
+    // copas em fileira para longe da água, umas mais altas (castanheiras) que as outras;
+    // a primeira é a moita baixa que desce até a beira
+    for (let j = 2; j >= 0; j--) {
+      const x = xb + lado * (r * 0.3 + j * r * 1.2) + (hash(sem + j) - 0.5) * r * 0.5;
+      const alto = j === 0 ? 0 : r * (0.5 + 1.8 * hash(sem * 1.7 + j));
+      const rr = r * (j === 0 ? 0.75 : 0.85 + 0.3 * hash(sem + j * 3));
+      copaPx(parte, x, y - rr * 0.55 - alto, rr, c, sem + j);
+      for (let yy = Math.round(y - rr * 0.55 - alto); yy <= y; yy++) for (let xx = Math.round(x - rr * 0.8); xx <= x + rr * 0.8; xx++) if (!parte.get(xx, yy)) parte.set(xx, yy, c.sombra);
+    }
+  });
+  // chão da mata entre as copas: sem buraco de céu até a beira
+  for (let y = H; y < ARENA_H; y++) {
+    const s = fundoRio(y), xb = lado < 0 ? margemE(y) : margemD(y), c = s < 0.22 ? LONGE : s < 0.55 ? MEIO : PERTO;
+    for (let x = 0; x < ARENA_W; x++) if ((lado < 0 ? x < xb : x > xb) && !parte.get(x, y)) parte.set(x, y, c.sombra);
+  }
+  // beira entre a mata e a água: praia branca no Negro, barranco de lama no Solimões
+  for (let y = H; y < ARENA_H; y++) {
+    const s = fundoRio(y), xb = lado < 0 ? margemE(y) : margemD(y), larg = 1 + Math.round(2.5 * s);
+    for (let k = 0; k < larg; k++) {
+      const x = Math.round(xb) + lado * k;
+      parte.set(x, y, lado < 0 ? (k === 0 ? '#C8BEA4' : '#E4DAC0') : (k === 0 ? '#6E5034' : '#8A6A46'));
+    }
+  }
+  // buritis na beira, perto
+  const pal = { tronco: '#8A7452', troncoS: '#6E5A40', folha: '#5A8A50', folhaL: '#7AA864', folhaS: '#44703E', coco: '#5A4026' };
+  for (const [y, h, inc, sem] of lado < 0 ? [[182, 46, -5, 1], [196, 58, 4, 4]] : [[184, 48, 6, 2], [194, 40, 3, 3]]) {
+    const xb = lado < 0 ? margemE(y) : margemD(y);
+    palmeiraPx(parte, xb + lado * 7, y, h, inc, t, pal, sem);
+  }
+  cam.colar(parte);
+}
+function encontroDasAguasPx(cam, t) {
+  const v = volta(t), H = RIO_BOTO.horizonte;
+  // mata do fundo, onde o rio dobra e some: fileira baixa e azulada no horizonte
+  mataPx(cam, H - 14, H + 2, 14, 5, { luz: '#A8C8C2', base: '#9ABCB8', sombra: '#8EB0AE' }, 7, 5);
+  // as duas águas, do horizonte até a frente
+  for (let y = H; y < ARENA_H; y++) {
+    const s = fundoRio(y), xa = margemE(y), xb = margemD(y);
+    for (let x = Math.max(0, Math.floor(xa)); x < Math.min(ARENA_W, Math.ceil(xb)); x++) {
+      const l = ladoAguas(x, y, v), u = clamp(s, 0, 1);
+      // longe as duas se misturam numa faixa pontilhada que alarga; perto, só um fio de espuma
+      const faixa = 0.7 + (1 - u) * 3.2;
+      let negro = l < 0;
+      if (Math.abs(l) < faixa && u < 0.75) negro = pontilha(x, y, 0.5 - l / faixa / 2);
+      let c = rampa(negro ? RAMPA_NEGRO : RAMPA_SOLIMOES, u, x, y);
+      if (Math.abs(l) < 0.6 && u >= 0.4) c = negro ? '#4A3A2A' : '#6A5038';
+      // a correnteza: manchas compridas, mais claras, que descem o rio (escorrendo para o fundo)
+      const z = 1 / (u + 0.05), X = (x - meioRio(u)) / (u + 0.05) * 0.012;
+      const mancha = Math.sin(z * 2.3 - v * TAU * 2 + Math.sin(X * 2.2) * 1.2) * Math.sin(X * 1.7 + z * 0.4);
+      if (mancha > 0.72 && pontilha(x, y, (mancha - 0.72) / 0.12)) c = negro ? (u > 0.5 ? '#232A33' : '#4A5868') : (u > 0.5 ? '#9C7244' : '#C0A076');
+      // reflexo escuro da mata perto das margens
+      const dm = Math.min(x - xa, xb - x);
+      const refl = (3 + 12 * u) * (0.7 + 0.3 * Math.sin(y * 1.7 + (x < meioRio(u) ? 0 : 2)));
+      if (dm < refl && pontilha(x, y, 0.7 - dm / refl * 0.7)) c = negro ? '#0E1014' : '#5E4228';
+      cam.set(x, y, c);
+    }
+  }
+  // brilhos correndo para o fundo: risquinhos que encolhem e somem na distância
+  for (let i = 0; i < 70; i++) {
+    const u = (hash(i * 3.3) + v * (1 + (i % 2))) % 1, s = 1.15 * (1 - u) ** 1.7;
+    const y = Math.round(H + 2 + s * (RIO_BOTO.perto - H)), a = hash(i * 7.1);
+    const x = Math.round(mix(margemE(y) + 3, margemD(y) - 3, a)), w = Math.round(1 + 6 * s);
+    const negro = ladoAguas(x, y, v) < 0;
+    for (let k = 0; k < w; k++) cam.set(x + k, y, negro ? '#5C6E80' : '#D6BA8C');
+  }
+  margemMataPx(cam, -1, t);
+  margemMataPx(cam, 1, t);
+}
+
 const ARENAS_PX = {
   mula: {
     nome: 'Floresta Amazônica em chamas', x: X_CURUPIRA,
@@ -296,7 +410,7 @@ const ARENAS_PX = {
   },
   boto: {
     nome: 'Encontro das águas', x: X_CURUPIRA_BOTO,
-    desc: 'Faixa de areia estreita entre duas águas que não se misturam: azul de um lado, barrenta do outro, e a mata na outra margem. O Boto fica na água e salta por cima da areia.',
+    desc: 'Ponta de areia no encontro das águas: o rio Negro escuro à esquerda e o Solimões barrento à direita, correndo lado a lado até sumir no fundo entre as margens de mata. O Boto fica na água e salta por cima da areia.',
     quadro(t) {
       const cam = nova(), frente = nova(), v = volta(t);
       ceuPx(cam, ['#5A96C2', '#649FC8', '#70AACC', '#7EB4D2', '#8EBED6', '#A0C8DA', '#B6D4DC', '#CCE0DE'], 0, 166);
@@ -309,20 +423,8 @@ const ARENAS_PX = {
         for (const [px, py] of n.pixels()) if (n.get(px, py) && py > y + 6 * e) n.apagar(px, py);
         cam.colar(n);
       }
-      // mata da outra margem: um plano azulado ao longe e um mais verde na frente
-      mataPx(cam, 140, 168, 22, 8, { luz: '#9CC0BA', base: '#8CB2AE', sombra: '#80A6A4' }, 2, 8);
-      for (const [x, h, s] of [[120, 30, 1], [300, 34, 2], [420, 26, 3]]) { troncoArvPx(cam, x, 160 - h, 160, 2, { luz: '#7E9E96', base: '#76968E', sombra: '#6E8E88' }, { sem: s, raiz: 0, curva: 1, wTopo: 1 }); copaPx(cam, x, 160 - h, 9, { luz: '#94BAB2', base: '#86ACA6', sombra: '#7CA29E' }, s); }
-      mataPx(cam, 150, 172, 26, 10, { luz: '#7EA678', base: '#6A946A', sombra: '#5A845E' }, 5, 9);
-      palmeiraPx(cam, 34, 168, 40, -6, t, { tronco: '#8A7452', troncoS: '#6E5A40', folha: '#5A8A50', folhaL: '#7AA864', folhaS: '#44703E', coco: '#5A4026' }, 1);
-      palmeiraPx(cam, 452, 168, 46, 7, t, { tronco: '#8A7452', troncoS: '#6E5A40', folha: '#5A8A50', folhaL: '#7AA864', folhaS: '#44703E', coco: '#5A4026' }, 2);
-      palmeiraPx(cam, 474, 170, 32, 4, t, { tronco: '#8A7452', troncoS: '#6E5A40', folha: '#5A8A50', folhaL: '#7AA864', folhaS: '#44703E', coco: '#5A4026' }, 3);
-      // as duas águas: reflexo escuro da mata embaixo da margem e brilhos correndo
-      for (let y = 170; y < CHAO_PX + 6; y++) for (let x = 0; x < ARENA_W; x++) {
-        const azul = x < 238 + Math.sin(y * 0.3 + v * TAU) * 3, u = (y - 170) / 14;
-        const cor = azul ? (pontilha(x, y, u) ? '#3E7EB6' : '#4E8A9A') : (pontilha(x, y, u) ? '#9A6E42' : '#7E6A48');
-        cam.set(x, y, cor);
-      }
-      for (let i = 0; i < 22; i++) { const y = 176 + (i % 7) * 7, x = ((i * 53 + v * 40 * (i % 2 ? 1 : -1)) % 500 + 500) % 500 - 10, w = 3 + (i % 3) * 2; for (let k = 0; k < w; k++) cam.set(x + k, y, x < 238 ? '#7CBCE0' : '#BC9264'); }
+      // o rio em perspectiva: Negro à esquerda, Solimões à direita, a mata nas margens
+      encontroDasAguasPx(cam, t);
       // a península de areia: mais estreita, molhada na beira, com marcas do vento
       const areia = nova(), bordaE = AREIA_BOTO[0], bordaD = AREIA_BOTO[1];
       for (let y = CHAO_PX; y < ARENA_H; y++) for (let x = 0; x < ARENA_W; x++) {
@@ -334,6 +436,11 @@ const ARENAS_PX = {
         if (d > 3 && beira >= 4 && hash(Math.floor(x / 2) + y * 7.3) > 0.97) c = '#EED6A0';
         areia.set(x, y, c);
       }
+      const pontaY = RIO_BOTO.ponta.y, pontaX = RIO_BOTO.ponta.x;
+      for (let y = pontaY; y < CHAO_PX; y++) {
+        const u = (y - pontaY) / (CHAO_PX - pontaY), meia = 3 + u * u * 70;
+        for (let x = Math.round(pontaX - meia); x <= pontaX + meia; x++) areia.set(x, y, y < pontaY + 2 || Math.abs(x - pontaX) > meia - 3 ? '#C49A5C' : '#D8AC68');
+      }
       cam.colar(areia.contornar('#9A7240'));
       pedraPx(cam, 132, 244, 9, ['#C8BCAA', '#A89A8A', '#5E544A']); pedraPx(cam, 300, 256, 7, ['#C8BCAA', '#A89A8A', '#5E544A']);
       // frente: as águas da frente cobrindo a base do Boto, com espuma batendo na areia
@@ -341,14 +448,15 @@ const ARENAS_PX = {
         const abre = (y - CHAO_PX) * 0.5, ond = Math.round(Math.sin(x * 0.15 + v * TAU) * 1.2);
         if (y < AGUA_Y + ond) continue;
         const fundo = y > AGUA_Y + 14 && pontilha(x, y, (y - AGUA_Y - 14) / 30);
-        if (x <= AREIA_BOTO[0] - abre) frente.set(x, y, y < AGUA_Y + 2 + ond ? '#8CD0EE' : fundo ? '#285E92' : '#2F6FA8');
-        else if (x >= AREIA_BOTO[1] + abre) frente.set(x, y, y < AGUA_Y + 2 + ond ? '#C9A070' : fundo ? '#74502E' : '#8A5E36');
+        if (x <= AREIA_BOTO[0] - abre) frente.set(x, y, y < AGUA_Y + 2 + ond ? '#6E8090' : fundo ? '#0E1014' : '#15181D');
+        else if (x >= AREIA_BOTO[1] + abre) frente.set(x, y, y < AGUA_Y + 2 + ond ? '#C9A070' : fundo ? '#6E4A2A' : '#7E5630');
       }
       for (const [x0, l] of [[AREIA_BOTO[0], -1], [AREIA_BOTO[1], 1]]) for (let i = 0; i < 6; i++) {
         const y = AGUA_Y + 3 + i * 7, k = Math.round(Math.sin(v * TAU + i) * 2), xb = x0 + l * ((y - CHAO_PX) * 0.5 + 1 + k);
-        frente.set(xb, y, '#FFFFFF'); frente.set(xb + l, y, '#FFFFFF'); frente.set(xb + l * 3, y + 1, '#E0F2FA');
+        const esp = l < 0 ? ['#E2DACA', '#9AA0A4'] : ['#F6EAD0', '#E0C89C'];
+        frente.set(xb, y, esp[0]); frente.set(xb + l, y, esp[0]); frente.set(xb + l * 3, y + 1, esp[1]);
       }
-      for (let i = 0; i < 8; i++) { const u = (v + i / 8) % 1, x = (i % 2 ? 20 : 420) + hash(i) * 50, y = AGUA_Y + 10 + hash(i + 4) * 30; if (u < 0.5) { frente.set(x + u * 8, y, i % 2 ? '#8CD0EE' : '#C9A070'); frente.set(x + u * 8 + 1, y, i % 2 ? '#8CD0EE' : '#C9A070'); } }
+      for (let i = 0; i < 8; i++) { const u = (v + i / 8) % 1, x = (i % 2 ? 20 : 420) + hash(i) * 50, y = AGUA_Y + 10 + hash(i + 4) * 30; if (u < 0.5) { frente.set(x + u * 8, y, i % 2 ? '#5C6E80' : '#C9A070'); frente.set(x + u * 8 + 1, y, i % 2 ? '#5C6E80' : '#C9A070'); } }
       return { cam, frente };
     }
   },

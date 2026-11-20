@@ -1159,9 +1159,10 @@ function respingoPx(cam, x, y, u) {
 /* Água em volta do Boto: efeito à parte, que o código põe na linha d'água seguindo o Boto em x
    (ele afunda e sobe para o jato; a água fica). Duas camadas: a de trás (metade de lá dos anéis
    e as cristas atrás do corpo) e a da frente (metade de cá, espuma colada no corpo e gotinhas).
-   Duas paletas, porque a margem da esquerda é azul e a da direita, barrenta (iguais à arena). */
+   Duas paletas, porque a água da esquerda é a do rio Negro (escura) e a da direita, a do
+   Solimões (barrenta), iguais à arena. A chave "azul" ficou pelo nome dos arquivos que o jogo lê. */
 const AGUA_BOTO_PALETAS = {
-  azul: { espuma: '#FFFFFF', espumaS: '#D4EEFA', claro: '#8CD0EE', medio: '#5C9ED2', escuro: '#1C4A7C' },
+  azul: { espuma: '#E8E2D4', espumaS: '#B4B2AC', claro: '#7A8A9A', medio: '#3E4A58', escuro: '#101418' },
   barro: { espuma: '#F6EAD0', espumaS: '#E6D2A8', claro: '#C9A070', medio: '#A8784A', escuro: '#4E3018' }
 };
 const AGUA_BOTO_QUADROS = 12;  // laço de 1 s a 12 fps
