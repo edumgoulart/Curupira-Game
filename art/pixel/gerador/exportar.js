@@ -354,7 +354,7 @@ function exportarMapa() {
       inicio: v(MAPA_INICIO),
       entradas: Object.fromEntries(Object.entries(ENTRADAS).map(([id, e]) => [id, { centro: v(e.centro), raio: e.raio, volta: v(e.volta) }])),
       portao: { retangulo: PORTAO.retangulo, aviso: v(PORTAO.aviso), raio: PORTAO.raio },
-      conversas: Object.fromEntries(Object.entries(CRIATURAS).map(([id, c]) => [id, { centro: v(c.conversa), raio: c.raio, mostrar: 'concluiu:' + c.progresso }])),
+      conversas: Object.fromEntries(Object.entries(CRIATURAS).map(([id, c]) => [id, { centro: v(c.base), raio: c.raio, mostrar: 'concluiu:' + c.progresso }])),
       objetos: lista
     }
   };

@@ -115,9 +115,11 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     o Curupira vira certo nas 8 direções, sem a de lado ficar bugada;
   - se ele passa atrás das árvores quando está acima do tronco e na frente quando está abaixo, e se
     não fica preso nas beiras (água, mata, troncos, cerca);
-  - as quatro entradas: entre as árvores em chamas (Mula), na boca da mata da Cuca com a luz verde,
-    na ponta da praia do encontro das águas (Boto) e na porta do prédio (Máquina). Aparece o nome e
-    "A / Espaço: entrar";
+  - as quatro entradas: na beira da mata em chamas (Mula), na beira da mata da Cuca, com o
+    caldeirão e a luz verde ao lado, na ponta da praia do encontro das águas (Boto) e na porta do
+    prédio (Máquina). Aparece o nome e "A / Espaço: entrar". Os becos para dentro da mata da Mula e
+    da Cuca saíram (pedido do Eduardo: "tira essas covas"; neles dava para sair do raio e não
+    conseguir mais entrar na luta);
   - o painel: ataques, dificuldade, "Lutar!" e "Voltar ao mapa" (B também fecha). Depois da luta, o
     Curupira volta para a frente da área, e a bandeira aparece na área vencida;
   - o portão da empresa: com `LIBERAR_TUDO_PARA_TESTE` em `true` ele já vem aberto. Pôr `false` para
@@ -139,11 +141,20 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     - antes de vencer: mata da Mula pegando fogo, com brasas e fumaça; névoa e a luz verde no
       caldeirão da Cuca; o Boto de olho vermelho no encontro das águas;
     - depois de vencer: a mata da Mula apagada com brotos e as árvores rebrotando; a névoa some; e
-      a criatura aparece livre, sem o chip, perto da sua área;
-    - chegar perto dela mostra "A / Espaço: conversar". A conversa trava o Curupira, escreve letra
+      a criatura aparece livre, sem o chip, perto da sua área. As criaturas estão na mesma
+      proporção do combate (reduzidas para 39/52, a razão entre o Curupira do mapa e o da luta);
+    - chegar perto dela, por qualquer lado, mostra "A / Espaço: conversar" (o raio agora conta da
+      criatura, e não de um ponto na frente dela). A conversa trava o Curupira, escreve letra
       por letra (A completa e depois avança, B fecha) e solta ele no fim;
     - as falas estão em `dados/mapa/conversa_mula.tres`, `conversa_cuca.tres` e
       `conversa_boto.tres` (uma fala por linha, "Quem: texto"), para trocar pelo inspetor.
+- **Correções na luta** (pedido do Eduardo):
+  - o coração do HUD congelava no meio da piscada depois de um golpe (às vezes cheio, parecendo que
+    voltou) e o retrato ficava preso na cara de dor. Levar golpes, com e sem dash, e ver se o
+    coração apaga e o retrato volta ao normal;
+  - laser e varredura da Máquina: o dano desliga na hora e o raio afina e some em 0,1 s (antes
+    sumia de uma vez, no mesmo quadro do dano). No teste quadro a quadro a caixa de dano não durava
+    mais que o raio; se no F6 ainda parecer que dura, dizer em que passada (reta ou no chão).
 - **Carta de derrota (F6 em `level1..4`, perder de propósito)**, pedido do Eduardo, no estilo do
   Cuphead. Passou no `game/testes/teste_derrota.gd`, mas ninguém jogou. Observar:
   - a carta descendo; o retrato do chefe de frente, rindo (olho e fogo vermelhos do chip);

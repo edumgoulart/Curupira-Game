@@ -93,7 +93,7 @@ func _laser() -> void:
 	laser.disparar()
 	if not await esperar(_d.duracao_laser):
 		return
-	laser.queue_free()
+	laser.apagar()
 	await tocar_e_esperar(&"fim_laser")
 
 
@@ -180,7 +180,7 @@ func _varredura() -> void:
 	laser.disparar()
 	if not await esperar(_d.duracao_varredura_alta):
 		return
-	laser.queue_free()
+	laser.apagar()
 	# 2ª passada: mira o chão perto dela e o ponto de impacto corre até a parede.
 	avisar(true, COR_AVISO_MAQUINA)
 	tocar(&"varredura_chao")
@@ -199,7 +199,7 @@ func _varredura() -> void:
 		tempo += await passo()
 		if derrotado:
 			return
-	laser.queue_free()
+	laser.apagar()
 	await tocar_e_esperar(&"subir")
 
 

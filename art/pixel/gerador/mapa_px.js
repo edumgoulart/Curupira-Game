@@ -38,31 +38,33 @@ const BACIA = 50;   // raio da água larga onde os dois rios se juntam
 // a ponta de areia que avança até a linha das duas águas (entrada do Boto)
 const ESPIGA = [pt(1132, 628), pt(1204, 601)];
 const TRILHAS = {
-  cuca: [HUB, pt(657, 507), pt(562, 428), pt(483, 368), pt(423, 323)],
-  mula: [HUB, pt(618, 603), pt(488, 638), pt(384, 660), pt(318, 675)],
+  cuca: [HUB, pt(657, 507), pt(562, 428), pt(483, 368), pt(423, 323), pt(406, 307)],
+  mula: [HUB, pt(618, 603), pt(488, 638), pt(384, 660), pt(318, 675), pt(290, 689)],
   boto: [HUB, pt(800, 598), pt(890, 632), pt(970, 652), pt(1050, 648), pt(1120, 634)],
   maquina: [HUB, pt(788, 528), pt(837, 432), pt(878, 348), pt(938, 303), pt(1043, 311), pt(1148, 318), pt(1148, 279), pt(1200, 249), pt(1250, 225)]
 };
-// a trilha continua para dentro da mata da Cuca e do fogo da Mula (chão escuro, sem árvore)
-const BOCA_CUCA = [pt(423, 323), pt(342, 246)];
-const BOCA_MULA = [pt(318, 675), pt(219, 729)];
+// a trilha da Cuca e a da Mula terminam na beira da mata (sem beco para dentro dela)
 const CERCA = { x0: 1072, x1: 1380, y: 285, portao: [1128, 1168] };
 const PREDIO = { x0: 1137, x1: 1347, teto: 54, frente: 120, base: 219, porta: [1230, 1269] };
-const CALDEIRAO = pt(333, 237);
+const CALDEIRAO = pt(452, 310);
 // onde cada área começa (o jogo mostra o nome e abre o painel), e onde o Curupira volta depois da luta
 const ENTRADAS = {
-  mula: { centro: pt(276, 696), raio: 20, volta: pt(369, 663) },
-  cuca: { centro: pt(375, 279), raio: 20, volta: pt(468, 360) },
+  mula: { centro: pt(286, 691), raio: 22, volta: pt(369, 663) },
+  cuca: { centro: pt(403, 304), raio: 22, volta: pt(468, 360) },
   boto: { centro: pt(1192, 606), raio: 16, volta: pt(1104, 638) },
   maquina: { centro: pt(1250, 231), raio: 20, volta: pt(1200, 255) }
 };
 const PORTAO = { retangulo: [CERCA.portao[0], CERCA.y - 8, CERCA.portao[1], CERCA.y + 3], aviso: pt(1148, 309), raio: 36 };
-// as criaturas libertadas: onde ficam (base) e onde o Curupira conversa com elas
+// as criaturas libertadas: onde ficam (base, nos pés ou na linha d'água) e o raio da conversa,
+// contado da base: dá para falar chegando por qualquer lado, não só pela frente
 const CRIATURAS = {
-  mula: { base: pt(250, 612), conversa: pt(296, 640), raio: 30, progresso: 'fase1' },
-  cuca: { base: pt(536, 318), conversa: pt(506, 352), raio: 30, progresso: 'fase2' },
-  boto: { base: pt(1230, 670), conversa: pt(1178, 654), raio: 24, progresso: 'fase3' }
+  mula: { base: pt(330, 612), raio: 54, progresso: 'fase1' },
+  cuca: { base: pt(536, 318), raio: 44, progresso: 'fase2' },
+  boto: { base: pt(1222, 642), raio: 60, progresso: 'fase3' }
 };
+// tamanho das criaturas no mapa: a mesma proporção do combate. Na luta o Curupira tem 52 px de
+// altura; no mapa, 39. Os chefes da arena são reduzidos na mesma razão.
+const ESCALA_CRIATURA = 39 / 52;
 
 /* ---------- utilidades ---------- */
 function ruido(x, y, e, sem = 0) {
@@ -116,8 +118,8 @@ function sombraChao(cam, cx, cy, rx, ry) {
 }
 
 /* ---------- terreno ---------- */
-const TRN = { GRAMA: 0, TRILHA: 1, AREIA: 2, AGUA: 3, MATA: 4, MATA_CUCA: 5, MATA_FOGO: 6, QUEIMADO: 7, DEVASTADO: 8, PATIO: 9, BOCA_CUCA: 10, PONTE: 11 };
-const ANDAVEL = new Set([TRN.GRAMA, TRN.TRILHA, TRN.AREIA, TRN.QUEIMADO, TRN.DEVASTADO, TRN.PATIO, TRN.BOCA_CUCA, TRN.PONTE]);
+const TRN = { GRAMA: 0, TRILHA: 1, AREIA: 2, AGUA: 3, MATA: 4, MATA_CUCA: 5, MATA_FOGO: 6, QUEIMADO: 7, DEVASTADO: 8, PATIO: 9, PONTE: 11 };
+const ANDAVEL = new Set([TRN.GRAMA, TRN.TRILHA, TRN.AREIA, TRN.QUEIMADO, TRN.DEVASTADO, TRN.PATIO, TRN.PONTE]);
 const PAL_CHAO = {
   grama: ['#4C8C36', '#5A9A3C', '#68A844'], tufo: '#80C056', flores: ['#FFFFFF', '#F4F0C8'],
   terra: '#B8683A', terraL: '#C67C48', terraD: '#A65C34', terraBorda: '#86462A', pedrinha: '#D8A070',
@@ -185,8 +187,6 @@ function classificar() {
     const cuca = (x / 562) ** 2 + (y / 428) ** 2 < 1 + (n - 0.5) * 0.14;
     const fogo = (x / 333) ** 2 + ((MAPA_H - y) / 210) ** 2 < 1 + (n - 0.5) * 0.16;
     const queim = (x / 543) ** 2 + ((MAPA_H - y) / 347) ** 2 < 1 + (n - 0.5) * 0.14;
-    const naBocaCuca = distSeg(p, BOCA_CUCA[0], BOCA_CUCA[1]).d < 16 + n2 * 3;
-    const naBocaMula = distSeg(p, BOCA_MULA[0], BOCA_MULA[1]).d < 17 + n2 * 3;
     const patio = x > CERCA.x0 && x < CERCA.x1 && y < CERCA.y;
     // a outra margem do Amazonas, abaixo do Solimões: mata fechada (não se chega lá)
     // (com uma faixa de margem verde, para a mata não cobrir a água)
@@ -206,15 +206,14 @@ function classificar() {
         AGUA_COR[i] = LADO[i] > 0 ? 0 : 1;
       }
     }
-    else if (cuca && !naBocaCuca) t = TRN.MATA_CUCA;
-    else if (cuca && naBocaCuca) t = TRN.BOCA_CUCA;
-    else if (fogo && !naBocaMula) t = TRN.MATA_FOGO;
+    else if (cuca) t = TRN.MATA_CUCA;
+    else if (fogo) t = TRN.MATA_FOGO;
     else if (patio) t = TRN.PATIO;
     else if (lesteAmazonas) t = TRN.MATA;
     else if (borda < larguraBorda && dTrilha > hwTrilha + 6 && dAgua > 20) t = TRN.MATA;
     else if (praia) t = TRN.AREIA;
     else if (dTrilha < hwTrilha) t = TRN.TRILHA;
-    else if (queim || naBocaMula) t = TRN.QUEIMADO;
+    else if (queim) t = TRN.QUEIMADO;
     else if (devast) t = TRN.DEVASTADO;
     TER[i] = t;
     if (t !== TRN.AGUA) PROF[i] = -dAgua;   // em terra: menos a distância até a água (areia molhada perto)
@@ -280,13 +279,6 @@ function pintarChao(cam) {
         break;
       }
       case TRN.PATIO: c = (x - CERCA.x0) % 16 === 0 || y % 16 === 0 ? P.patioJunta : h > 0.97 ? P.patioL : P.patio; break;
-      case TRN.BOCA_CUCA: {
-        const borda = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => ter(x + dx, y + dy) === TRN.MATA_CUCA);
-        c = borda ? P.bocaCuca[2] : ruido(x, y, 5, 11) > 0.55 ? P.bocaCuca[1] : P.bocaCuca[0];
-        // a trilha continua para dentro, em terra escura
-        if (!borda && distSeg(pt(x + 0.5, y + 0.5), BOCA_CUCA[0], BOCA_CUCA[1]).d < 5.6 + (ruido(x, y, 8, 3) - 0.5) * 2) c = h > 0.9 ? '#5A3E2C' : '#6A4834';
-        break;
-      }
     }
     cam.set(x, y, c);
   }
@@ -320,9 +312,7 @@ function mataFechada(cam) {
     const x = gx + (hash(k) - 0.5) * passo * 0.9 + ((gy / (passo * 0.8)) % 2 ? passo / 2 : 0), y = gy + (hash(k + 5) - 0.5) * passo * 0.6;
     const t = ter(clamp(Math.round(x), 0, MAPA_W - 1), clamp(Math.round(y), 0, MAPA_H - 1));
     if (t !== TRN.MATA && t !== TRN.MATA_CUCA && t !== TRN.MATA_FOGO) continue;
-    // não fecha a boca da trilha na Cuca e no fogo
     const r = 13 + hash(k + 9) * 6;
-    if (distSeg(pt(x, y), BOCA_CUCA[0], BOCA_CUCA[1]).d < 12 + r * 1.2 || distSeg(pt(x, y), BOCA_MULA[0], BOCA_MULA[1]).d < 13 + r * 1.2) continue;
     blobs.push({ x, y, t, r, sem: k });
   }
   blobs.sort((a, b) => a.y - b.y);
@@ -643,7 +633,35 @@ function ponteMapa(cam) {
 function chefeNoMapa(cam, x, y, desenhar, X, Y) {
   const l = nova();
   desenhar(l);
-  cam.colar(l, Math.round(x - X), Math.round(y - Y));
+  cam.colar(reduzir(l, ESCALA_CRIATURA, X, Y), Math.round(x - X), Math.round(y - Y));
+}
+// reduz uma camada pela fração f em volta de (ax, ay), sem misturar cores: cada pixel novo
+// pega a cor que mais aparece no pedaço que ele cobre (o contorno escuro ganha nos empates)
+function reduzir(l, f, ax, ay) {
+  const r = new Camada(l.W, l.H), k = 3;
+  if (l.x1 < 0) return r;
+  const X0 = Math.floor(ax + (l.x0 - ax) * f) - 1, X1 = Math.ceil(ax + (l.x1 + 1 - ax) * f) + 1;
+  const Y0 = Math.floor(ay + (l.y0 - ay) * f) - 1, Y1 = Math.ceil(ay + (l.y1 + 1 - ay) * f) + 1;
+  for (let Y = Y0; Y <= Y1; Y++) for (let X = X0; X <= X1; X++) {
+    const conta = new Map();
+    let cheio = 0;
+    for (let j = 0; j < k; j++) for (let i = 0; i < k; i++) {
+      const sx = Math.floor(ax + (X + (i + 0.5) / k - ax) / f), sy = Math.floor(ay + (Y + (j + 0.5) / k - ay) / f);
+      const c = sx >= 0 && sy >= 0 && sx < l.W && sy < l.H ? l.c[sy * l.W + sx] : 0;
+      if (!c) continue;
+      cheio++;
+      conta.set(c, (conta.get(c) || 0) + 1);
+    }
+    if (cheio * 2 < k * k) continue;
+    let melhor = 0, n = -1;
+    for (const [c, v] of conta) if (v > n || (v === n && luzCor(CORES_LISTA[c]) < luzCor(CORES_LISTA[melhor]))) { melhor = c; n = v; }
+    r.setI(X, Y, melhor);
+  }
+  return r;
+}
+function luzCor(cor) {
+  const v = parseInt(cor.slice(1, 7), 16);
+  return ((v >> 16) & 255) * 0.3 + ((v >> 8) & 255) * 0.59 + (v & 255) * 0.11;
 }
 function mulaLivre(cam, x, y, t) {
   const R = mulaBase(t);
@@ -666,13 +684,13 @@ function botoLivre(cam, x, y, t) {
   // anéis na água em volta
   const v = voltaM(t);
   for (let k = 0; k < 2; k++) {
-    const u = (v + k / 2) % 1, rx = 14 + u * 16, ry = rx * 0.32;
+    const u = (v + k / 2) % 1, rx = (14 + u * 16) * ESCALA_CRIATURA, ry = rx * 0.32;
     for (let a = 0; a < TAU; a += 0.06) if (pontilha(Math.round(x + Math.cos(a) * rx), Math.round(y + Math.sin(a) * ry), 1 - u)) cam.set(x + Math.cos(a) * rx, y + 1 + Math.sin(a) * ry, PAL_CHAO.negroEspuma);
   }
 }
 
 /* ---------- montagem ---------- */
-const FRASCOS = [[393, 300, '#5AF07A'], [369, 267, '#A06AF0'], [354, 288, '#5AF07A'], [405, 321, '#F06AA8'], [321, 255, '#5AF07A']];
+const FRASCOS = [[CALDEIRAO.x - 18, CALDEIRAO.y + 2, '#5AF07A'], [CALDEIRAO.x + 17, CALDEIRAO.y - 3, '#A06AF0'], [CALDEIRAO.x + 22, CALDEIRAO.y + 6, '#5AF07A'], [CALDEIRAO.x - 12, CALDEIRAO.y + 10, '#F06AA8']];
 let MAPA_BASE = null, ANDA = null, AGUA_PIX = null, BRASAS = null;
 
 function montarMapa() {
@@ -716,17 +734,18 @@ function montarMapa() {
 
   // Mula: castanheiras grandes pegando fogo dos dois lados da trilha (o arco da entrada).
   // Depois que a Mula é libertada, o fogo apaga e elas rebrotam.
-  for (const [x, y, s] of [[291, 650, 1], [326, 738, 2], [246, 676, 3], [262, 762, 4]]) {
+  for (const [x, y, s] of [[268, 654, 1], [338, 766, 2], [222, 640, 3], [258, 768, 4]]) {
     objeto('castanheira_fogo', x, y, (c, X, Y, t) => castanheiraEmChamas(c, X, Y, t, s), { animado: true, mostrar: 'nao_concluiu:fase1', pe: [5, 2], sombra: [22, 7], transparente: true });
     objeto('castanheira_rebrota', x, y, (c, X, Y) => castanheiraRebrotando(c, X, Y, s), { mostrar: 'concluiu:fase1', pe: [5, 2], transparente: true });
   }
 
-  // Cuca: duas árvores tortas e escuras com barba-de-velho, uma de cada lado da boca da mata
-  for (const [x, y, s] of [[438, 294, 5], [374, 336, 6]])
+  // Cuca: duas árvores tortas e escuras com barba-de-velho, uma de cada lado da entrada
+  for (const [x, y, s] of [[430, 282, 5], [378, 330, 6]])
     objeto('arvore_cuca', x, y, (c, X, Y) => arvoreTorta(c, X, Y, s), { pe: [4, 2], sombra: [16, 6], transparente: true });
 
-  // Cuca: caldeirão no fim da boca da mata
+  // Cuca: caldeirão e frascos na beira da mata, ao lado da entrada
   caldeiraoMapa(cam, CALDEIRAO.x, CALDEIRAO.y);
+  bloquearElipse(CALDEIRAO.x, CALDEIRAO.y - 2, 12, 5);
   FRASCOS.forEach(([x, y, cor]) => cam.carimbo(['.k.', '.k.', 'GLG', 'GGG', '.G.'], x - 1, y - 4, { k: '#6E5A44', G: cor, L: tingir(cor, '#FFFFFF', 0.5) }));
 
   // Boto: canoa na praia, vitórias-régias no remanso do Negro e buritis na beira
@@ -742,8 +761,11 @@ function montarMapa() {
 
   // árvores soltas nos campos: castanheiras, embaúbas e touceiras de açaí; queimadas perto do fogo
   const longeDeTudo = (x, y, d) => Object.values(TRILHAS).every(tr => distPoli(pt(x, y), tr).d > d)
-    && Object.values(ENTRADAS).every(e => Math.hypot(e.centro.x - x, e.centro.y - y) > 50 && Math.hypot(e.volta.x - x, e.volta.y - y) > 40)
-    && Object.values(CRIATURAS).every(e => Math.hypot(e.base.x - x, e.base.y - y) > 70)
+    && Object.values(ENTRADAS).every(e => Math.hypot(e.centro.x - x, e.centro.y - y) > 64 && Math.hypot(e.volta.x - x, e.volta.y - y) > 40)
+    && Object.values(CRIATURAS).every(e => Math.hypot(e.base.x - x, e.base.y - y) > 60)
+    && Math.hypot(x - CALDEIRAO.x, y - CALDEIRAO.y) > 36
+    // a copa fica uns 50 px acima do tronco: também não pode tapar as entradas
+    && Object.values(ENTRADAS).every(e => Math.hypot(e.centro.x - x, e.centro.y - (y - 50)) > 72)
     && Math.hypot(x - HUB.x, y - HUB.y) > 100 && Math.hypot(x - SAMAUMA.x, y - SAMAUMA.y) > 110;
   let k = 0;
   for (let gy = 30; gy < MAPA_H; gy += 60) for (let gx = 30; gx < MAPA_W; gx += 70) {
@@ -796,11 +818,6 @@ function montarMapa() {
   }
   // a ponte passa por cima de tudo
   for (let i = 0; i < ANDA.length; i++) if (TER[i] === TRN.PONTE) ANDA[i] = 1;
-  // a mata da Cuca: só a boca, até a entrada
-  for (let y = 0; y < MAPA_H; y++) for (let x = 0; x < MAPA_W; x++) {
-    const p = pt(x + 0.5, y + 0.5);
-    if (distSeg(p, BOCA_CUCA[0], BOCA_CUCA[1]).d < 11 && ter(x, y) === TRN.BOCA_CUCA && Math.hypot(p.x - CALDEIRAO.x, p.y - CALDEIRAO.y) > 20) ANDA[y * MAPA_W + x] = 1;
-  }
 
   // listas para animar
   AGUA_PIX = [];
@@ -878,8 +895,8 @@ function camadasDoProgresso() {
         for (let y = Math.floor(cy - ry); y <= cy + ry; y++) for (let x = Math.floor(cx - rx); x <= cx + rx; x++) {
           const d = Math.hypot((x - cx) / rx, (y - cy) / ry) + (ruido(x, y, 13, i) - 0.5) * 0.5;
           if (d >= 1 || x < 0 || y < 0) continue;
-          // a névoa não cobre a boca da trilha (é por ali que se entra)
-          if (ter(x, y) !== TRN.MATA_CUCA || distSeg(pt(x, y), BOCA_CUCA[0], BOCA_CUCA[1]).d < 48) continue;
+          // a névoa não cobre a beira onde se entra
+          if (ter(x, y) !== TRN.MATA_CUCA || Math.hypot(x - ENTRADAS.cuca.centro.x, y - ENTRADAS.cuca.centro.y) < 48) continue;
           if (pontilha(x, y, (1 - d) * 0.8)) c.set(x - ox, y - oy, d < 0.3 ? '#8AA4A0' : '#5E7C80');
         }
       }

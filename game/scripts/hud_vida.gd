@@ -61,10 +61,13 @@ func mostrar_especial(cheio: bool) -> void:
 
 func _process(delta: float) -> void:
 	_tempo += delta
-	if _tempo_dor > 0.0:
+	var tremia: bool = _tempo_dor > 0.0
+	if tremia:
 		_tempo_dor = maxf(_tempo_dor - delta, 0.0)
-	# Redesenha todo frame só quando algo se mexe (coração pulando/tremendo).
-	if _tempo_dor > 0.0 or atual == 1:
+	# Redesenha todo frame só quando algo se mexe (coração pulando/tremendo). No quadro em que
+	# o tremor acaba, redesenha mais uma vez: senão o coração fica congelado no meio da piscada
+	# (às vezes cheio) e o retrato preso na cara de dor.
+	if tremia or atual == 1:
 		queue_redraw()
 
 

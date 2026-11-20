@@ -9,6 +9,8 @@ extends Hitbox
 
 ## Comprimento (px): sai da tela de qualquer ponto da arena.
 const COMPRIMENTO: float = 2600.0
+## Tempo do raio afinando e sumindo no fim (s). Só visual: o dano já desliga no começo.
+const DURACAO_APAGAR: float = 0.1
 
 var _travado: bool = false
 
@@ -57,6 +59,16 @@ func definir_comprimento(comprimento: float) -> void:
 func travar() -> void:
 	_travado = true
 	linha.width = 5.0
+
+
+## Fim do disparo: o dano desliga na hora e o raio afina e some logo depois. Assim o visual
+## nunca acaba antes da caixa de dano (antes ele sumia no mesmo quadro, de uma vez).
+func apagar() -> void:
+	forma.set_deferred("disabled", true)
+	var tween: Tween = create_tween()
+	tween.tween_property(raio, "scale:y", 0.0, DURACAO_APAGAR)
+	tween.parallel().tween_property(raio, "modulate:a", 0.0, DURACAO_APAGAR)
+	tween.tween_callback(queue_free)
 
 
 func disparar() -> void:

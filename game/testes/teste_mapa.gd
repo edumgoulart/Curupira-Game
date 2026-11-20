@@ -80,6 +80,18 @@ func _process(_d: float) -> bool:
 			_soltar()
 			_ok(area == id, "chega na entrada %s em %d quadros (pos %s, área '%s', aviso '%s')" % [id, passos, cur.position / 4.0, area, mapa.get_node("%Aviso").text.replace("\n", " | ")])
 			_foto("area_" + id)
+			# sem beco (Mula e Cuca, que entram na mata): seguindo da entrada para dentro, ou o
+			# chão acaba ou continua dentro da entrada (antes dava para entrar num beco e sair do raio)
+			var c_e := Vector2(e.centro[0], e.centro[1])
+			var para_dentro: Vector2 = (c_e - Vector2(e.volta[0], e.volta[1])).normalized()
+			var fora := false
+			for passo_px in range(1, 80):
+				for lado in [-1.0, 0.0, 1.0]:
+					var p: Vector2 = (c_e + para_dentro * passo_px + para_dentro.orthogonal() * lado * 10.0) * 4.0
+					if cen.pode_andar(p) and cen.entrada_em(p) == "" and p.distance_to(c_e * 4.0) < float(e.raio) * 4.0 + 120.0:
+						fora = true
+			if id == "mula" or id == "cuca":
+				_ok(not fora, "%s: sem beco depois da entrada" % id)
 			if id == "mula":
 				etapa = 3
 				passos = 0
@@ -131,8 +143,20 @@ func _process(_d: float) -> bool:
 		var id: String = ["mula", "cuca", "boto"][i_id]
 		passos += 1
 		if passos == 1:
+			# o raio conta da criatura: procura chão em volta dela, fora das entradas, e confere
+			# de quantos lados dá para conversar (antes só dava bem na frente)
 			var c: Dictionary = cen.dados.conversas[id]
-			cur.position = Vector2(c.centro[0], c.centro[1]) * 4.0
+			var centro := Vector2(c.centro[0], c.centro[1]) * 4.0
+			var lados: int = 0
+			var achou := Vector2.INF
+			for k in 16:
+				var p: Vector2 = centro + Vector2.from_angle(TAU * k / 16.0) * float(c.raio) * 4.0 * 0.8
+				if cen.pode_andar(p) and cen.entrada_em(p) == "" and cen.conversa_em(p) == id:
+					lados += 1
+					if achou == Vector2.INF:
+						achou = p
+			_ok(lados >= 3, "%s: dá para conversar de %d lados (de 16)" % [id, lados])
+			cur.position = achou if achou != Vector2.INF else centro
 			mapa.get_node("Camera").position = cur.position
 		if passos == 4:
 			_ok(cen.pode_andar(cur.position), "%s: dá para pisar onde se conversa" % id)
