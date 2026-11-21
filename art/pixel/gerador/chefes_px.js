@@ -348,6 +348,47 @@ function terraRaspadaPx(cam, R, d, semente) {
   }
 }
 
+// pose da rajada de bolas: k = quanto já abaixou (0 = parada, 1 = na pose); a = altura do tiro
+// (0 = baixa, peito no chão, bolas rente ao chão; 1 = alta, pescoço esticado para a frente, bolas
+// na altura do peito do Curupira). Com a = 0 é a pose de sempre.
+const BOLA_ALTA = { y: 6, inc: -10, pesc: -42, fn: 7, fl: 6 };
+function poseBolasMula(R, k, a) {
+  R.y += mix(9, BOLA_ALTA.y, a) * k; R.inc = mix(-13, BOLA_ALTA.inc, a) * k; R.pesc = mix(-52, BOLA_ALTA.pesc, a) * k;
+  R.pes.fn = pt(-15 - mix(13, BOLA_ALTA.fn, a) * k, 0); R.pes.fl = pt(-24 - mix(11, BOLA_ALTA.fl, a) * k, 0); R.pes.bn = pt(27 + 3 * k, 0);
+  R.fogo.sobe = 0.55 * (1 - k);
+}
+function bolasMula(s, t, a) {
+  const R = mulaBase(t);
+  const k = suave(trecho(s, 0, 0.45)) * (1 - suave(trecho(s, 2.0, 2.5)));
+  poseBolasMula(R, k, a);
+  R.fogo.alt = 1 + 0.25 * k + (s < 0.5 ? 0.15 * Math.sin(t * 40) * k : 0);
+  R.fogo.tom = s > 0.2 && s < 0.5 ? 1 : 0;
+  const tiros = [];
+  for (const ts of [0.55, 1.0, 1.45]) {
+    const d = s - ts;
+    if (d < 0) continue;
+    R.x += 3 * Math.exp(-d * 12); R.inc -= 3 * Math.exp(-d * 12); R.fogo.alt += 0.5 * Math.exp(-d * 9);
+    tiros.push(d);
+  }
+  return {
+    R, depois(cam, info) {
+      // aviso: anel piscando na boca e brasas sendo puxadas
+      if (s > 0.12 && s < 0.55) aviso(() => {
+        const u = trecho(s, 0.12, 0.55);
+        if (Math.floor(t * 16) % 2) elipse(cam, info.boca.x, info.boca.y, 2 + 3 * u, 2 + 3 * u, PM.fogo6);
+        for (let i = 0; i < 6; i++) { const a = i * 1.1 + s * 3, d = 18 * (1 - (u * 2 + i / 6) % 1); cam.set(info.boca.x + Math.cos(a) * d, info.boca.y + Math.sin(a) * d * 0.7, PM.fogo4); }
+      });
+      // a baixa rola rente ao chão; a alta voa reta na altura do peito do Curupira (35 px)
+      const yAlvo = a > 0.5 ? CHAO_PX - 35 : CHAO_PX - 6;
+      for (const d of tiros) {
+        const x = info.boca.x - 8 - 250 * d, y = mix(info.boca.y, yAlvo, Math.min(1, d / 0.1)) - (a > 0.5 ? 0 : Math.abs(Math.sin(d * 16)) * 1.5);
+        if (x > -12) bolaFogoPx(cam, x, y, 4.5, t + d);
+        if (d < 0.12) explosaoPx(cam, info.boca.x - 3, info.boca.y, d / 0.12, 7);
+      }
+    }
+  };
+}
+
 const MULA_ESTADOS = {
   idle: {
     dur: 2.4, nome: 'Parada, respirando',
@@ -361,35 +402,20 @@ const MULA_ESTADOS = {
   bolas: {
     dur: 2.6, nome: 'Rajada rasteira', fase: 1, dica: 'pular',
     desc: 'Abaixa o peito até o chão, aponta o fogo para a frente e cospe três bolas rolando rente ao chão. Coice a cada bola.',
+    quadro: (s, t) => bolasMula(s, t, 0)
+  },
+  bolas_alto: {
+    dur: 2.6, nome: 'Rajada alta (Expert)', fase: 1, dica: 'abaixar',
+    desc: 'Abaixa só um pouco, com o pescoço esticado para a frente, e cospe as bolas retas na altura do peito do Curupira. No Expert ela mistura bolas altas e baixas na mesma rajada.',
+    quadro: (s, t) => bolasMula(s, t, 1)
+  },
+  bolas_troca: {
+    dur: 0.5, nome: 'Troca de altura (Expert)', fase: 1,
+    desc: 'No meio da rajada, passa da pose baixa para a alta (até 0,25 s) e da alta para a baixa (depois), avisando a altura da próxima bola.',
     quadro(s, t) {
       const R = mulaBase(t);
-      const k = suave(trecho(s, 0, 0.45)) * (1 - suave(trecho(s, 2.0, 2.5)));
-      R.y += 9 * k; R.inc = -13 * k; R.pesc = -52 * k;
-      R.pes.fn = pt(-15 - 13 * k, 0); R.pes.fl = pt(-24 - 11 * k, 0); R.pes.bn = pt(27 + 3 * k, 0);
-      R.fogo.sobe = 0.55 * (1 - k); R.fogo.alt = 1 + 0.25 * k + (s < 0.5 ? 0.15 * Math.sin(t * 40) * k : 0);
-      R.fogo.tom = s > 0.2 && s < 0.5 ? 1 : 0;
-      const tiros = [];
-      for (const ts of [0.55, 1.0, 1.45]) {
-        const d = s - ts;
-        if (d < 0) continue;
-        R.x += 3 * Math.exp(-d * 12); R.inc -= 3 * Math.exp(-d * 12); R.fogo.alt += 0.5 * Math.exp(-d * 9);
-        tiros.push(d);
-      }
-      return {
-        R, depois(cam, info) {
-          // aviso: anel piscando na boca e brasas sendo puxadas
-          if (s > 0.12 && s < 0.55) aviso(() => {
-            const u = trecho(s, 0.12, 0.55);
-            if (Math.floor(t * 16) % 2) elipse(cam, info.boca.x, info.boca.y, 2 + 3 * u, 2 + 3 * u, PM.fogo6);
-            for (let i = 0; i < 6; i++) { const a = i * 1.1 + s * 3, d = 18 * (1 - (u * 2 + i / 6) % 1); cam.set(info.boca.x + Math.cos(a) * d, info.boca.y + Math.sin(a) * d * 0.7, PM.fogo4); }
-          });
-          for (const d of tiros) {
-            const x = info.boca.x - 8 - 250 * d, y = mix(info.boca.y, CHAO_PX - 6, Math.min(1, d / 0.1)) - Math.abs(Math.sin(d * 16)) * 1.5;
-            if (x > -12) bolaFogoPx(cam, x, y, 4.5, t + d);
-            if (d < 0.12) explosaoPx(cam, info.boca.x - 3, info.boca.y, d / 0.12, 7);
-          }
-        }
-      };
+      poseBolasMula(R, 1, s < 0.25 ? suave(s / 0.25) : 1 - suave((s - 0.25) / 0.25));
+      return { R };
     }
   },
   pisoteio: {

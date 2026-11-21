@@ -115,20 +115,28 @@ func _verificar_chefe(chefe_id: String) -> void:
 			for a in f.ataques:
 				if a not in ataques:
 					ataques.append(a)
+	# A dificuldade muda o ataque em alguns chefes (Mula: 3 + 2 meteoros no Expert) e a vida,
+	# então cada teste roda com a dificuldade dele no GameState.
+	var game_state: Node = root.get_node("GameState")
 	if _filtros.get("so", "") != "combos":
-		for a in ataques:
-			var r: Dictionary = await _testar(chefe_id, a, &"", 0.0)
-			_relatar("  ataque %-10s %s" % [a, _resumo(r)])
+		for dif in [0, 1]:
+			if _filtros.has("dificuldade") and int(_filtros["dificuldade"]) != dif:
+				continue
+			game_state.dificuldade = dif
+			for a in ataques:
+				var r: Dictionary = await _testar(chefe_id, a, &"", 0.0)
+				_relatar("  %s ataque %-10s %s" % [NOMES_DIFICULDADE[dif], a, _resumo(r)])
 	if _filtros.get("so", "") == "ataques":
 		return
 	var feitos: Dictionary = {}
 	for dif in [0, 1]:
 		if _filtros.has("dificuldade") and int(_filtros["dificuldade"]) != dif:
 			continue
+		game_state.dificuldade = dif
 		var fases: Array = dados.fases_expert if dif == 1 else dados.fases_normal
 		for i in fases.size():
 			for c in fases[i].combos:
-				var chave := "%s+%s@%.2f" % [c.primeiro, c.segundo, c.atraso]
+				var chave := "%d:%s+%s@%.2f" % [dif, c.primeiro, c.segundo, c.atraso]
 				var texto := "  %s fase %d  combo %-22s atraso %.2f: " % [NOMES_DIFICULDADE[dif], i + 1, "%s+%s" % [c.primeiro, c.segundo], c.atraso]
 				if feitos.has(chave):
 					_relatar(texto + feitos[chave])

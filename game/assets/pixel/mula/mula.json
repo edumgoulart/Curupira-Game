@@ -1,7 +1,7 @@
 {
  "imagem": "mula.png",
- "celula": [170, 162],
- "ancora": [100, 153],
+ "celula": [172, 162],
+ "ancora": [101, 153],
  "escala_no_jogo": 4,
  "animacoes": [
   {
@@ -229,8 +229,186 @@
    }
   },
   {
-   "nome": "aviso_pisoteio",
+   "nome": "aviso_bolas_alto",
    "linha": 4,
+   "quadros": 6,
+   "fps": 12,
+   "loop": false,
+   "caixa": [
+    -89,
+    -101,
+    49,
+    2
+   ],
+   "pontos": {
+    "boca": [
+     [-36, -85],
+     [-40, -81],
+     [-49, -71],
+     [-56, -56],
+     [-59, -45],
+     [-60, -43]
+    ],
+    "ponta_fogo": [
+     [-40, -102],
+     [-46, -98],
+     [-62, -88],
+     [-75, -65],
+     [-82, -48],
+     [-83, -45]
+    ],
+    "frente": [
+     [-30, -42],
+     [-30, -40],
+     [-30, -35],
+     [-30, -30],
+     [-30, -27],
+     [-30, -26]
+    ]
+   },
+   "nota": "Expert: abaixa só um pouco, pescoço esticado para a frente (bola na altura do peito)"
+  },
+  {
+   "nome": "bolas_alto",
+   "linha": 5,
+   "quadros": 5,
+   "fps": 12,
+   "loop": true,
+   "caixa": [
+    -100,
+    -55,
+    49,
+    2
+   ],
+   "pontos": {
+    "boca": [
+     [-60, -39],
+     [-60, -41],
+     [-60, -42],
+     [-60, -43],
+     [-60, -43]
+    ],
+    "ponta_fogo": [
+     [-96, -39],
+     [-89, -43],
+     [-86, -44],
+     [-85, -45],
+     [-84, -45]
+    ],
+    "frente": [
+     [-30, -24],
+     [-30, -25],
+     [-30, -26],
+     [-30, -26],
+     [-30, -26]
+    ]
+   },
+   "nota": "um coice por bola alta: recomeçar a cada tiro"
+  },
+  {
+   "nome": "fim_bolas_alto",
+   "linha": 6,
+   "quadros": 6,
+   "fps": 12,
+   "loop": false,
+   "caixa": [
+    -86,
+    -107,
+    46,
+    2
+   ],
+   "pontos": {
+    "boca": [
+     [-60, -44],
+     [-58, -49],
+     [-54, -61],
+     [-47, -74],
+     [-39, -82],
+     [-36, -85]
+    ],
+    "ponta_fogo": [
+     [-84, -46],
+     [-81, -55],
+     [-72, -73],
+     [-58, -90],
+     [-45, -99],
+     [-40, -102]
+    ],
+    "frente": [
+     [-30, -27],
+     [-30, -29],
+     [-30, -33],
+     [-30, -37],
+     [-30, -40],
+     [-30, -42]
+    ]
+   }
+  },
+  {
+   "nome": "bolas_sobe",
+   "linha": 7,
+   "quadros": 3,
+   "fps": 12,
+   "loop": false,
+   "caixa": [
+    -78,
+    -55,
+    48,
+    2
+   ],
+   "pontos": {
+    "boca": [
+     [-60, -29],
+     [-60, -36],
+     [-60, -43]
+    ],
+    "ponta_fogo": [
+     [-78, -27],
+     [-78, -36],
+     [-77, -44]
+    ],
+    "frente": [
+     [-30, -21],
+     [-30, -24],
+     [-30, -27]
+    ]
+   },
+   "nota": "no meio da rajada: da pose baixa para a alta"
+  },
+  {
+   "nome": "bolas_desce",
+   "linha": 8,
+   "quadros": 3,
+   "fps": 12,
+   "loop": false,
+   "caixa": [
+    -82,
+    -55,
+    49,
+    2
+   ],
+   "pontos": {
+    "boca": [
+     [-60, -43],
+     [-60, -36],
+     [-60, -29]
+    ],
+    "ponta_fogo": [
+     [-77, -44],
+     [-78, -35],
+     [-78, -26]
+    ],
+    "frente": [
+     [-30, -27],
+     [-30, -24],
+     [-30, -21]
+    ]
+   },
+   "nota": "no meio da rajada: da pose alta para a baixa"
+  },
+  {
+   "nome": "aviso_pisoteio",
+   "linha": 9,
    "quadros": 7,
    "fps": 12,
    "loop": false,
@@ -272,7 +450,7 @@
   },
   {
    "nome": "pisoteio_alto",
-   "linha": 5,
+   "linha": 10,
    "quadros": 4,
    "fps": 12,
    "loop": true,
@@ -306,7 +484,7 @@
   },
   {
    "nome": "pisoteio",
-   "linha": 6,
+   "linha": 11,
    "quadros": 8,
    "fps": 12,
    "loop": false,
@@ -352,7 +530,7 @@
   },
   {
    "nome": "aviso_investida",
-   "linha": 7,
+   "linha": 12,
    "quadros": 13,
    "fps": 12,
    "loop": false,
@@ -413,7 +591,7 @@
   },
   {
    "nome": "galope",
-   "linha": 8,
+   "linha": 13,
    "quadros": 6,
    "fps": 27,
    "loop": true,
@@ -452,7 +630,7 @@
   },
   {
    "nome": "batida",
-   "linha": 9,
+   "linha": 14,
    "quadros": 3,
    "fps": 12,
    "loop": false,
@@ -482,7 +660,7 @@
   },
   {
    "nome": "tonta",
-   "linha": 10,
+   "linha": 15,
    "quadros": 7,
    "fps": 12,
    "loop": true,
@@ -525,7 +703,7 @@
   },
   {
    "nome": "trote",
-   "linha": 11,
+   "linha": 16,
    "quadros": 6,
    "fps": 16,
    "loop": true,
@@ -565,7 +743,7 @@
   },
   {
    "nome": "aviso_meteoros",
-   "linha": 12,
+   "linha": 17,
    "quadros": 6,
    "fps": 12,
    "loop": false,
@@ -604,7 +782,7 @@
   },
   {
    "nome": "meteoros",
-   "linha": 13,
+   "linha": 18,
    "quadros": 7,
    "fps": 12,
    "loop": true,
@@ -647,7 +825,7 @@
   },
   {
    "nome": "cansada",
-   "linha": 14,
+   "linha": 19,
    "quadros": 12,
    "fps": 12,
    "loop": true,
@@ -704,7 +882,7 @@
   },
   {
    "nome": "derrota",
-   "linha": 15,
+   "linha": 20,
    "quadros": 36,
    "fps": 10,
    "loop": false,
@@ -833,7 +1011,7 @@
   },
   {
    "nome": "transicao",
-   "linha": 16,
+   "linha": 21,
    "quadros": 24,
    "fps": 12,
    "loop": false,
@@ -927,7 +1105,7 @@
   },
   {
    "nome": "dano",
-   "linha": 17,
+   "linha": 22,
    "quadros": 4,
    "fps": 12,
    "loop": false,

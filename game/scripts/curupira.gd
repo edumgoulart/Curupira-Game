@@ -10,16 +10,29 @@ extends CharacterBody2D
 ## O tiro sai da mão desenhada no quadro atual (ponto "mao" do curupira.json).
 ##
 ## Animações usadas (curupira_frames.tres, gerado pelo gerador de pixel art):
-##   idle, correr, pular, cair, pouso, dash, freio, especial, dano, derrota,
+##   idle, correr, pular, cair, pouso, dash, freio, dano, derrota,
 ##   atirar, atirar_diag_cima, atirar_cima, atirar_diag_baixo,
-##   correr_atirar, correr_atirar_diag_cima,
+##   correr_atirar, correr_atirar_diag_cima (+ as versões "_coice"),
 ##   ar_atirar_cima, ar_atirar_diag_cima, ar_atirar_lado, ar_atirar_diag_baixo, ar_atirar_baixo,
-##   abaixar, agachado, agachado_atirar, levantar
+##   abaixar, agachado, agachado_atirar, levantar,
+##   especial_<tipo>_<mira>_inicio / _loop / _fim, com tipo = animacao do EspecialData
+##   (onca, canhao, pocao, bolha) e mira = frente, diag_cima, cima ou agachado.
 ## Se uma animação ainda não existir, toca a idle no lugar (não dá erro).
+##
+## Tiro: as animações de tiro parado, no ar e agachado são um coice só (sem loop). Cada tiro
+## recomeça o coice do quadro 0; sem atirar, ficam paradas no último quadro (braço firme). Assim a
+## mão mexe no ritmo do ataque equipado, e com a mira travada ela fica parada. Correndo, as pernas
+## não podem parar: a cada tiro troca por um instante para a "_coice", no mesmo quadro das pernas.
+##
+## Especial: ESPECIAL tem três partes (FaseEspecial). O golpe sai quando acaba o "_inicio"; o
+## Canhão segura o "_loop" enquanto o feixe dura; o "_fim" é a volta, que andar, pular, dar dash
+## ou atirar interrompem. Sai na mira: cima e diagonal para cima; o resto vai para a frente.
 ## O dash tem efeito próprio (fantasmas, folhas, vento, corpo esticado) no node EfeitoDash.
 ## Encanto (coração do Boto): puxado para o lado do Boto por um tempo; visual no EfeitoEncanto.
 
 enum Estado { PARADO, CORRENDO, PULANDO, CAINDO, AGACHADO, DASH, ESPECIAL, DERROTADO }
+## Partes do especial: preparo (até o golpe sair), disparando (Canhão: o feixe) e recuperando.
+enum FaseEspecial { PREPARO, DISPARANDO, RECUPERANDO }
 
 ## Ângulos da mira (graus de tela; o lado vem de olhando_para).
 const MIRA_CIMA: float = -90.0
@@ -36,6 +49,12 @@ const DURACAO_POSE_DANO: float = 0.2
 const PISCA_DANO_DURACAO: float = 0.15
 const TREMOR_DANO_PX: float = 9.0
 const TREMOR_DANO_DURACAO: float = 0.25
+## Quanto tempo o braço fica no coice depois de um tiro correndo (s). Só visual.
+const DURACAO_COICE_CORRENDO: float = 0.1
+## Animações da corrida: todas com o mesmo número de quadros, para trocar sem as pernas pularem.
+const ANIMACOES_CORRIDA: Array[StringName] = [
+	&"correr", &"correr_atirar", &"correr_atirar_coice", &"correr_atirar_diag_cima", &"correr_atirar_diag_cima_coice",
+]
 
 ## Emitido no último golpe. A arena escuta para mostrar a tela de derrota.
 signal derrotado
@@ -65,6 +84,12 @@ var _tempo_especial: float = 0.0
 var _tempo_ataque: float = 0.0
 var _tempo_pouso: float = 0.0
 var _tempo_dano: float = 0.0
+var _tempo_coice: float = 0.0
+# Especial em andamento: parte, mira travada no aperto ("frente", "diag_cima", "cima", "agachado")
+# e o aviso de que o golpe sai neste frame (depois de o Atirador ir para a mão do golpe).
+var _fase_especial: FaseEspecial = FaseEspecial.PREPARO
+var _mira_especial: String = "frente"
+var _soltar_especial: bool = false
 var _material_pisca: ShaderMaterial
 var _tween_pisca: Tween
 var _estava_no_ar: bool = false
@@ -151,14 +176,15 @@ func _physics_process(delta: float) -> void:
 
 	if atirando:
 		atirador.tentar_atirar(olhando_para, fator_lentidao(), mira)
+	# O golpe do especial sai aqui, com o Atirador já na mão da pose do golpe.
+	if _soltar_especial:
+		_soltar_especial = false
+		if estado != Estado.DERROTADO:
+			atirador.atirar_especial(olhando_para, _angulo_especial())
 	# Especial: só com a barra cheia; disparar zera a barra.
-	if pode_atirar and Input.is_action_just_pressed("attack_special") and carga.esta_cheia():
-		atirador.atirar_especial(olhando_para)
+	if pode_atirar and Input.is_action_just_pressed("attack_special") and carga.esta_cheia() and atirador.especial:
 		carga.gastar()
-		# Especial contínuo (Canhão Flamejante): fica parado enquanto dispara (GDD).
-		if atirador.especial.duracao_disparo > 0.0:
-			estado = Estado.ESPECIAL
-			_tempo_especial = atirador.especial.duracao_disparo
+		_comecar_especial()
 
 
 ## Lentidão (GDD: deixa movimentos e ataques mais lentos). Quem deixa lento chama
@@ -261,11 +287,16 @@ func _pode_atirar() -> bool:
 
 
 ## Chamado pelo Atirador a cada ataque que sai. O projétil já nasce na mão; aqui só a pose.
-## Recomeça a pose de tiro do primeiro quadro (o coice da mão), exceto correndo e no ar,
-## onde as pernas não podem pular de quadro.
+## Recomeça o coice do primeiro quadro (parado, agachado e no ar); correndo, liga o coice por um
+## instante, sem mexer no quadro das pernas. No especial a pose é dele.
 func _ao_disparar() -> void:
+	if estado == Estado.ESPECIAL:
+		return
 	_tempo_ataque = maxf(_tempo_ataque, DURACAO_POSE_ATAQUE)
-	if estado == Estado.PARADO or estado == Estado.AGACHADO:
+	if estado == Estado.CORRENDO:
+		_tempo_coice = DURACAO_COICE_CORRENDO
+	elif String(sprite.animation).contains("atirar") and not sprite.sprite_frames.get_animation_loop(sprite.animation):
+		sprite.play(sprite.animation)
 		sprite.set_frame_and_progress(0, 0.0)
 
 
@@ -322,14 +353,73 @@ func _usar_formas(agachado: bool) -> void:
 			formas[i].set_deferred("position", lista[i][1])
 
 
-## Disparando especial contínuo: não anda, não pula, não dá dash, não vira.
-## A gravidade continua (se disparou no ar, cai com o feixe junto).
+## Aperto do especial: trava a mira (cima e diagonal para cima saem na mira; agachado sai rente ao
+## chão; o resto vai para a frente) e começa o preparo. O golpe sai quando a animação do preparo acaba.
+func _comecar_especial() -> void:
+	if estado == Estado.AGACHADO:
+		_mira_especial = "agachado"
+	elif mira == MIRA_CIMA:
+		_mira_especial = "cima"
+	elif mira == MIRA_DIAG_CIMA:
+		_mira_especial = "diag_cima"
+	else:
+		_mira_especial = "frente"
+	estado = Estado.ESPECIAL
+	_fase_especial = FaseEspecial.PREPARO
+	_tempo_especial = FolhaSprites.duracao(sprite, _animacao_especial())
+	_tempo_ataque = 0.0
+	_tempo_dano = 0.0
+
+
+## Ângulo do golpe do especial (graus, como a mira do tiro).
+func _angulo_especial() -> float:
+	match _mira_especial:
+		"cima":
+			return MIRA_CIMA
+		"diag_cima":
+			return MIRA_DIAG_CIMA
+	return MIRA_FRENTE
+
+
+## Nome da animação da parte atual do especial (ex.: especial_onca_diag_cima_inicio).
+func _animacao_especial() -> StringName:
+	var tipo: String = atirador.especial.animacao if atirador.especial else "onca"
+	var parte: String = ["inicio", "loop", "fim"][_fase_especial]
+	return StringName("especial_%s_%s_%s" % [tipo, _mira_especial, parte])
+
+
+## Especial: não anda e não vira; a gravidade continua (se disparou no ar, cai junto).
+## Preparo -> golpe sai -> (Canhão: segura o feixe por duracao_disparo) -> volta.
+## Na volta, andar, pular, dar dash ou atirar devolve o controle na hora.
 func _processar_especial(delta: float) -> void:
+	if _fase_especial == FaseEspecial.RECUPERANDO and _quer_sair_do_especial():
+		estado = Estado.CAINDO  # provisório; _atualizar_estado corrige depois do move_and_slide
+		_processar_movimento_normal(delta)
+		return
 	velocity.x = 0.0
 	_aplicar_gravidade(delta)
 	_tempo_especial -= delta
-	if _tempo_especial <= 0.0 or is_zero_approx(_tempo_especial):
-		estado = Estado.CAINDO  # provisório; _atualizar_estado corrige depois do move_and_slide
+	if _tempo_especial > 0.0 and not is_zero_approx(_tempo_especial):
+		return
+	match _fase_especial:
+		FaseEspecial.PREPARO:
+			_soltar_especial = true
+			if atirador.especial.duracao_disparo > 0.0:
+				_fase_especial = FaseEspecial.DISPARANDO
+				_tempo_especial = atirador.especial.duracao_disparo
+			else:
+				_fase_especial = FaseEspecial.RECUPERANDO
+				_tempo_especial = FolhaSprites.duracao(sprite, _animacao_especial())
+		FaseEspecial.DISPARANDO:
+			_fase_especial = FaseEspecial.RECUPERANDO
+			_tempo_especial = FolhaSprites.duracao(sprite, _animacao_especial())
+		FaseEspecial.RECUPERANDO:
+			estado = Estado.CAINDO  # provisório; _atualizar_estado corrige depois do move_and_slide
+
+
+func _quer_sair_do_especial() -> bool:
+	return Input.get_axis("move_left", "move_right") != 0.0 or _tempo_buffer_pulo > 0.0 \
+		or Input.is_action_just_pressed("dash") or Input.is_action_pressed("attack_basic")
 
 
 ## Derrotado: sem controle; só a gravidade age, para ele cair se estava no ar.
@@ -367,6 +457,7 @@ func _atualizar_janelas(delta: float) -> void:
 	_tempo_ataque -= delta
 	_tempo_pouso -= delta
 	_tempo_dano -= delta
+	_tempo_coice -= delta
 
 
 func _aplicar_gravidade(delta: float) -> void:
@@ -455,7 +546,8 @@ func _processar_dash(delta: float) -> void:
 ## o derrotado não sai.
 func _atualizar_estado() -> void:
 	if estado == Estado.DASH or estado == Estado.ESPECIAL or estado == Estado.DERROTADO:
-		_usar_formas(false)
+		# O especial agachado continua com a caixa baixa.
+		_usar_formas(estado == Estado.ESPECIAL and _mira_especial == "agachado")
 		return
 	if is_on_floor():
 		if _estava_no_ar:
@@ -472,31 +564,35 @@ func _atualizar_estado() -> void:
 
 
 func _atualizar_animacao() -> void:
-	if _tempo_dano > 0.0 and estado != Estado.DERROTADO and estado != Estado.DASH:
+	# No especial a pose de dano não entra (o pisca e o tremor do golpe continuam).
+	if _tempo_dano > 0.0 and estado != Estado.DERROTADO and estado != Estado.DASH and estado != Estado.ESPECIAL:
 		_tocar(&"dano")
 		return
 	var atacando: bool = _tempo_ataque > 0.0 and _pode_atirar()
 	match estado:
 		Estado.PARADO:
 			if atacando or _mira_travada():
-				_tocar(_animacao_de_tiro_de_pe(), &"atirar")
+				_tocar_tiro(_animacao_de_tiro_de_pe(), &"atirar")
 			elif _tempo_pouso > 0.0:
 				_tocar(&"pouso")
 			else:
 				_tocar(&"idle")
 		Estado.CORRENDO:
 			if atacando:
-				_tocar(&"correr_atirar_diag_cima" if mira == MIRA_DIAG_CIMA else &"correr_atirar", &"correr")
+				var nome: String = "correr_atirar_diag_cima" if mira == MIRA_DIAG_CIMA else "correr_atirar"
+				if _tempo_coice > 0.0:
+					nome += "_coice"
+				_tocar_correndo(StringName(nome))
 			else:
-				_tocar(&"correr")
+				_tocar_correndo(&"correr")
 		Estado.PULANDO, Estado.CAINDO:
 			if atacando:
-				_tocar(_animacao_de_tiro_no_ar(), &"pular")
+				_tocar_tiro(_animacao_de_tiro_no_ar(), &"pular")
 			else:
 				_tocar(&"pular" if estado == Estado.PULANDO else &"cair")
 		Estado.AGACHADO:
 			if atacando:
-				_tocar(&"agachado_atirar", &"agachado")
+				_tocar_tiro(&"agachado_atirar", &"agachado")
 			elif sprite.animation == &"abaixar" and sprite.is_playing():
 				pass  # termina de descer
 			elif sprite.animation != &"agachado" and sprite.animation != &"abaixar" and sprite.animation != &"agachado_atirar":
@@ -506,7 +602,7 @@ func _atualizar_animacao() -> void:
 		Estado.DASH:
 			_tocar(&"dash")
 		Estado.ESPECIAL:
-			_tocar(&"especial", &"atirar")
+			_tocar(_animacao_especial(), &"atirar")
 		Estado.DERROTADO:
 			_tocar(&"derrota")
 
@@ -533,6 +629,26 @@ func _animacao_de_tiro_no_ar() -> StringName:
 		MIRA_BAIXO:
 			return &"ar_atirar_baixo"
 	return &"ar_atirar_lado"
+
+
+## Pose de tiro (coice sem loop). Ao entrar nela sem ter atirado (mira travada, troca de direção,
+## pouso), começa no último quadro, com o braço firme; quem recomeça o coice é o _ao_disparar.
+func _tocar_tiro(nome: StringName, reserva: StringName) -> void:
+	var antes: StringName = sprite.animation
+	_tocar(nome, reserva)
+	if sprite.animation != antes and sprite.sprite_frames and not sprite.sprite_frames.get_animation_loop(sprite.animation):
+		sprite.set_frame_and_progress(sprite.sprite_frames.get_frame_count(sprite.animation) - 1, 0.0)
+
+
+## Corrida: troca entre correr, correr atirando e o coice mantendo o quadro das pernas
+## (sem isso a passada recomeçaria a cada tiro).
+func _tocar_correndo(nome: StringName) -> void:
+	var antes: StringName = sprite.animation
+	var quadro: int = sprite.frame
+	var progresso: float = sprite.frame_progress
+	_tocar(nome, &"correr_atirar" if String(nome).ends_with("_coice") else &"correr")
+	if sprite.animation != antes and antes in ANIMACOES_CORRIDA and sprite.animation in ANIMACOES_CORRIDA:
+		sprite.set_frame_and_progress(quadro, progresso)
 
 
 ## Se a animação ainda não existir no SpriteFrames, toca a reserva (idle por padrão):

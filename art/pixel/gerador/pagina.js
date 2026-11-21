@@ -11,7 +11,7 @@ const NQ = {
 /* ---------- fontes de quadros ----------
    Cada quadro: tela, âncora (ox, oy = pés), deslocamento do corpo (dx, dy), mão e pontas do fogo (relativas à âncora). */
 function quadroBase(A, k) {
-  const n = NQ[A.id], p = k / n, t = p * A.ciclo, pose = A.pose(p, t);
+  const n = NQ[A.id] || A.n, p = k / n, t = p * A.ciclo, pose = A.pose(p, t);
   return { p, t, pose };
 }
 const FONTE_MAO = {
@@ -19,7 +19,7 @@ const FONTE_MAO = {
   obter(A) {
     if (!this.cache[A.id]) {
       const lista = [];
-      for (let k = 0; k < NQ[A.id]; k++) {
+      for (let k = 0; k < (NQ[A.id] || A.n); k++) {
         const { t, pose } = quadroBase(A, k);
         const r = curupiraPixel(pose, t, false, estado.virados);
         lista.push({
@@ -133,7 +133,7 @@ class Palco {
       return;
     }
     this.t += dt;
-    const s = this.fonte.escala, n = NQ[A.id], c = coresDe(this.fonte);
+    const s = this.fonte.escala, n = NQ[A.id] || A.n, c = coresDe(this.fonte);
     const p = ((this.t / A.ciclo) % 1 + 1) % 1, volta = Math.floor(this.t / A.ciclo);
     const q = this.quadros[Math.floor(p * n) % n];
     const dir = A.vaiVolta && volta % 2 ? -1 : 1;

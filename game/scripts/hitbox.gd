@@ -13,6 +13,14 @@ signal acertou(alvo: Area2D)
 @export var dano: int = 1
 
 
+## true se o corpo é do mundo (chão e paredes, layer 1). Os tiros dos chefes que somem ao bater
+## num corpo usam isto: a mask deles tem a layer player para achar a hurtbox do Curupira, e o
+## corpo do Curupira também está nessa layer. Sem o filtro, o tiro encostava primeiro no corpo
+## (maior que a hurtbox), sumia e não dava dano.
+static func e_mundo(corpo: Node) -> bool:
+	return corpo is CollisionObject2D and (corpo as CollisionObject2D).get_collision_layer_value(1)
+
+
 func _ready() -> void:
 	area_entered.connect(_on_area_entered)
 

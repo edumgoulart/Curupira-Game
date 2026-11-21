@@ -48,8 +48,27 @@
   "nome": "onca",
   "fps": 12,
   "loop": true,
-  "tamanho": [21, 18],
-  "centro": [10, 10],
+  "tamanho": [22, 21],
+  "centro": [11, 10],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "onca_diag_cima": {
+  "nome": "onca_diag_cima",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [22, 21],
+  "centro": [11, 10],
+  "nota": "olhando para a direita; espelhar para a esquerda",
+  "quadros": 2
+ },
+ "onca_cima": {
+  "nome": "onca_cima",
+  "fps": 12,
+  "loop": true,
+  "tamanho": [22, 21],
+  "centro": [11, 10],
+  "nota": "olhando para a direita; espelhar para a esquerda",
   "quadros": 2
  },
  "acerto": {

@@ -400,7 +400,14 @@ function poseCorrer(p) {
 
 // braço do tiro: arma, estica e dá um coice a cada tiro (5 tiros/s no Tiro de Folha)
 const INTERVALO_TIRO = 0.2;
+// Para exportar ao jogo: com um número aqui, o braço fica esticado e só dá o coice dessa força
+// (1 = logo depois do tiro, 0 = firme). O jogo recomeça o coice a cada tiro, no ritmo do ataque.
+let COICE_FORCADO = null;
 function bracoTiro(o, t) {
+  if (COICE_FORCADO !== null) {
+    const coice = COICE_FORCADO;
+    return { mao: soma(o.perto, pt(66 - coice * 14, 14 - coice * 3)), coice };
+  }
   const q = (t / INTERVALO_TIRO) % 1;
   const ida = q < 0.25 ? suave(q / 0.25) : 1, coice = q >= 0.25 ? Math.exp(-(q - 0.25) * 12) : 0;
   const estendida = soma(o.perto, pt(66 - coice * 8, 14)), armada = soma(o.perto, pt(42, 2));

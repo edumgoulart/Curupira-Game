@@ -1,7 +1,7 @@
 {
  "imagem": "curupira.png",
- "celula": [52, 68],
- "ancora": [24, 64],
+ "celula": [58, 74],
+ "ancora": [24, 66],
  "escala_no_jogo": 4,
  "animacoes": [
   {
@@ -171,41 +171,41 @@
    "nome": "atirar",
    "linha": 7,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
-    -13,
-    -50,
+    -14,
+    -49,
     19,
     2
    ],
    "pontos": {
     "mao": [
-     [10, -22],
-     [16, -18],
-     [10, -22],
+     [12, -19],
+     [14, -19],
+     [15, -19],
      [16, -18]
     ]
    },
-   "nota": "para a frente"
+   "nota": "coice de um tiro; o jogo recomeça a cada tiro e para no último quadro (firme)"
   },
   {
    "nome": "atirar_diag_cima",
    "linha": 8,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
-    -14,
-    -50,
+    -15,
+    -49,
     16,
     2
    ],
    "pontos": {
     "mao": [
-     [6, -30],
+     [10, -30],
+     [11, -31],
      [13, -32],
-     [6, -30],
      [13, -32]
     ]
    }
@@ -214,19 +214,19 @@
    "nome": "atirar_cima",
    "linha": 9,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
-    -15,
-    -50,
+    -16,
+    -49,
     10,
     2
    ],
    "pontos": {
     "mao": [
-     [-2, -33],
-     [1, -40],
-     [-2, -33],
+     [0, -36],
+     [1, -38],
+     [1, -39],
      [1, -40]
     ]
    }
@@ -235,19 +235,19 @@
    "nome": "atirar_diag_baixo",
    "linha": 10,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
-    -12,
-    -49,
+    -13,
+    -48,
     13,
     2
    ],
    "pontos": {
     "mao": [
-     [6, -14],
-     [9, -7],
-     [6, -14],
+     [7, -10],
+     [8, -9],
+     [8, -8],
      [9, -7]
     ]
    },
@@ -267,18 +267,43 @@
    ],
    "pontos": {
     "mao": [
-     [13, -22],
+     [19, -19],
      [19, -17],
      [19, -18],
      [19, -19],
      [19, -17],
-     [13, -21]
+     [19, -18]
     ]
-   }
+   },
+   "nota": "braço firme"
+  },
+  {
+   "nome": "correr_atirar_coice",
+   "linha": 12,
+   "quadros": 6,
+   "fps": 12.5,
+   "loop": true,
+   "caixa": [
+    -11,
+    -48,
+    19,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [16, -19],
+     [16, -18],
+     [16, -19],
+     [16, -19],
+     [16, -18],
+     [16, -19]
+    ]
+   },
+   "nota": "mesmas pernas, braço no coice do tiro"
   },
   {
    "nome": "correr_atirar_diag_cima",
-   "linha": 12,
+   "linha": 13,
    "quadros": 6,
    "fps": 12.5,
    "loop": true,
@@ -290,21 +315,46 @@
    ],
    "pontos": {
     "mao": [
-     [10, -30],
+     [17, -32],
      [17, -31],
      [17, -32],
-     [16, -32],
+     [17, -32],
      [17, -31],
-     [10, -29]
+     [17, -32]
     ]
-   }
+   },
+   "nota": "braço firme"
+  },
+  {
+   "nome": "correr_atirar_diag_cima_coice",
+   "linha": 14,
+   "quadros": 6,
+   "fps": 12.5,
+   "loop": true,
+   "caixa": [
+    -11,
+    -48,
+    17,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [14, -31],
+     [14, -29],
+     [14, -30],
+     [14, -31],
+     [14, -29],
+     [14, -30]
+    ]
+   },
+   "nota": "mesmas pernas, braço no coice do tiro"
   },
   {
    "nome": "ar_atirar_cima",
-   "linha": 13,
+   "linha": 15,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
     -14,
     -51,
@@ -313,19 +363,19 @@
    ],
    "pontos": {
     "mao": [
-     [-1, -35],
+     [1, -38],
+     [2, -39],
      [2, -41],
-     [-1, -35],
      [2, -41]
     ]
    }
   },
   {
    "nome": "ar_atirar_diag_cima",
-   "linha": 14,
+   "linha": 16,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
     -14,
     -51,
@@ -334,19 +384,19 @@
    ],
    "pontos": {
     "mao": [
-     [7, -31],
+     [11, -31],
+     [12, -32],
      [14, -33],
-     [7, -31],
-     [14, -33]
+     [14, -34]
     ]
    }
   },
   {
    "nome": "ar_atirar_lado",
-   "linha": 15,
+   "linha": 17,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
     -14,
     -51,
@@ -355,19 +405,19 @@
    ],
    "pontos": {
     "mao": [
-     [11, -23],
-     [17, -20],
-     [11, -23],
+     [13, -21],
+     [15, -20],
+     [16, -20],
      [17, -20]
     ]
    }
   },
   {
    "nome": "ar_atirar_diag_baixo",
-   "linha": 16,
+   "linha": 18,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
     -13,
     -51,
@@ -376,19 +426,19 @@
    ],
    "pontos": {
     "mao": [
-     [7, -15],
-     [9, -8],
-     [7, -15],
-     [9, -8]
+     [7, -12],
+     [8, -10],
+     [9, -9],
+     [10, -8]
     ]
    }
   },
   {
    "nome": "ar_atirar_baixo",
-   "linha": 17,
+   "linha": 19,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
     -13,
     -51,
@@ -397,9 +447,9 @@
    ],
    "pontos": {
     "mao": [
-     [-1, -12],
+     [-3, -10],
+     [-3, -8],
      [-4, -6],
-     [-1, -12],
      [-4, -6]
     ]
    },
@@ -407,7 +457,7 @@
   },
   {
    "nome": "abaixar",
-   "linha": 18,
+   "linha": 20,
    "quadros": 5,
    "fps": 18,
    "loop": false,
@@ -429,7 +479,7 @@
   },
   {
    "nome": "agachado",
-   "linha": 19,
+   "linha": 21,
    "quadros": 8,
    "fps": 5.1,
    "loop": true,
@@ -454,10 +504,10 @@
   },
   {
    "nome": "agachado_atirar",
-   "linha": 20,
+   "linha": 22,
    "quadros": 4,
-   "fps": 10,
-   "loop": true,
+   "fps": 20,
+   "loop": false,
    "caixa": [
     -10,
     -26,
@@ -466,16 +516,16 @@
    ],
    "pontos": {
     "mao": [
-     [18, -6],
-     [18, -6],
-     [18, -6],
+     [16, -6],
+     [17, -6],
+     [17, -6],
      [18, -6]
     ]
    }
   },
   {
    "nome": "levantar",
-   "linha": 21,
+   "linha": 23,
    "quadros": 4,
    "fps": 16,
    "loop": false,
@@ -495,42 +545,828 @@
    }
   },
   {
-   "nome": "especial",
-   "linha": 22,
-   "quadros": 16,
-   "fps": 10,
+   "nome": "especial_onca_frente_inicio",
+   "linha": 24,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -18,
+    -60,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -12],
+     [-3, -12],
+     [-7, -12],
+     [-9, -12]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_onca_frente_fim",
+   "linha": 25,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -10,
+    -63,
+    31,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [23, -18],
+     [23, -18],
+     [21, -17],
+     [14, -15],
+     [6, -13],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_onca_diag_cima_inicio",
+   "linha": 26,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -18,
+    -60,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -12],
+     [-3, -12],
+     [-7, -12],
+     [-9, -12]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_onca_diag_cima_fim",
+   "linha": 27,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -12,
+    -64,
+    25,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [17, -32],
+     [17, -32],
+     [16, -31],
+     [11, -24],
+     [5, -16],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_onca_cima_inicio",
+   "linha": 28,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -18,
+    -60,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -12],
+     [-3, -12],
+     [-7, -12],
+     [-9, -12]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_onca_cima_fim",
+   "linha": 29,
+   "quadros": 6,
+   "fps": 18,
    "loop": false,
    "caixa": [
     -17,
-    -63,
+    -64,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [2, -40],
+     [2, -40],
+     [2, -39],
+     [2, -29],
+     [2, -17],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_onca_agachado_inicio",
+   "linha": 30,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -13,
+    -36,
+    24,
+    5
+   ],
+   "pontos": {
+    "mao": [
+     [7, -2],
+     [2, -4],
+     [-2, -5],
+     [-4, -6]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_onca_agachado_fim",
+   "linha": 31,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -10,
+    -39,
+    27,
+    3
+   ],
+   "pontos": {
+    "mao": [
+     [18, -8],
+     [18, -8],
+     [18, -8],
+     [14, -5],
+     [11, -2],
+     [9, -1]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_canhao_frente_inicio",
+   "linha": 32,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -18,
+    -60,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -12],
+     [-3, -12],
+     [-7, -12],
+     [-9, -11]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_canhao_frente_loop",
+   "linha": 33,
+   "quadros": 4,
+   "fps": 16,
+   "loop": true,
+   "caixa": [
+    -12,
+    -60,
     26,
     2
    ],
    "pontos": {
     "mao": [
-     [2, -12],
-     [1, -12],
-     [-1, -12],
-     [-3, -12],
-     [-6, -12],
-     [-8, -12],
-     [-9, -12],
-     [17, -16],
-     [23, -17],
-     [23, -17],
-     [22, -17],
-     [22, -17],
-     [22, -17],
-     [17, -16],
-     [10, -14],
-     [4, -13]
+     [22, -18],
+     [23, -18],
+     [22, -18],
+     [23, -18]
     ]
    },
-   "nota": "o cabelo pega fogo e apaga; a onça sai no quadro 7"
+   "nota": "segurando o feixe"
+  },
+  {
+   "nome": "especial_canhao_frente_fim",
+   "linha": 34,
+   "quadros": 5,
+   "fps": 16,
+   "loop": false,
+   "caixa": [
+    -12,
+    -56,
+    26,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [22, -18],
+     [20, -17],
+     [13, -15],
+     [5, -13],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_canhao_diag_cima_inicio",
+   "linha": 35,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -18,
+    -60,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -12],
+     [-3, -12],
+     [-7, -12],
+     [-9, -11]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_canhao_diag_cima_loop",
+   "linha": 36,
+   "quadros": 4,
+   "fps": 16,
+   "loop": true,
+   "caixa": [
+    -13,
+    -61,
+    19,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [16, -33],
+     [16, -32],
+     [16, -33],
+     [16, -32]
+    ]
+   },
+   "nota": "segurando o feixe"
+  },
+  {
+   "nome": "especial_canhao_diag_cima_fim",
+   "linha": 37,
+   "quadros": 5,
+   "fps": 16,
+   "loop": false,
+   "caixa": [
+    -13,
+    -58,
+    20,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [16, -33],
+     [15, -30],
+     [10, -23],
+     [4, -15],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_canhao_cima_inicio",
+   "linha": 38,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -18,
+    -60,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -12],
+     [-3, -12],
+     [-7, -12],
+     [-9, -11]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_canhao_cima_loop",
+   "linha": 39,
+   "quadros": 4,
+   "fps": 16,
+   "loop": true,
+   "caixa": [
+    -15,
+    -61,
+    12,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [1, -40],
+     [1, -40],
+     [1, -40],
+     [1, -40]
+    ]
+   },
+   "nota": "segurando o feixe"
+  },
+  {
+   "nome": "especial_canhao_cima_fim",
+   "linha": 40,
+   "quadros": 5,
+   "fps": 16,
+   "loop": false,
+   "caixa": [
+    -15,
+    -59,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [1, -40],
+     [1, -37],
+     [1, -27],
+     [1, -17],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_canhao_agachado_inicio",
+   "linha": 41,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -13,
+    -36,
+    24,
+    5
+   ],
+   "pontos": {
+    "mao": [
+     [7, -2],
+     [2, -4],
+     [-2, -5],
+     [-4, -6]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_canhao_agachado_loop",
+   "linha": 42,
+   "quadros": 4,
+   "fps": 16,
+   "loop": true,
+   "caixa": [
+    -12,
+    -40,
+    22,
+    3
+   ],
+   "pontos": {
+    "mao": [
+     [18, -7],
+     [18, -7],
+     [18, -7],
+     [18, -7]
+    ]
+   },
+   "nota": "segurando o feixe"
+  },
+  {
+   "nome": "especial_canhao_agachado_fim",
+   "linha": 43,
+   "quadros": 5,
+   "fps": 16,
+   "loop": false,
+   "caixa": [
+    -12,
+    -36,
+    22,
+    3
+   ],
+   "pontos": {
+    "mao": [
+     [18, -7],
+     [17, -7],
+     [14, -5],
+     [10, -2],
+     [9, -1]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_pocao_frente_inicio",
+   "linha": 44,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -16,
+    -55,
+    13,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -15],
+     [-4, -21],
+     [-9, -27],
+     [-11, -29]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_pocao_frente_fim",
+   "linha": 45,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -10,
+    -54,
+    32,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [21, -19],
+     [18, -13],
+     [12, -6],
+     [9, -7],
+     [4, -10],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_pocao_diag_cima_inicio",
+   "linha": 46,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -18,
+    -56,
+    13,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [-1, -13],
+     [-6, -17],
+     [-11, -20],
+     [-14, -22]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_pocao_diag_cima_fim",
+   "linha": 47,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -11,
+    -55,
+    26,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [15, -33],
+     [18, -26],
+     [18, -17],
+     [15, -16],
+     [6, -13],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_pocao_cima_inicio",
+   "linha": 48,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -16,
+    -56,
+    13,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [0, -12],
+     [-4, -13],
+     [-9, -14],
+     [-11, -14]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_pocao_cima_fim",
+   "linha": 49,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -13,
+    -56,
+    17,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [1, -40],
+     [8, -37],
+     [14, -31],
+     [12, -26],
+     [5, -17],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_pocao_agachado_inicio",
+   "linha": 50,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -10,
+    -32,
+    22,
+    3
+   ],
+   "pontos": {
+    "mao": [
+     [7, -3],
+     [3, -8],
+     [-2, -13],
+     [-4, -15]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_pocao_agachado_fim",
+   "linha": 51,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -10,
+    -33,
+    30,
+    6
+   ],
+   "pontos": {
+    "mao": [
+     [18, -6],
+     [16, 0],
+     [11, 6],
+     [10, 4],
+     [9, 1],
+     [9, -1]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_bolha_frente_inicio",
+   "linha": 52,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -13,
+    -58,
+    13,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [2, -13],
+     [4, -17],
+     [5, -20],
+     [6, -22]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_bolha_frente_fim",
+   "linha": 53,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -10,
+    -63,
+    30,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [22, -18],
+     [22, -18],
+     [21, -18],
+     [14, -15],
+     [6, -13],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_bolha_diag_cima_inicio",
+   "linha": 54,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -13,
+    -58,
+    13,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [2, -13],
+     [4, -17],
+     [5, -20],
+     [6, -22]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_bolha_diag_cima_fim",
+   "linha": 55,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -11,
+    -64,
+    25,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [17, -32],
+     [17, -32],
+     [16, -31],
+     [11, -24],
+     [5, -16],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_bolha_cima_inicio",
+   "linha": 56,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -13,
+    -58,
+    13,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [2, -13],
+     [4, -17],
+     [5, -20],
+     [6, -22]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_bolha_cima_fim",
+   "linha": 57,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -15,
+    -65,
+    14,
+    2
+   ],
+   "pontos": {
+    "mao": [
+     [3, -41],
+     [3, -41],
+     [3, -39],
+     [2, -29],
+     [2, -17],
+     [1, -12]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
+  },
+  {
+   "nome": "especial_bolha_agachado_inicio",
+   "linha": 58,
+   "quadros": 4,
+   "fps": 20,
+   "loop": false,
+   "caixa": [
+    -10,
+    -32,
+    23,
+    3
+   ],
+   "pontos": {
+    "mao": [
+     [9, -2],
+     [9, -6],
+     [9, -9],
+     [9, -11]
+    ]
+   },
+   "nota": "preparo; o golpe sai quando termina"
+  },
+  {
+   "nome": "especial_bolha_agachado_fim",
+   "linha": 59,
+   "quadros": 6,
+   "fps": 18,
+   "loop": false,
+   "caixa": [
+    -10,
+    -39,
+    27,
+    3
+   ],
+   "pontos": {
+    "mao": [
+     [18, -8],
+     [18, -8],
+     [18, -8],
+     [14, -5],
+     [11, -2],
+     [9, -1]
+    ]
+   },
+   "nota": "quadro 0 = golpe saindo; depois volta à pose parada"
   },
   {
    "nome": "dano",
-   "linha": 23,
+   "linha": 60,
    "quadros": 5,
    "fps": 15,
    "loop": false,
@@ -553,7 +1389,7 @@
   },
   {
    "nome": "derrota",
-   "linha": 24,
+   "linha": 61,
    "quadros": 22,
    "fps": 8.5,
    "loop": false,

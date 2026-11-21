@@ -42,6 +42,9 @@ const PISCA_BRILHO_FIM: float = 16.0
 @export var cena_estouro: PackedScene
 
 var _aviso: float = 1.0
+## Tempo escondido antes de o aviso começar (s): a segunda onda da chuva do Expert só começa a
+## brilhar quando a primeira já está caindo.
+var _espera: float = 0.0
 var _queda: float = 0.3
 var _duracao_impacto: float = 0.15
 var _golpes: int = 2
@@ -58,8 +61,11 @@ var _pisca: float = 0.0
 @onready var _y_final_fogo: float = fogo.position.y
 
 
-func configurar(dados: MulaData) -> void:
-	_aviso = dados.aviso_meteoro
+## aviso < 0 = o aviso_meteoro dos dados (o combo do Expert passa um mais longo).
+## espera = tempo escondido (sem brilho nem sombra) antes de o aviso começar.
+func configurar(dados: MulaData, aviso: float = -1.0, espera: float = 0.0) -> void:
+	_aviso = dados.aviso_meteoro if aviso < 0.0 else aviso
+	_espera = maxf(espera, 0.0)
 	_queda = dados.duracao_queda_meteoro
 	_duracao_impacto = dados.duracao_impacto_meteoro
 	_golpes = dados.golpes_meteoro
@@ -72,9 +78,15 @@ func _ready() -> void:
 	fogo.visible = false
 	_criar_brilho()
 	_atualizar_visual()
+	visible = _espera <= 0.0
 
 
 func _physics_process(delta: float) -> void:
+	if _espera > 0.0:
+		_espera -= delta
+		if _espera > 0.0:
+			return
+		visible = true
 	_tempo += delta
 	_pisca += delta * lerpf(PISCA_BRILHO_INICIO, PISCA_BRILHO_FIM, _forca_do_aviso())
 	_atualizar_visual()

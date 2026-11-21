@@ -24,6 +24,8 @@ extends Resource
 @export_group("Geral")
 ## Vida do chefe (GDD).
 @export var vida: int = 1000
+## Vida a mais no Expert, somada à de cima. Mula: +400 (pedido do Eduardo). 0 = a mesma vida.
+@export var vida_extra_expert: int = 0
 ## Pausa entre um ataque e o próximo (s) (GDD).
 @export_range(0.0, 5.0, 0.05, "suffix:s") var pausa_entre_ataques: float = 1.2
 ## Golpes tirados do Curupira ao encostar no corpo do chefe. v1.0 (combinado): 1.
@@ -52,6 +54,11 @@ extends Resource
 @export_range(0.0, 5.0, 0.05, "suffix:s") var duracao_transicao: float = 1.2
 ## Respiro parado depois da transição, antes do primeiro combo da fase nova (s). v1.0: 0,5.
 @export_range(0.0, 3.0, 0.05, "suffix:s") var pausa_apos_transicao: float = 0.5
+
+
+## A vida do chefe na dificuldade escolhida.
+func vida_para(dificuldade: int) -> int:
+	return vida + (vida_extra_expert if dificuldade == GameState.Dificuldade.EXPERT else 0)
 
 
 ## As fases da dificuldade, da primeira à última (ordenadas pela vida em que começam).

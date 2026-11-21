@@ -5,7 +5,8 @@ extends Resource
 ##
 ## Combinado com o Eduardo:
 ##   Normal — Mula, Cuca e Boto: 1 fase; Máquina: 2 (troca na metade da vida).
-##   Expert — Mula, Cuca e Boto: 2 fases (metade); Máquina: 3 (terços).
+##   Expert — Cuca e Boto: 2 fases (metade); Máquina: 3 (terços). Mula: 1 fase com os 4 ataques,
+##            um de cada vez (sem combos), mais rápida e com +400 de vida (pedido do Eduardo).
 ## Na fase com combos, o chefe às vezes encadeia dois ataques (ComboChefe) em vez de um só.
 
 ## Fração da vida em que a fase começa. A primeira fase usa 1,0 (o começo da luta);
@@ -21,3 +22,6 @@ extends Resource
 @export_range(0.0, 1.0, 0.05) var chance_combo: float = 0.0
 ## Multiplica a pausa entre ataques do chefe nesta fase (1 = a pausa do GDD). v1.0: 1.
 @export_range(0.2, 2.0, 0.05) var fator_pausa: float = 1.0
+## Velocidade do chefe nesta fase (1 = normal; 1,15 = 15% mais rápido): avisos, animações,
+## pausas e corrida. Os projéteis que ele solta não mudam. v1.0: 1 (Mula no Expert: 1,15).
+@export_range(0.5, 2.0, 0.05) var ritmo: float = 1.0

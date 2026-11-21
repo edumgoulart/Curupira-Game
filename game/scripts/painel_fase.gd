@@ -12,13 +12,12 @@ signal lutar(id_area: String)
 signal fechou
 
 const CATALOGO: CatalogoAtaques = preload("res://dados/ataques/catalogo.tres")
-## O que cada dificuldade muda, mostrado embaixo do botão.
-const DETALHE_DIFICULDADE := [
-	"Mula, Cuca e Boto numa fase só · Máquina em duas",
-	"Duas fases e mais combos · Máquina em três",
-]
+## Quantas fases a luta tem, mostrado embaixo do botão da dificuldade (contado das fases do
+## chefe no .tres, porque muda de chefe para chefe: a Mula tem uma fase só no Expert).
+const NOMES_FASES := ["Uma fase", "Duas fases", "Três fases", "Quatro fases"]
 
 var _id_area: String = ""
+var _chefe: ChefeData
 var _basicos: Array[AtaqueData] = []
 var _especiais: Array[EspecialData] = []
 var _i_basico: int = 0
@@ -50,6 +49,7 @@ func _ready() -> void:
 ## Abre o painel do chefe da área.
 func abrir(id_area: String, chefe: ChefeData) -> void:
 	_id_area = id_area
+	_chefe = chefe
 	titulo.text = chefe.nome
 	situacao.text = _situacao(chefe)
 	_basicos.assign(CATALOGO.basicos.filter(func(a: AtaqueData) -> bool: return GameState.liberado(a.fase_que_libera)))
@@ -136,7 +136,7 @@ func _atualizar_textos() -> void:
 	var b: AtaqueData = _basicos[_i_basico]
 	var e: EspecialData = _especiais[_i_especial]
 	dificuldade.text = "Dificuldade: " + _com_setas(GameState.nome_dificuldade(), GameState.NOMES_DIFICULDADE.size())
-	detalhe_dificuldade.text = DETALHE_DIFICULDADE[GameState.dificuldade]
+	detalhe_dificuldade.text = _detalhe_dificuldade()
 	basico.text = "Básico: " + _com_setas(b.nome, _basicos.size())
 	especial.text = "Especial: " + _com_setas(e.nome, _especiais.size())
 	detalhe_basico.text = "%d de dano · %s tiros/s · +%d de carga por acerto" % [b.dano, _numero(b.tiros_por_segundo), b.carga_por_acerto]
@@ -150,6 +150,22 @@ func _atualizar_textos() -> void:
 		detalhe_especial.text = "%d de dano · chefe %d%% mais lento por %s s" % [e.dano, roundi(e.lentidao * 100.0), _numero(e.duracao_lentidao)]
 	else:
 		detalhe_especial.text = "%d de dano" % e.dano
+
+
+## O que a dificuldade escolhida muda nesta luta, lido das fases do chefe:
+## "Duas fases · mais combos", "Uma fase · mais rápido · mais vida".
+func _detalhe_dificuldade() -> String:
+	var fases: Array[FaseChefe] = _chefe.fases_para(GameState.dificuldade)
+	var n: int = clampi(fases.size(), 1, NOMES_FASES.size())
+	var partes: Array[String] = [NOMES_FASES[n - 1]]
+	if GameState.dificuldade == GameState.Dificuldade.EXPERT:
+		if fases.any(func(f: FaseChefe) -> bool: return not f.combos.is_empty() and f.chance_combo > 0.0):
+			partes.append("mais combos")
+		if fases.any(func(f: FaseChefe) -> bool: return f.ritmo > 1.0):
+			partes.append("mais rápido")
+		if _chefe.vida_extra_expert > 0:
+			partes.append("mais vida")
+	return " · ".join(partes)
 
 
 ## Setas só quando há o que escolher.

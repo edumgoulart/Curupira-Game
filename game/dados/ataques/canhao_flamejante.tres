@@ -12,4 +12,5 @@ duracao_disparo = 1.5
 pulsos = 10
 carga_necessaria = 100
 cena_projetil = ExtResource("2_feixe")
+animacao = "canhao"
 fase_que_libera = "fase1"

@@ -63,18 +63,19 @@ func tentar_atirar(direcao: int, multiplicador: float = 1.0, angulo: float = 0.0
 ## Dispara o especial. Quem confere se a barra está cheia é o Curupira.
 ## Dois tipos: projétil (sai voando, ex.: Instinto Selvagem) ou feixe preso ao Curupira
 ## (ex.: Canhão Flamejante, que fica como filho deste Atirador e anda/cai junto com ele).
-func atirar_especial(direcao: int) -> void:
+## angulo: mira em graus (0 = frente, -45 = diagonal para cima, -90 = cima).
+func atirar_especial(direcao: int, angulo: float = 0.0) -> void:
 	if especial == null:
 		return
 	var no: Node = especial.cena_projetil.instantiate()
 	if no is FeixeCanhao:
 		if not seguindo_mao:
 			position.x = _x_base * direcao
-		no.configurar(especial, float(direcao))
+		no.configurar(especial, float(direcao), angulo)
 		add_child(no)
 	else:
 		no.free()
-		var projetil: Projetil = _criar(especial.cena_projetil, especial.dano, especial.velocidade_projetil, direcao)
+		var projetil: Projetil = _criar(especial.cena_projetil, especial.dano, especial.velocidade_projetil, direcao, angulo)
 		projetil.veneno_por_segundo = especial.veneno_por_segundo
 		projetil.duracao_veneno = especial.duracao_veneno
 		projetil.lentidao = especial.lentidao

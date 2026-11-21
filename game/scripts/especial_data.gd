@@ -29,5 +29,8 @@ extends Resource
 @export var duracao_lentidao: float = 0.0
 ## Cena do especial: um Projetil (sai voando) ou um FeixeCanhao (preso ao Curupira).
 @export var cena_projetil: PackedScene
+## Gesto do Curupira ao disparar: as animações especial_<animacao>_<mira>_inicio/_loop/_fim da
+## folha (onca, canhao, pocao ou bolha). Só visual; o golpe sai quando acaba o "_inicio".
+@export var animacao: String = "onca"
 ## Fase cujo chefe libera este especial ("" = especial inicial). Ex.: "fase1" = Mula sem Cabeça.
 @export var fase_que_libera: String = ""

@@ -48,8 +48,8 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     especial cheio;
   - os tiros dos chefes saindo do lugar certo: bola da boca da Mula, feitiço da garra da Cuca, jato do bico do Boto, laser da lente da Máquina;
   - a dificuldade: trocar Normal/Expert no painel do mapa (←/→) e conferir as fases. Normal: Mula, Cuca e
-    Boto sem troca de fase, Máquina com uma troca na metade. Expert: uma troca na metade (Máquina:
-    em 2/3 e 1/3). A barra do chefe mostra os entalhes certos;
+    Boto sem troca de fase, Máquina com uma troca na metade. Expert: Cuca e Boto com uma troca na
+    metade, Máquina em 2/3 e 1/3, Mula sem troca. A barra do chefe mostra os entalhes certos;
   - a transição: o chefe termina o ataque, a tela treme e clareia, os tiros dele somem, ele faz
     a animação de 2 s (continua levando dano) e volta com um combo que tem o ataque novo;
   - a ordem dos ataques variando (não alterna mais A/B) e os combos (dois ataques emendados);
@@ -155,6 +155,41 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
   - laser e varredura da Máquina: o dano desliga na hora e o raio afina e some em 0,1 s (antes
     sumia de uma vez, no mesmo quadro do dano). No teste quadro a quadro a caixa de dano não durava
     mais que o raio; se no F6 ainda parecer que dura, dizer em que passada (reta ou no chão).
+- **Mula rebalanceada (F6 em `level1`)**, pedido do Eduardo ("o Expert tem que dificultar").
+  Passou no teste das lutas e no `verificar_desvio.gd` (agora ele testa cada dificuldade com o
+  `GameState` certo), mas ninguém jogou. Os números estão no `mula.tres` / `mula_data.gd`:
+  - **dano corrigido:** bola de fogo, fogo rastejante, bolha do Boto e nota e feitiço da Cuca às
+    vezes encostavam primeiro no corpo do Curupira (maior que a hurtbox) e sumiam sem dar dano.
+    Agora só somem no chão e na parede (`Hitbox.e_mundo`). O `game/testes/teste_dano_projeteis.gd`
+    passou 8/8 em cada caso (antes: 0 a 5 de 8). Conferir no F6 pulando, caindo e agachando;
+  - nos dois níveis: a onda de fogo do pisoteio mais rápida (650 → 800 px/s, `velocidade_onda`)
+    e crescendo conforme se afasta da Mula: com 850 px andados fica 3× maior (216 px de altura),
+    alta demais para pular, até no máximo 3,5× (`distancia_onda_longe`, `escala_onda_longe`,
+    `escala_onda_max`). Ver se dá para perceber que é preciso correr para perto da Mula. O dash
+    (invencível) ainda passa por ela, mesmo grande;
+  - nos dois níveis: as bolas com a mesma velocidade, mas o espaço entre elas sorteado de 0,35 s até o dobro,
+    0,7 s (`intervalo_bolas` e `intervalo_bolas_max`). Ver se dá para ler quando cabe pular
+    entre duas e quando é melhor pular por cima de todas ou dar dash;
+  - no Expert, uma fase só, com os 4 ataques desde o começo e sem transição; 1600 de vida
+    (`vida_extra_expert` = 400). Sem combos: um ataque de cada vez (pedido do Eduardo: com a bola
+    alta o Curupira agacha e agachado não anda, então não dava para fugir dos meteoros). O
+    painel do mapa diz "Uma fase · mais rápido · mais vida";
+  - no Expert, a Mula 15% mais rápida (`ritmo` = 1,15 na fase: avisos, animações, pausas e
+    corrida; os tiros não) e a pausa entre ataques em 0,45 (≈0,5 s). Ver se ficou rápido demais
+    para ler as poses de aviso;
+  - no Expert, 5 bolas por rajada, altas (abaixar) e baixas (pular) misturadas, com pelo menos
+    uma de cada. Pose nova no gerador (`bolas_alto` em `chefes_px.js`; `aviso_bolas_alto`,
+    `bolas_alto`, `fim_bolas_alto`, `bolas_sobe` e `bolas_desce` na folha): para a alta ela
+    abaixa menos e estica o pescoço para a frente, e troca de pose antes de cada bola que muda
+    de altura (o espaço nessa troca é no mínimo 0,55 s). A diferença entre as poses é pequena:
+    ver se dá para ler, ou se é melhor ler pela bola;
+  - no Expert, a chuva de meteoros: primeiro ela cospe uma rajada de pedras para o céu (~1,2 s,
+    2 pedras a cada 0,05 s, em leque; `lancamento_meteoros_expert`). Depois a chuva cobre a arena
+    toda, menos perto da Mula (`zona_livre_mula_expert` = 220 px), em duas ondas: a primeira a
+    cada 300 px a partir do Curupira, com os brilhos acendendo do mais perto dele ao mais longe;
+    a segunda, nos vãos, só começa a brilhar (fraco) quando a primeira começa a cair, e cai 1 s
+    depois (`aviso_segunda_onda_expert`). Ver se dá para diferenciar as duas ondas e ler onde
+    ficar;
 - **Carta de derrota (F6 em `level1..4`, perder de propósito)**, pedido do Eduardo, no estilo do
   Cuphead. Passou no `game/testes/teste_derrota.gd`, mas ninguém jogou. Observar:
   - a carta descendo; o retrato do chefe de frente, rindo (olho e fogo vermelhos do chip);
@@ -174,6 +209,24 @@ no mesmo commit. Quem deixar algo pendente para o outro, anota aqui.
     da Cuca e do Boto na câmara; o Curupira partindo ao amanhecer, com o incêndio, a mata da
     Cuca, o rio e a empresa no horizonte;
   - os textos estão em `dados/abertura.tres`, para trocar pelo inspetor.
+- **Animações de tiro e dos especiais (F6 em `level1..4`)**, pedido do Eduardo. Passou no
+  `game/testes/teste_especiais.gd`, mas ninguém jogou. Observar:
+  - o tiro: a mão dá o coice só quando sai um tiro, no ritmo do ataque (Bola de Fogo e Bolha
+    d'Água devagar, Folha rápido), e fica firme entre um tiro e outro. Com a mira travada (Shift /
+    L2) sem atirar, a mão não mexe. Correndo, ver se o coice aparece sem a passada engasgar;
+  - os quatro especiais têm gesto próprio: onça (puxa as mãos para trás e empurra rugindo), Canhão
+    (pernas abertas, mãos juntas tremendo, fumaça no fim), Poção (arma o braço e arremessa) e Bolha
+    (bolha entre as palmas e empurra). Cada um na frente, na diagonal para cima, para cima e
+    agachado. A animação antiga `especial` saiu da folha;
+  - mirando para cima ou na diagonal para cima, o especial sai nessa direção. Diagonal e cima no
+    chão: cima + frente ou só cima; agachado sai rente ao chão; o resto vai para a frente;
+  - **muda o jogo:** o golpe sai depois de um preparo de 0,2 s, e o Curupira fica parado durante
+    o especial (antes só no Canhão). A volta (~0,3 s) é interrompida por andar, pular, dash ou
+    tiro. O feixe do Canhão também espera esse preparo. Ver se ficou lento ou injusto; o tempo é o
+    fps das animações `especial_*` (gerador, `ESPECIAIS_PX` em `poses_px.js`);
+  - o feixe do Canhão na diagonal é a arte girada (como o laser da Máquina); ver se fica feio;
+  - no ar o especial usa a mesma pose de pé (cai junto, como o Canhão já fazia);
+  - a onça para cima e na diagonal tem desenho próprio (`onca_cima`, `onca_diag_cima`).
 - **Decisões da v1.0 (GDD e TDD), para conferir no F6:**
   - a trava de mira no **L2** do controle (o Shift continua no teclado);
   - o jogo abrindo em **tela cheia**;

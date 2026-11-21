@@ -77,13 +77,6 @@ function poseAbaixarPx(p, t) {
   return pose;
 }
 
-// especial: o cabelo pega fogo enquanto carrega, queima no grito e apaga depois
-function poseEspecialPx(p, t) {
-  const pose = poseEspecial(p, t);
-  pose.chamas = p < 0.38 ? suave(trecho(p, 0.06, 0.34)) : p < 0.72 ? 1 : 1 - suave(trecho(p, 0.72, 0.96));
-  return pose;
-}
-
 /* ---------- mira em 8 direções ----------
    O braço de tiro é o mesmo do ataque de lado, girado em volta do ombro. Para cima o corpo
    inclina um pouco para trás; para baixo, um pouco para a frente. */
@@ -118,6 +111,205 @@ function poseArAtirarPx(p, t, ang) {
   };
 }
 
+/* ---------- especiais ----------
+   Cada especial tem um gesto próprio e sai na mira: frente (0), diagonal para cima (-45) ou cima (-90).
+   Partes: "inicio" (preparo; o golpe sai logo depois do último quadro), "loop" (só o Canhão: segura
+   o feixe enquanto ele dura) e "fim" (o quadro 0 é o golpe saindo; depois a volta à pose parada).
+   O cabelo pega fogo no preparo, queima no golpe e apaga na volta (GDD).
+     onca:   puxa as mãos para trás do quadril juntando energia dourada e empurra as duas palmas, rugindo;
+     canhao: abre bem as pernas, junta fogo atrás do quadril e segura o feixe com as mãos juntas, tremendo;
+     pocao:  a poção aparece na mão, ele arma o braço para trás e arremessa;
+     bolha:  segura uma bolha d'água entre as palmas na frente do peito e empurra. */
+const ESPECIAIS_PX = {
+  onca:   { nome: 'Instinto Selvagem', inicio: 4, fim: 6, fpsInicio: 20, fpsFim: 18 },
+  canhao: { nome: 'Canhão Flamejante', inicio: 4, loop: 4, fim: 5, fpsInicio: 20, fpsLoop: 16, fpsFim: 16 },
+  pocao:  { nome: 'Poção Maldita', inicio: 4, fim: 6, fpsInicio: 20, fpsFim: 18 },
+  bolha:  { nome: 'Bolha Abissal', inicio: 4, fim: 6, fpsInicio: 20, fpsFim: 18 }
+};
+const MIRAS_ESPECIAL = { frente: 0, diag_cima: -45, cima: -90 };
+// ponto a (x, y) de "o" no referencial da mira (x = para onde a mira aponta)
+const naMira = (o, ang, x, y) => soma(o, rot(pt(x, y), ang));
+const polar = (o, ang, r) => soma(o, pt(Math.cos(ang * Math.PI / 180) * r, Math.sin(ang * Math.PI / 180) * r));
+
+// golpe saindo com as duas palmas na mira (onça e bolha); "forca" 1 = inclinado com tudo
+function posePalmas(ang, forca, tipo) {
+  const cima = -ang / 90;
+  const q0 = pt(mix(8, 2, cima) * forca, mix(-51, -46, forca)), inc = mix(3, mix(15, -7, cima), forca), o = ombrosDe(q0, inc);
+  const maos = [naMira(o.longe, ang, 62, 8), naMira(o.perto, ang, 70, 14)];
+  return {
+    quadril: q0, inclina: inc, pes: [pe(mix(-9, -20, forca)), pe(mix(11, 22, forca))],
+    maos, formaMao: ['palma', 'palma'], angMao: [ang - 80, ang - 80], bracoL: [70, 76],
+    cabeca: { dx: 2 * forca, dy: ang < 0 ? -1.5 : 0, inc: -4 * forca }, giro: 0.55, olhar: ang < 0 ? 0.4 : 0,
+    ex: 'furioso', vento: [-1.2 * forca, -1.6], saia: 6 * forca,
+    estouro: { c: naMira(lerp(maos[0], maos[1], 0.5), ang, 8, 0), tipo: tipo === 'bolha' ? 'agua' : tipo }
+  };
+}
+// volta à pose parada a partir de "golpe": u de 0 (golpe) a 1 (parado)
+function voltaEspecial(golpe, u, t, k) {
+  const r = suave(trecho(u, 0.3, 1));
+  const pose = mixPose(golpe, { ...poseParado(0.25, t), ex: 'oba' }, r);
+  pose.ex = r < 0.15 ? golpe.ex : r < 0.7 ? 'determinado' : 'oba';
+  pose.formaMao = r < 0.6 ? golpe.formaMao : ['punho', 'punho'];
+  pose.angMao = golpe.angMao;
+  pose.chamas = 1 - suave(trecho(u, 0.25, 1));
+  pose.estouro = k === 0 ? golpe.estouro : k === 1 && golpe.estouro ? { ...golpe.estouro, fraco: true } : null;
+  return pose;
+}
+
+function poseEspecialTipo(tipo, ang, parte, k, t) {
+  const E = ESPECIAIS_PX[tipo], cima = -ang / 90, parado = poseParado(0.25, t);
+  const treme = (k % 2 ? 1 : -1);
+  if (parte === 'inicio') {
+    const e = suave((k + 1) / E.inicio), chamas = 0.15 + 0.85 * e;
+    if (tipo === 'onca' || tipo === 'canhao') {
+      const canhao = tipo === 'canhao';
+      const q0 = pt(mix(0, canhao ? -8 : -6, e) + (e > 0.6 ? treme * 0.8 : 0), mix(-51, canhao ? -42 : -44, e)), inc = mix(3, canhao ? -6 : -10, e), o = ombrosDe(q0, inc);
+      const armada = [soma(o.longe, pt(-14, 30)), soma(o.perto, pt(-18, 33))];
+      const maos = armada.map((a, i) => lerp(parado.maos[i], a, e));
+      return {
+        quadril: q0, inclina: inc, pes: [pe(mix(-9, canhao ? -26 : -20, e)), pe(mix(11, canhao ? 26 : 22, e))],
+        maos, formaMao: ['palma', 'palma'], angMao: [-30, -30], bracoL: [46, 46],
+        cabeca: { inc: 4 * e, dy: ang < 0 ? -1 : 0 }, olhar: ang < 0 ? 0.4 : 0, ex: 'bravo', saia: -4 * e,
+        vento: [0, mix(-0.8, -1.8, e)], chamas, energia: { c: lerp(maos[0], maos[1], 0.5), r: 3 + (canhao ? 11 : 10) * e, tipo: canhao ? 'fogo' : 'onca' }
+      };
+    }
+    if (tipo === 'pocao') {
+      const q0 = pt(mix(0, -4, e), mix(-51, -48, e)), inc = mix(3, -10, e), o = ombrosDe(q0, inc);
+      const mao = lerp(parado.maos[1], polar(o.perto, ang - 135, 40), e);
+      const mira = lerp(parado.maos[0], naMira(o.longe, ang, 50, 0), e);
+      return {
+        quadril: q0, inclina: inc, pes: [pe(-12), pe(mix(11, 15, e), -5 * e, 12 * e)],
+        maos: [mira, mao], formaMao: ['palma', 'punho'], angMao: [ang - 80, -90], bracoL: [52, 46],
+        cabeca: { inc: 3 * e, dy: ang < 0 ? -1.5 : 0 }, giro: 0.55, olhar: ang < 0 ? 0.4 : 0,
+        ex: k < 2 ? 'convencido' : 'determinado', saia: -3 * e, chamas, frasco: { c: mao, brilho: k % 2 }
+      };
+    }
+    // bolha: as palmas seguram a bolha na frente do peito, uma em cima e outra embaixo
+    const q0 = pt(mix(0, -3, e), mix(-51, -47, e)), inc = mix(3, -4, e), o = ombrosDe(q0, inc);
+    const c = soma(o.perto, pt(28, 14)), rr = 7 + 9 * e;
+    const maos = [lerp(parado.maos[0], soma(c, pt(-3, rr)), e), lerp(parado.maos[1], soma(c, pt(1, -rr)), e)];
+    return {
+      quadril: q0, inclina: inc, pes: [pe(mix(-9, -14, e)), pe(mix(11, 16, e))],
+      maos, formaMao: ['palma', 'palma'], angMao: [-90, 90], bracoL: [52, 50],
+      cabeca: { inc: 2 * e, dy: 1 }, giro: 0.55, ex: 'determinado', saia: -2 * e, vento: [0, -1.2], chamas,
+      energia: { c, r: 4 + 10 * e, tipo: 'agua' }
+    };
+  }
+  if (parte === 'loop') {
+    // Canhão segurando o feixe: mãos juntas na mira, corpo tremendo com o tranco
+    const q0 = pt(mix(6, 0, cima) + treme * 1.2, -43 + (k % 2) * 0.6), inc = mix(14, -6, cima) - (k % 2) * 1.5, o = ombrosDe(q0, inc);
+    return {
+      quadril: q0, inclina: inc, pes: [pe(-26), pe(24)],
+      maos: [naMira(o.longe, ang, 70, 9), naMira(o.perto, ang, 72, 10)], formaMao: ['palma', 'palma'], angMao: [ang - 80, ang - 80], bracoL: [70, 72],
+      cabeca: { dx: 2, dy: ang < 0 ? -1.5 : 0, inc: -4 }, giro: 0.55, olhar: ang < 0 ? 0.4 : 0, ex: 'furioso', chamas: 1,
+      vento: [mix(-2.4, -0.8, cima), mix(-0.4, 0.5, cima)], saia: 18 + (k % 2) * 6, agita: 2
+    };
+  }
+  // fim: o quadro 0 é o golpe saindo
+  const u = k / (E.fim - 1);
+  if (tipo === 'onca' || tipo === 'bolha') return voltaEspecial(posePalmas(ang, tipo === 'onca' ? 1 : 0.8, tipo), u, t, k);
+  if (tipo === 'canhao') {
+    const golpe = poseEspecialTipo('canhao', ang, 'loop', 0, t);
+    golpe.estouro = null;
+    const pose = voltaEspecial(golpe, mix(0.25, 1, u), t, 9);
+    pose.fumaca = { c: lerp(golpe.maos[0], golpe.maos[1], 0.5), u };
+    pose.chamas = 1 - suave(u);
+    return pose;
+  }
+  // poção: o braço passa da mira e desce (continuação do arremesso), depois volta
+  const giro = ang + 55 * suave(trecho(u, 0, 0.45));
+  const q0 = pt(mix(6, 1, cima), -48), inc = mix(14, -4, cima), o = ombrosDe(q0, inc);
+  const golpe = {
+    quadril: q0, inclina: inc, pes: [pe(-14), pe(19)],
+    maos: [soma(o.longe, pt(-30, 16)), polar(o.perto, giro + 8, 66)], formaMao: ['punho', 'palma'], angMao: [-90, giro - 80], bracoL: [50, 70],
+    cabeca: { dx: 2, dy: ang < 0 ? -1.5 : 0, inc: -3 }, giro: 0.55, olhar: ang < 0 ? 0.4 : 0, ex: 'determinado', saia: 8,
+    estouro: { c: polar(o.perto, ang + 8, 80), tipo: 'veneno' }
+  };
+  return voltaEspecial(golpe, trecho(u, 0.2, 1), t, k);
+}
+/* Agachado: o mesmo gesto de cada especial, com o corpo comprimido e o golpe saindo para a frente,
+   rente ao chão (como o tiro agachado). A volta termina na pose agachada, não de pé. */
+function poseEspecialAgachado(tipo, parte, k, t) {
+  const E = ESPECIAIS_PX[tipo], treme = (k % 2 ? 1 : -1);
+  const corpo = (cabecaAlta, tremendo = 0) => {
+    const base = agachadoPx(t, 0, 0, cabecaAlta);
+    base.quadril = soma(base.quadril, pt(tremendo, 0));
+    const Tc = E5.tronco * 0.6;
+    return { base, perto: soma(base.quadril, rot(pt(-3, -Tc + 9), base.inclina)), longe: soma(base.quadril, rot(pt(-7, -Tc + 8), base.inclina)) };
+  };
+  const golpePalmas = (tipoGolpe) => {
+    const est = tipoGolpe === 'bolha' ? 'agua' : tipoGolpe;
+    const { base, perto, longe } = corpo(true);
+    const maos = [soma(longe, pt(56, 4)), soma(perto, pt(62, 2))];
+    return { ...base, maos, formaMao: ['palma', 'palma'], angMao: [-80, -80], bracoL: [62, 66], ex: 'furioso', saia: -18, vento: [-1.4, -0.6],
+      estouro: est ? { c: soma(lerp(maos[0], maos[1], 0.5), pt(8, 0)), tipo: est } : null };
+  };
+  const volta = (golpe, u, kk) => {
+    const r = suave(trecho(u, 0.3, 1));
+    const pose = mixPose(golpe, agachadoPx(t), r);
+    pose.comprime = 1;
+    pose.ex = r < 0.15 ? golpe.ex : 'determinado';
+    pose.formaMao = golpe.formaMao; pose.angMao = golpe.angMao;
+    pose.chamas = 1 - suave(trecho(u, 0.25, 1));
+    pose.estouro = kk === 0 ? golpe.estouro : kk === 1 && golpe.estouro ? { ...golpe.estouro, fraco: true } : null;
+    return pose;
+  };
+  if (parte === 'inicio') {
+    const e = suave((k + 1) / E.inicio), chamas = 0.15 + 0.85 * e;
+    const { base, perto, longe } = corpo(false, e > 0.6 && tipo !== 'pocao' ? treme * 0.6 : 0);
+    const inicio = { ...base, ex: 'bravo', chamas, saia: -14 - 3 * e };
+    if (tipo === 'onca' || tipo === 'canhao') {
+      // mãos puxadas para trás, rente ao quadril, juntando energia
+      const maos = [lerp(base.maos[0], soma(base.quadril, pt(-12, -2)), e), lerp(base.maos[1], soma(base.quadril, pt(-8, -4)), e)];
+      return { ...inicio, maos, formaMao: ['palma', 'palma'], angMao: [-30, -30],
+        energia: { c: lerp(maos[0], maos[1], 0.5), r: 3 + 9 * e, tipo: tipo === 'canhao' ? 'fogo' : 'onca' } };
+    }
+    if (tipo === 'pocao') {
+      // a poção sobe para trás da cabeça; a outra mão aponta para a frente
+      const mao = lerp(base.maos[1], soma(perto, pt(-18, -24)), e), mira = lerp(base.maos[0], soma(longe, pt(46, 4)), e);
+      return { ...inicio, maos: [mira, mao], formaMao: ['palma', 'punho'], angMao: [-80, -90], bracoL: [50, 44], ex: k < 2 ? 'convencido' : 'determinado', frasco: { c: mao, brilho: k % 2 } };
+    }
+    // bolha entre as palmas, na frente do rosto
+    const c = soma(perto, pt(26, 4)), rr = 6 + 8 * e;
+    return { ...inicio, ex: 'determinado', maos: [lerp(base.maos[0], soma(c, pt(-3, rr)), e), lerp(base.maos[1], soma(c, pt(1, -rr)), e)],
+      formaMao: ['palma', 'palma'], angMao: [-90, 90], bracoL: [50, 48], energia: { c, r: 4 + 9 * e, tipo: 'agua' } };
+  }
+  if (parte === 'loop') {
+    const { base, perto, longe } = corpo(true, treme * 1.0);
+    return { ...base, maos: [soma(longe, pt(60, 6)), soma(perto, pt(62, 4))], formaMao: ['palma', 'palma'], angMao: [-80, -80], bracoL: [66, 66],
+      ex: 'furioso', chamas: 1, vento: [-2.4, -0.4], saia: -18 - (k % 2) * 4, agita: 2 };
+  }
+  const u = k / (E.fim - 1);
+  if (tipo === 'onca' || tipo === 'bolha') return volta(golpePalmas(tipo), u, k);
+  if (tipo === 'canhao') {
+    const golpe = poseEspecialAgachado('canhao', 'loop', 0, t);
+    const pose = volta(golpe, mix(0.25, 1, u), 9);
+    pose.fumaca = { c: lerp(golpe.maos[0], golpe.maos[1], 0.5), u };
+    pose.chamas = 1 - suave(u);
+    return pose;
+  }
+  // poção: arremessa para a frente e o braço desce até o chão
+  const { base, perto, longe } = corpo(true);
+  const giro = 8 + 50 * suave(trecho(u, 0, 0.45));
+  const golpe = { ...base, maos: [soma(longe, pt(-20, 10)), polar(perto, giro, 62)], formaMao: ['punho', 'palma'], angMao: [-90, giro - 80], bracoL: [44, 66],
+    ex: 'determinado', saia: -18, estouro: { c: polar(perto, 8, 76), tipo: 'veneno' } };
+  return volta(golpe, trecho(u, 0.2, 1), k);
+}
+// pose de um quadro do especial; mira = 'frente' | 'diag_cima' | 'cima' | 'agachado'
+function poseEspecialMira(tipo, mira, parte, k, t) {
+  return mira === 'agachado' ? poseEspecialAgachado(tipo, parte, k, t) : poseEspecialTipo(tipo, MIRAS_ESPECIAL[mira], parte, k, t);
+}
+// a sequência inteira (preparo, golpe e volta) numa só, para a página do gerador
+function poseEspecialSeq(tipo, mira, p, t) {
+  const E = ESPECIAIS_PX[tipo], nl = E.loop ? E.loop * 3 : 0, n = E.inicio + nl + E.fim;
+  const k = Math.min(n - 1, Math.floor(p * n));
+  const pose = k < E.inicio ? poseEspecialMira(tipo, mira, 'inicio', k, t)
+    : k < E.inicio + nl ? poseEspecialMira(tipo, mira, 'loop', (k - E.inicio) % E.loop, t)
+      : poseEspecialMira(tipo, mira, 'fim', k - E.inicio - nl, t);
+  pose.rotulo = E.nome;
+  return pose;
+}
+
 /* ---------- dano ----------
    Leva o golpe: tranco para trás, cabeça jogada para trás, cabelo arrepiado, braços abertos e
    olhos apertados; depois amortece nos joelhos e volta à pose parada. k = 0 (golpe) .. 4 (recuperado). */
@@ -148,7 +340,19 @@ function poseDanoPx(k, t) {
 
 const ANIMS_PX = ANIMS.flatMap(A => {
   if (A.id === 'parado') return [{ ...A, desc: 'Respira e balança no lugar. O cabelo é vermelho e só mexe com o corpo.' }];
-  if (A.id === 'especial') return [{ ...A, pose: poseEspecialPx, desc: 'Carrega a energia, o cabelo pega fogo, ele grita e solta a onça. Depois o fogo apaga.' }];
+  if (A.id === 'especial') return Object.entries(ESPECIAIS_PX).map(([tipo, E]) => {
+    const n = E.inicio + (E.loop ? E.loop * 3 : 0) + E.fim;
+    const ciclo = E.inicio / E.fpsInicio + (E.loop ? E.loop * 3 / E.fpsLoop : 0) + E.fim / E.fpsFim;
+    return {
+      ...A, id: 'especial_' + tipo, nome: 'Especial: ' + E.nome, godot: `especial_${tipo}_<mira>_inicio/fim`, ciclo, n,
+      onca: tipo === 'onca' ? E.inicio / n : undefined,
+      pose: (p, t) => poseEspecialSeq(tipo, 'frente', p, t),
+      desc: { onca: 'Puxa as mãos para trás juntando energia dourada e empurra as duas palmas, rugindo: sai a onça.',
+        canhao: 'Abre as pernas, junta fogo atrás do quadril e segura o feixe com as mãos juntas, tremendo. No fim sai fumaça das mãos.',
+        pocao: 'A poção aparece na mão, ele arma o braço para trás e arremessa.',
+        bolha: 'Segura uma bolha d\'água entre as palmas na frente do peito e empurra.' }[tipo] + ' Sai também na diagonal para cima, para cima e agachado.'
+    };
+  });
   if (A.id === 'pular') return [
     { ...A, pose: (p, t) => posePularPx(p, t), desc: 'Mesma altura e tempo do GDD. Pulo contido: joelho sobe, braços perto do corpo, sem agitar. Para atirar no ar, veja as cinco animações "No ar, atirando".' }
   ];

@@ -73,22 +73,46 @@ function exportarCurupira() {
   const D = s => [poseDash(s / 1.4, s), s];
   porPoses('dash', [0.12, 0.17, 0.22, 0.27].map(D), 20, true, '0,2 s, como no GDD');
   porPoses('freio', [0.31, 0.36, 0.42, 0.48].map(D), 16, false);
-  // atirar: parado, nas quatro direções do chão
-  porAnim('atacar', 'atirar', { nota: 'para a frente' });
-  porAnim('atirar_diag_cima', 'atirar_diag_cima');
-  porAnim('atirar_cima', 'atirar_cima');
-  porAnim('atirar_diag_baixo', 'atirar_diag_baixo', { nota: 'no chão, só com a mira travada' });
-  porAnim('atacar_correndo', 'correr_atirar');
-  porAnim('correr_atirar_diag_cima', 'correr_atirar_diag_cima');
+  // Tiros: o braço fica esticado e o jogo recomeça o coice a cada tiro, no ritmo do ataque equipado
+  // (Tiro de Folha 5/s, Bolha d'Água 0,8/s...). Sem atirar (mira travada, cadência lenta) fica firme
+  // no último quadro. Quadros: coice forte, médio, fraco e firme.
+  const COICES = [1, 0.55, 0.2, 0];
+  const porCoice = (id, nome, nota) => {
+    const A = ANIMS_PX.find(a => a.id === id);
+    porPoses(nome, COICES.map((c, k) => { COICE_FORCADO = c; const t = k * 0.05, r = [A.pose(0, t), t]; COICE_FORCADO = null; return r; }), 20, false, nota);
+  };
+  porCoice('atacar', 'atirar', 'coice de um tiro; o jogo recomeça a cada tiro e para no último quadro (firme)');
+  porCoice('atirar_diag_cima', 'atirar_diag_cima');
+  porCoice('atirar_cima', 'atirar_cima');
+  porCoice('atirar_diag_baixo', 'atirar_diag_baixo', 'no chão, só com a mira travada');
+  // correndo as pernas não podem parar: o braço fica firme e, a cada tiro, o jogo troca por uns
+  // instantes para a versão "_coice", no mesmo quadro das pernas
+  const porCorrida = (id, nome) => {
+    const A = ANIMS_PX.find(a => a.id === id), n = NQ_EXP[id];
+    for (const [c, suf] of [[0, ''], [0.8, '_coice']]) {
+      COICE_FORCADO = c;
+      porPoses(nome + suf, Array.from({ length: n }, (_, k) => { const p = k / n, t = p * A.ciclo; return [A.pose(p, t), t]; }), n / A.ciclo, true, suf ? 'mesmas pernas, braço no coice do tiro' : 'braço firme');
+      COICE_FORCADO = null;
+    }
+  };
+  porCorrida('atacar_correndo', 'correr_atirar');
+  porCorrida('correr_atirar_diag_cima', 'correr_atirar_diag_cima');
   // no ar: cinco direções, a mesma pose para subir e cair
-  for (const k of ['cima', 'diag_cima', 'lado', 'diag_baixo', 'baixo']) porAnim('ar_atirar_' + k, 'ar_atirar_' + k, { nota: k === 'baixo' ? 'para baixo só existe no ar' : undefined });
+  for (const k of ['cima', 'diag_cima', 'lado', 'diag_baixo', 'baixo']) porCoice('ar_atirar_' + k, 'ar_atirar_' + k, k === 'baixo' ? 'para baixo só existe no ar' : undefined);
   // agachar: descer, ficar, atirar, levantar
   const AB = ANIMS_PX.find(a => a.id === 'abaixar');
   porPoses('abaixar', [0, 0.025, 0.05, 0.08, 0.11].map(p => [AB.pose(p, p * AB.ciclo), p * AB.ciclo]), 18, false);
   porPoses('agachado', Array.from({ length: 8 }, (_, k) => { const t = k / 8 * (TAU / 4); return [agachadoPx(t), t]; }), 5.1, true);
-  porAnim('agachado_atirar', 'agachado_atirar');
+  porCoice('agachado_atirar', 'agachado_atirar');
   porPoses('levantar', [0.87, 0.91, 0.95, 0.99].map(p => [AB.pose(p, p * AB.ciclo), p * AB.ciclo]), 16, false);
-  porAnim('especial', 'especial', { loop: false, nota: 'o cabelo pega fogo e apaga; a onça sai no quadro 7' });
+  // especiais: cada um com o seu gesto, na frente, na diagonal para cima, para cima e agachado.
+  // O golpe sai quando acaba o "inicio"; o Canhão segura o "loop" enquanto o feixe dura.
+  for (const [tipo, E] of Object.entries(ESPECIAIS_PX)) for (const mira of [...Object.keys(MIRAS_ESPECIAL), 'agachado']) {
+    const base = `especial_${tipo}_${mira}`, lista = (parte, n, fps) => Array.from({ length: n }, (_, k) => { const t = k / fps; return [poseEspecialMira(tipo, mira, parte, k, t), t]; });
+    porPoses(base + '_inicio', lista('inicio', E.inicio, E.fpsInicio), E.fpsInicio, false, 'preparo; o golpe sai quando termina');
+    if (E.loop) porPoses(base + '_loop', lista('loop', E.loop, E.fpsLoop), E.fpsLoop, true, 'segurando o feixe');
+    porPoses(base + '_fim', lista('fim', E.fim, E.fpsFim), E.fpsFim, false, 'quadro 0 = golpe saindo; depois volta à pose parada');
+  }
   porPoses('dano', [0, 1, 2, 3, 4].map(k => { const t = 0.1 + k / 15; return [poseDanoPx(k, t), t]; }), 15, false, 'tranco para trás e volta (0,33 s); o código pisca o sprite durante a invencibilidade');
   porAnim('derrota', 'derrota', { loop: false });
   montarFolha('curupira', pt(OX, OY), anims);
@@ -97,10 +121,16 @@ function exportarCurupira() {
     const nome = 'folha_' + { '-90': 'cima', '-45': 'diag_cima', 0: 'lado', 45: 'diag_baixo', 90: 'baixo' }[a];
     efeito('curupira', nome, [0, 0.06].map(t => folhaDirecao(a, t)), 12, true, [7, 7], 'olhando para a direita; espelhar para a esquerda');
   }
-  efeito('curupira', 'onca', [0, 0.07].map(t => oncaPixel(t)), 12, true, [10, 10]);
+  // onça do Instinto Selvagem nas três miras do especial, todas no mesmo recorte (mesmo centro)
+  const oncaEm = (t, ang) => {
+    const cam = nova(); cam.colar(oncaPixel(t), C0.x - 10, C0.y - 10);
+    return ang === -90 ? girar90(cam, 3) : ang ? girarLivre(cam, ang) : cam;
+  };
+  efeitosJuntos('curupira', [['onca', 0], ['onca_diag_cima', -45], ['onca_cima', -90]].map(([nome, ang]) =>
+    [nome, [0, 0.07].map(t => oncaEm(t, ang)), 12, true, 'olhando para a direita; espelhar para a esquerda']));
   efeito('curupira', 'acerto', seq(6, (c, x, y, u, k) => acertoPx(c, x, y, u, k)), 20, false, [C0.x, C0.y], 'onde o tiro bate no chefe; simétrico, não gira');
 }
-const NQ_EXP = { parado: 12, correr: 6, atacar: 4, atacar_correndo: 6, especial: 16, derrota: 22, atirar_cima: 4, atirar_diag_cima: 4, atirar_diag_baixo: 4, correr_atirar_diag_cima: 6, agachado_atirar: 4, ar_atirar_cima: 4, ar_atirar_diag_cima: 4, ar_atirar_lado: 4, ar_atirar_diag_baixo: 4, ar_atirar_baixo: 4 };
+const NQ_EXP = { parado: 12, correr: 6, atacar: 4, atacar_correndo: 6, derrota: 22, atirar_cima: 4, atirar_diag_cima: 4, atirar_diag_baixo: 4, correr_atirar_diag_cima: 6, agachado_atirar: 4, ar_atirar_cima: 4, ar_atirar_diag_cima: 4, ar_atirar_lado: 4, ar_atirar_diag_baixo: 4, ar_atirar_baixo: 4 };
 
 /* ---------- efeitos (quadros soltos) ---------- */
 function efeito(pasta, nome, camadas, fps, loop, centro, nota) {
@@ -110,6 +140,28 @@ function efeito(pasta, nome, camadas, fps, loop, centro, nota) {
   const W = x1 - x0 + 1, H = y1 - y0 + 1;
   const quadros = camadas.map(c => { const t = document.createElement('canvas'); t.width = W; t.height = H; t.getContext('2d').drawImage(c.paraTela(), x0, y0, W, H, 0, 0, W, H); return png(t); });
   saida.efeitos[pasta + '/' + nome] = { pasta, nome, fps, loop, tamanho: [W, H], centro: [centro[0] - x0, centro[1] - y0], quadros, ...(nota ? { nota } : {}) };
+}
+// vários efeitos recortados na mesma caixa (o centro fica no mesmo pixel em todos): lista de
+// [nome, camadas, fps, loop, nota], desenhados em volta de C0
+function efeitosJuntos(pasta, lista) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const [, camadas] of lista) for (const c of camadas) if (c.x1 >= 0) { x0 = Math.min(x0, c.x0); y0 = Math.min(y0, c.y0); x1 = Math.max(x1, c.x1); y1 = Math.max(y1, c.y1); }
+  const W = x1 - x0 + 1, H = y1 - y0 + 1;
+  for (const [nome, camadas, fps, loop, nota] of lista) {
+    const quadros = camadas.map(c => { const t = document.createElement('canvas'); t.width = W; t.height = H; t.getContext('2d').drawImage(c.paraTela(), x0, y0, W, H, 0, 0, W, H); return png(t); });
+    saida.efeitos[pasta + '/' + nome] = { pasta, nome, fps, loop, tamanho: [W, H], centro: [C0.x - x0, C0.y - y0], quadros, ...(nota ? { nota } : {}) };
+  }
+}
+// gira uma camada desenhada em volta de C0 (graus, negativo = anti-horário na tela), pixel mais
+// perto: só para efeitos de energia, que não têm contorno fino para quebrar
+function girarLivre(cam, graus) {
+  const n = nova(), r = -graus * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+  for (const [x, y] of cam.pixels(12)) {
+    const dx = x + 0.5 - C0.x, dy = y + 0.5 - C0.y;
+    const cor = cam.get(Math.floor(C0.x + dx * c - dy * s), Math.floor(C0.y + dx * s + dy * c));
+    if (cor) n.set(x, y, cor);
+  }
+  return n;
 }
 // desenha um efeito centrado no meio da arena e devolve a camada
 const C0 = pt(240, 135);
@@ -156,6 +208,11 @@ function exportarMula() {
     ['aviso_bolas', 'bolas', 0, 0.5, 12, false, { ajuste: aj, nota: 'abaixa o peito até a altura das bolas' }],
     ['bolas', 'bolas', 0.55, 1.0, 12, true, { ajuste: aj, nota: 'um coice por bola: recomeçar a cada tiro' }],
     ['fim_bolas', 'bolas', 2.0, 2.5, 12, false, { ajuste: aj }],
+    ['aviso_bolas_alto', 'bolas_alto', 0, 0.5, 12, false, { ajuste: aj, nota: 'Expert: abaixa só um pouco, pescoço esticado para a frente (bola na altura do peito)' }],
+    ['bolas_alto', 'bolas_alto', 0.55, 1.0, 12, true, { ajuste: aj, nota: 'um coice por bola alta: recomeçar a cada tiro' }],
+    ['fim_bolas_alto', 'bolas_alto', 2.0, 2.5, 12, false, { ajuste: aj }],
+    ['bolas_sobe', 'bolas_troca', 0, 0.25, 12, false, { ajuste: aj, nota: 'no meio da rajada: da pose baixa para a alta' }],
+    ['bolas_desce', 'bolas_troca', 0.25, 0.5, 12, false, { ajuste: aj, nota: 'no meio da rajada: da pose alta para a baixa' }],
     ['aviso_pisoteio', 'pisoteio', 0, 0.55, 12, false, { ajuste: aj }],
     ['pisoteio_alto', 'pisoteio', 0.55, 0.85, 12, true, { ajuste: aj, nota: 'segura no alto tremendo; dura o resto do aviso' }],
     ['pisoteio', 'pisoteio', 0.85, 1.5, 12, false, { ajuste: aj, nota: 'a onda de fogo sai no quadro 2' }],

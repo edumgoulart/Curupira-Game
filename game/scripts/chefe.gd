@@ -135,7 +135,7 @@ func _ready() -> void:
 	_timer_lentidao.timeout.connect(_fim_lentidao)
 	add_child(_timer_lentidao)
 	vida.zerou.connect(_ao_zerar_vida)
-	vida.configurar(dados.vida)
+	vida.configurar(dados.vida_para(GameState.dificuldade))
 	contato.dano = dados.golpes_contato
 	FolhaSprites.preparar(sprite)
 	_pos_sprite_base = sprite.position
@@ -532,9 +532,10 @@ func esta_lento() -> bool:
 
 ## Multiplicador do relógio do chefe: 1 = normal; 0,6 = 40% mais lento (Bolha Abissal).
 ## Cada chefe multiplica o delta por isto: pausas, avisos, pulos e cadência ficam mais lentos.
+## O ritmo da fase acelera tudo do mesmo jeito (Mula no Expert).
 ## Projéteis que o chefe já soltou não são afetados.
 func fator_tempo() -> float:
-	return 1.0 - _lentidao if esta_lento() else 1.0
+	return (1.0 - _lentidao if esta_lento() else 1.0) * fase_atual().ritmo
 
 
 func _cor_base() -> Color:

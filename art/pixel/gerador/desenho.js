@@ -436,18 +436,76 @@ function curupiraPixel(pose, t, piscando = false, virados = false, exForcada = '
   cabeloPx(cam, hx, hy, t, pose.vento || v.vento, pose.agita ?? 1);
   const pontas = pose.chamas > 0.05 ? cabeloFogo(cam, hx, hy, t, ex.fogo, pose.vento || v.vento, pose.chamas) : [];
   rostoPixel(cam, hx, hy, ex, t, piscando, pose.olhar);
-  // 9. bola de energia do especial
-  if (pose.energia) {
-    const c = P(pose.energia.c), r = pose.energia.r * SM * 1.3 + 0.6;
-    cam.disco(c.x, c.y, r + 1.2 + Math.sin(t * 40) * 0.4, PM.fogo3);
-    cam.disco(c.x, c.y, r, PM.fogo5);
-    cam.disco(c.x, c.y, Math.max(0.6, r * 0.5), PM.fogo6);
-  }
+  // 9. bola de energia do especial, na cor do elemento
+  if (pose.energia) energiaEspecialPx(cam, P(pose.energia.c), pose.energia.r * SM * 1.3 + 0.6, pose.energia.tipo, t);
   // 10. braço da frente
   parte = membroPx(o.perto, maoP, bl[1], cot[1], 2.8, corFrente);
   mao(parte, maoP, formas[1], MAPA_PELE);
   cam.colar(parte.contornar(PM.peleO));
+  // 11. na mão e na frente de tudo: a poção, o estouro do golpe e a fumaça do canhão
+  if (pose.frasco) frascoEspecialPx(cam, P(pose.frasco.c), pose.frasco.brilho);
+  if (pose.estouro) estouroPx(cam, P(pose.estouro.c), pose.estouro.tipo, pose.estouro.fraco);
+  if (pose.fumaca) fumacaMaosPx(cam, P(pose.fumaca.c), pose.fumaca.u);
   return { cam, mao: P(maoP), pontas };
+}
+
+/* ---------- efeitos dos especiais no corpo ---------- */
+// cores de cada elemento: borda, meio, miolo
+function coresEspecial(tipo) {
+  if (tipo === 'fogo') return [PM.fogo1, PM.fogo3, PM.fogo5];
+  if (tipo === 'agua') return [PBO.aguaD, PBO.agua, PBO.aguaL];
+  if (tipo === 'veneno') return [PAT.venenoD, PAT.veneno, PAT.venenoL];
+  return [PM.fogo3, PM.fogo5, PM.fogo6];   // onça: dourado
+}
+function energiaEspecialPx(cam, c, r, tipo, t) {
+  const [borda, meio, miolo] = coresEspecial(tipo);
+  if (tipo === 'agua') {
+    // bolha: anel escuro, água por dentro, redemoinho girando e o brilho em cima
+    const b = new Camada(cam.W, cam.H);
+    b.disco(c.x, c.y, r + 0.6, meio);
+    b.disco(c.x + 0.3, c.y + 0.5, r * 0.6, PBO.aguaD);
+    for (let k = 0; k < 6; k++) { const a = t * 14 + k * 0.7, d = r * 0.25 + k * r * 0.1; b.set(c.x + Math.cos(a) * d, c.y + Math.sin(a) * d, PBO.aguaL); }
+    b.set(c.x - r * 0.5, c.y - r * 0.55, PM.branco); b.set(c.x - r * 0.5 + 1, c.y - r * 0.55, PM.branco);
+    cam.colar(b.contornar(PBO.aguaO));
+    return;
+  }
+  cam.disco(c.x, c.y, r + 1.2 + Math.sin(t * 40) * 0.4, borda);
+  cam.disco(c.x, c.y, r, meio);
+  cam.disco(c.x, c.y, Math.max(0.6, r * 0.5), miolo);
+  // faíscas sendo puxadas para a bola
+  for (let k = 0; k < 4; k++) {
+    const a = k * TAU / 4 + t * 9, d = r + 3 + (k % 2);
+    cam.set(c.x + Math.cos(a) * d, c.y + Math.sin(a) * d, k % 2 ? miolo : meio);
+  }
+}
+// golpe saindo: anel com raios (fraco = só as pontas, no quadro seguinte)
+function estouroPx(cam, c, tipo, fraco) {
+  const [borda, meio, miolo] = coresEspecial(tipo), r = fraco ? 7 : 4.5;
+  for (let k = 0; k < 8; k++) {
+    const a = k * TAU / 8 + (fraco ? TAU / 16 : 0), dx = Math.cos(a), dy = Math.sin(a);
+    for (let d = r; d < r + (fraco ? 1.5 : 3); d++) cam.set(c.x + dx * d, c.y + dy * d, d < r + 1 ? miolo : meio);
+  }
+  if (fraco) return;
+  const b = new Camada(cam.W, cam.H);
+  b.disco(c.x, c.y, 2.6, meio); b.disco(c.x, c.y, 1.4, miolo);
+  cam.colar(b.contornar(borda));
+}
+// fumaça subindo das mãos no fim do canhão
+function fumacaMaosPx(cam, c, u) {
+  if (u > 0.95) return;
+  for (let k = 0; k < 3; k++) {
+    const v = (u + k * 0.22) % 1, x = c.x + Math.sin(v * 6 + k) * 1.5 + k - 1, y = c.y - 2 - v * 9;
+    const r = 0.8 + v * 1.4;
+    cam.disco(x, y, r, v < 0.5 ? PM.fumacaL : PM.fumaca);
+  }
+}
+// frasco de veneno da Poção Maldita na mão (o mesmo do projétil, menor), com brilho verde piscando
+function frascoEspecialPx(cam, c, brilho) {
+  const x = Math.round(c.x - 2), y = Math.round(c.y - 7);
+  const b = new Camada(cam.W, cam.H);
+  b.carimbo(['.rr.', '.vv.', 'vGGv', 'GLGG', 'GGGG', '.GG.'], x, y, { r: PCU.rolha, v: PCU.vidro, G: PAT.veneno, L: PAT.venenoL });
+  cam.colar(b.contornar(PCU.vidroO));
+  if (brilho) { cam.set(x - 2, y + 1, PAT.venenoL); cam.set(x + 5, y + 3, PAT.venenoL); }
 }
 
 /* Busto de frente para os rostos: a mesma cabeça, sem corpo, numa camada pequena */

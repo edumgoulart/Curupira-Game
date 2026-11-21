@@ -7,3 +7,4 @@
 script = ExtResource("1_esp")
 nome = "Instinto Selvagem"
 cena_projetil = ExtResource("2_proj")
+animacao = "onca"

@@ -32,12 +32,16 @@ var _direcao: float = 1.0
 @onready var boca: Sprite2D = $Boca
 
 
-func configurar(dados: EspecialData, direcao: float) -> void:
+## angulo: mira em graus (0 = frente, -45 = diagonal para cima, -90 = cima).
+func configurar(dados: EspecialData, direcao: float, angulo: float = 0.0) -> void:
 	_pulsos = maxi(dados.pulsos, 1)
 	_dano_por_pulso = dados.dano / _pulsos
 	_intervalo = dados.duracao_disparo / _pulsos
 	# O feixe começa no Atirador e vai para o lado em que o Curupira olha.
 	_direcao = direcao
+	# Mirando para cima, o feixe inteiro gira em volta da mão (desenho e caixa de dano juntos),
+	# como o laser da Máquina. Para a esquerda o feixe cresce para -x, então o giro é ao contrário.
+	rotation = deg_to_rad(angulo * direcao)
 
 
 func _ready() -> void:

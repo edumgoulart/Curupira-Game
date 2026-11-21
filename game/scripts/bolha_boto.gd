@@ -17,7 +17,10 @@ func _ready() -> void:
 	add_to_group("ataques_chefe")
 	_x_inicial = global_position.x
 	acertou.connect(func(_alvo: Area2D) -> void: queue_free())
-	body_entered.connect(func(_corpo: Node2D) -> void: queue_free())
+	# Só some em chão e parede (o corpo do Curupira também está na mask; ver Hitbox.e_mundo).
+	body_entered.connect(func(corpo: Node2D) -> void:
+		if Hitbox.e_mundo(corpo):
+			queue_free())
 
 
 func _physics_process(delta: float) -> void:

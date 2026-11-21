@@ -21,7 +21,10 @@ func _ready() -> void:
 	super._ready()
 	add_to_group("ataques_chefe")
 	acertou.connect(func(_alvo: Area2D) -> void: queue_free())
-	body_entered.connect(func(_corpo: Node2D) -> void: queue_free())
+	# Só some em chão e parede (o corpo do Curupira também está na mask; ver Hitbox.e_mundo).
+	body_entered.connect(func(corpo: Node2D) -> void:
+		if Hitbox.e_mundo(corpo):
+			queue_free())
 	var aviso_tela := get_node_or_null("VisibleOnScreenNotifier2D") as VisibleOnScreenNotifier2D
 	if aviso_tela:
 		aviso_tela.screen_exited.connect(queue_free)

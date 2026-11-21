@@ -24,7 +24,10 @@ func _ready() -> void:
 	if velocidade.x > 0.0:
 		fogo.scale.x = -absf(fogo.scale.x)
 	acertou.connect(func(_alvo: Area2D) -> void: _estourar())
-	body_entered.connect(func(_corpo: Node2D) -> void: _estourar())
+	# Só estoura em chão e parede; no Curupira, quem estoura é o acerto na hurtbox.
+	body_entered.connect(func(corpo: Node2D) -> void:
+		if Hitbox.e_mundo(corpo):
+			_estourar())
 
 
 func _physics_process(delta: float) -> void:
